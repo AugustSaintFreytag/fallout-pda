@@ -1,0 +1,18 @@
+begin function { array_var aEvent }
+
+	; Takes a stringmap with fields "id", "date", "name".
+	; Returns the event encoded as a "@@@"-delimited string.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; Main
+
+	array_var aComponents = Ar_List aEvent["id"], aEvent["date"], aEvent["name"]
+	string_var sEncodedEvent = Sv_Join aComponents "@@@"
+
+	SetFunctionValue sEncodedEvent
+
+	; Clean-Up
+
+	let aComponents := Ar_Null
+
+end

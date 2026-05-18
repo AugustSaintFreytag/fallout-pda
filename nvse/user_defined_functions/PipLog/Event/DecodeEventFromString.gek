@@ -1,0 +1,32 @@
+begin function { string_var sData }
+
+	; Splits a "@@@"-delimited string and reconstructs an event stringmap.
+	; Returns a stringmap with fields "id", "date", "name".
+	; Returns Ar_Null if the encoded string is malformed (wrong field count).
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; Main
+
+	array_var aComponents = Sv_Split sData "@@@"
+
+	if eval Ar_Size aComponents != 3
+		PrintC "Could not decode event from string '%z', invalid format." sData
+
+		SetFunctionValue Ar_Null
+		let aComponents := Ar_Null
+		return
+	endif
+
+	array_var aEvent = Ar_Construct "stringmap"
+
+	let aEvent["id"] = aComponents[0]
+	let aEvent["date"] = aComponents[1]
+	let aEvent["name"] = aComponents[2]
+
+	SetFunctionValue aEvent
+
+	; Clean-Up
+
+	let aComponents := Ar_Null
+
+end

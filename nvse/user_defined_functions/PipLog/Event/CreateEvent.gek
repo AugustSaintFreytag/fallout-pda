@@ -1,0 +1,17 @@
+begin function { string_var sDate, string_var sName }
+
+	; UDFs
+
+	ref GetRandomId = CompileScript "PipLog\Utils\GetRandomId.gek"
+
+	; Main
+
+	array_var aEvent = Ar_Construct "stringmap"
+
+	let aEvent["id"] := (Call GetRandomId)
+	let aEvent["date"] := sDate
+	let aEvent["name"] := sName
+
+	SetFunctionValue aEvent
+
+end

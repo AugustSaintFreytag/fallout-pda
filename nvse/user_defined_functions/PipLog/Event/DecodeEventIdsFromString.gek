@@ -1,0 +1,20 @@
+begin function { string_var sIdList }
+
+	; Splits a comma-separated event ID list string into a positional array of strings.
+	; Returns an empty array if sIdList is empty.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; Main
+
+	array_var aIds = Ar_Construct "array"
+
+	if sIdList == ""
+		SetFunctionValue aIds
+		return
+	endif
+
+	let aIds := Sv_Split sIdList ","
+
+	SetFunctionValue aIds
+
+end

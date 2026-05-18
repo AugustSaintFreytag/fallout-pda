@@ -1,0 +1,35 @@
+begin function { string_var sIdList, string_var sId }
+
+	; Appends sId to the comma-separated event ID list string.
+	; Returns the list unchanged if sId is already present.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; UDFs
+
+	ref DecodeEventIdsFromStringUDF = CompileScript "PipLog\Event\DecodeEventIdsFromString.gek"
+
+	; Main
+
+	array_var aIds = Ar_Construct "array"
+
+	if sIdList != ""
+		let aIds := (Call DecodeEventIdsFromStringUDF sIdList)
+	endif
+
+	if (Ar_Find sId, aIds) != Ar_BadNumericIndex
+		SetFunctionValue sIdList
+		let aIds := Ar_Null
+		return
+	endif
+
+	Ar_Append aIds, sId
+
+	string_var sNewIdList = Sv_Join aIds ","
+
+	SetFunctionValue sNewIdList
+
+	; Clean-Up
+
+	let aIds := Ar_Null
+
+end

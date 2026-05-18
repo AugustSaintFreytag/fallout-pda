@@ -1,0 +1,68 @@
+begin function { array_var aEvent, short bIsPlayerEvent }
+
+	; Encodes aEvent and registers it in the appropriate event storage maps.
+	; Pass bIsPlayerEvent = 1 for player-created events, 0 for global/mod events.
+	; Adds to the by-id registry and appends the event id to the by-date index.
+	; Global event maps use transient keys (*) and are rebuilt each game load.
+
+	; UDFs
+
+	ref EncodeEventToStringUDF = CompileScript "PipLog\Event\EncodeEventToString.gek"
+	ref AppendEventIdToListUDF = CompileScript "PipLog\Event\AppendEventIdToList.gek"
+
+	; State
+
+	string_var sKeyById = "*PLC_aGlobalEventsById"
+	string_var sKeyByDate = "*PLC_aGlobalEventsByDate"
+
+	if bIsPlayerEvent
+		let sKeyById := "PLC_aPlayerEventsById"
+		let sKeyByDate := "PLC_aPlayerEventsByDate"
+	endif
+
+	; Main
+
+	string_var sEventId = aEvent["id"]
+	string_var sEventDate = aEvent["date"]
+	string_var sEncodedEvent = (Call EncodeEventToStringUDF aEvent)
+
+	; Update the by-id registry
+
+	array_var aStoredEventsById = Player.AuxStringMapArrayGetAsArray ($sKeyById)
+
+	if Ar_Size aStoredEventsById == -1
+		let aStoredEventsById := Ar_Construct "stringmap"
+	endif
+
+	let aStoredEventsById[sEventId] = sEncodedEvent
+
+	Player.AuxStringMapArraySetFromArray ($sKeyById) aStoredEventsById
+
+	; Update the by-date index
+
+	array_var aStoredEventIdsByDate = Player.AuxStringMapArrayGetAsArray ($sKeyByDate)
+
+	if Ar_Size aStoredEventIdsByDate == -1
+		let aStoredEventIdsByDate := Ar_Construct "stringmap"
+	endif
+
+	string_var sCurrentIds = ""
+
+	if Ar_HasKey aStoredEventIdsByDate, sEventDate
+		let sCurrentIds := aStoredEventIdsByDate[sEventDate]
+	endif
+
+	string_var sUpdatedIds = (Call AppendEventIdToListUDF sCurrentIds sEventId)
+
+	let aStoredEventIdsByDate[sEventDate] = sUpdatedIds
+
+	Player.AuxStringMapArraySetFromArray ($sKeyByDate) aStoredEventIdsByDate
+
+	; Clean-Up
+
+	Sv_Destruct sKeyById, sKeyByDate, sEventId, sEventDate, sEncodedEvent, sCurrentIds, sUpdatedIds
+	
+	let aStoredEventsById := Ar_Null
+	let aStoredEventIdsByDate := Ar_Null
+
+end
