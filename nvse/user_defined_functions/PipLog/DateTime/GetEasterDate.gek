@@ -1,0 +1,93 @@
+begin function { short iYear }
+
+	; Returns the date of Easter Sunday for the given year as a stringmap,
+	; or Ar_Null if Easter is disabled in the INI (Events:bEaster = 0).
+	;
+	; Easter falls on the first Sunday after the first full moon on or after
+	; the Vernal Equinox. Moon phase is estimated from the current NVSE moon
+	; phase value extrapolated forward to the equinox at one phase step per 3 days.
+	;
+	; Return format: stringmap { "day": short, "month": short (0-indexed), "name": "Easter" }
+
+	; UDFs
+
+	ref GetAstronomicalDateUDF = CompileScript "PipLog\DateTime\GetAstronomicalDate.gek"
+	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
+	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
+	ref GetDayOfWeekAltUDF = CompileScript "PipLog\DateTime\GetDayOfWeekAlt.gek"
+
+	; Config
+
+	if GetINIFloat_Cached "Events:bEaster" "Config\PipLog\PipLog.ini" == 0
+		SetFunctionValue Ar_Null
+		return
+	endif
+
+	; Compute Vernal Equinox for current year
+
+	array_var aVernalEquinox = (Call GetAstronomicalDateUDF iYear 1)
+	if eval !aVernalEquinox || (Ar_Size aVernalEquinox) < 3
+		SetFunctionValue Ar_Null
+		return
+	endif
+
+	; Estimate the moon phase at the equinox by projecting forward from today
+	short iDaysToVernal = (Call GetDaysBetweenUDF GameDay GameMonth GameYear aVernalEquinox[1] aVernalEquinox[0] aVernalEquinox[2] 0)
+	short iVernalMoonPhase = (GetMoonPhase + (iDaysToVernal / 3)) % 8
+	
+	if iVernalMoonPhase < 0
+		let iVernalMoonPhase += 8
+	endif
+
+	; Days until the next full moon on or after the equinox (phase 0 = full moon in NVSE)
+	short iDaysToFullMoon = 0
+	
+	if iVernalMoonPhase != 0
+		let iDaysToFullMoon := (8 - iVernalMoonPhase) * 3
+	endif
+
+	short iFullMoonDay = aVernalEquinox[1] + iDaysToFullMoon
+	short iFullMoonMonth = aVernalEquinox[0]
+	short iFullMoonYear = aVernalEquinox[2]
+
+	while iFullMoonDay > (Call GetDaysInMonthUDF iFullMoonYear iFullMoonMonth)
+		let iFullMoonDay -= (Call GetDaysInMonthUDF iFullMoonYear iFullMoonMonth)
+		let iFullMoonMonth += 1
+		
+		if iFullMoonMonth > 11
+			let iFullMoonMonth := 0
+			let iFullMoonYear += 1
+		endif
+	loop
+
+	; Advance to the next Sunday after the full moon
+	; If the full moon itself is a Sunday, Easter is the following Sunday
+	short iFullMoonWeekday = (Call GetDayOfWeekAltUDF iFullMoonDay iFullMoonMonth iFullMoonYear)
+	short iDaysToSunday = (7 - iFullMoonWeekday) % 7
+	
+	if iDaysToSunday == 0
+		let iDaysToSunday := 7
+	endif
+
+	short iEasterDay = iFullMoonDay + iDaysToSunday
+	short iEasterMonth = iFullMoonMonth
+	short iEasterYear = iFullMoonYear
+
+	while iEasterDay > (Call GetDaysInMonthUDF iEasterYear iEasterMonth)
+		let iEasterDay -= (Call GetDaysInMonthUDF iEasterYear iEasterMonth)
+		let iEasterMonth += 1
+		
+		if iEasterMonth > 11
+			let iEasterMonth := 0
+			let iEasterYear += 1
+		endif
+	loop
+
+	array_var aEasterDate = Ar_Map "day"::iEasterDay, "month"::iEasterMonth, "name"::"Easter"
+	SetFunctionValue aEasterDate
+
+	; Clean-Up
+
+	let aVernalEquinox := Ar_Null
+
+end

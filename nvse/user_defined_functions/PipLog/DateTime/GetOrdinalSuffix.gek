@@ -1,0 +1,21 @@
+begin function { short iDay }
+
+	; Returns the English ordinal suffix for iDay: "st", "nd", "rd", or "th".
+	; Correctly handles the irregular cases 11th, 12th, 13th.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; Main
+
+	string_var sSuffix = "th"
+
+	if eval iDay % 10 == 1 && iDay != 11
+		let sSuffix := "st"
+	elseif eval iDay % 10 == 2 && iDay != 12
+		let sSuffix := "nd"
+	elseif eval iDay % 10 == 3 && iDay != 13
+		let sSuffix := "rd"
+	endif
+
+	SetFunctionValue sSuffix
+
+end

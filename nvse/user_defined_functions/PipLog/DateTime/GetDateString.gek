@@ -1,0 +1,19 @@
+begin function { short iYear, short iMonth, short iDay }
+
+	string_var sYear = $iYear
+	string_var sMonth = $(iMonth + 1)
+	string_var iDay = $iDay
+
+	if Sv_Length sMonth < 2
+		let sMonth := Sv_Construct "0%z" sMonth
+	endif
+
+	if Sv_Length sDay < 2
+		let sDay := Sv_Construct "0%z" sDay
+	endif
+
+	; Format: YYYY-MM-DD
+	string_var sResult = Sv_Construct "%z-%z-%z" sYear sMonth sDay
+	SetFunctionValue sResult
+
+end

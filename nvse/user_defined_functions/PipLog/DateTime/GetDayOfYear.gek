@@ -1,0 +1,30 @@
+begin function {}
+
+	; Returns the current in-game day of the year (1 = January 1st).
+	; Walks forward from the start of the year to GameDay/GameMonth.
+
+	; UDFs
+
+	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
+
+	; State
+
+	short iDay = 1
+	short iMonth = 0
+	short iDayOfYear = 1
+
+	; Main
+
+	while eval iDay != GameDay || iMonth != GameMonth
+		let iDay += 1
+		let iDayOfYear += 1
+
+		if iDay > (Call GetDaysInMonthUDF GameYear iMonth)
+			let iDay := 1
+			let iMonth += 1
+		endif
+	loop
+
+	SetFunctionValue iDayOfYear
+
+end

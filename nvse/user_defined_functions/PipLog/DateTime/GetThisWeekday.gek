@@ -1,0 +1,13 @@
+begin function { short iDays }
+
+	; Advances the in-game clock forward by iDays full days.
+	; Used to seek to a target weekday by iterating one day at a time.
+	; Does nothing if iDays is zero or negative.
+
+	; Main
+
+	if iDays > 0
+		let Gamehour += (23.99999 * iDays)
+	endif
+
+end

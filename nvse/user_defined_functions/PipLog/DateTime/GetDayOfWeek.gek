@@ -1,0 +1,37 @@
+begin function { short iDay, short iMonth, short iYear }
+
+	; Returns the day of the week for the given date as a 0-indexed integer.
+	; 0 = Sunday, 1 = Monday, ..., 6 = Saturday.
+	;
+	; Uses a modified Zeller's Congruence tuned to match the game world.
+	; New Vegas begins on Monday, 19 October 2281 — in reality that date was a Wednesday.
+	; This function produces game-consistent weekdays, not astronomically correct ones.
+	;
+	; iMonth is 0-indexed, matching Fallout's GameMonth.
+
+	; Main — adjust month and year for the Zeller algorithm
+
+	if iMonth < 2
+		; January and February are treated as months 12 and 13 of the prior year
+		let iMonth += 12
+		let iYear -= 1
+	endif
+
+	if eval iMonth == 2 && (iYear % 4 == 0) && ((iYear % 100 != 0) || (iYear % 400 == 0))
+		let iYear -= 1
+	endif
+
+	short iCentury = iYear / 100
+	short iYearOfCentury = iYear % 100
+
+	short iWeekday = (iDay + ((13 * (iMonth + 1)) / 5) + iYearOfCentury + (iYearOfCentury / 4) + (iCentury / 4) - (2 * iCentury)) % 7
+
+	; Shift to 0-indexed (Zeller outputs 0 = Saturday; adjust to 0 = Sunday)
+	let iWeekday -= 1
+	if iWeekday < 0
+		let iWeekday += 7
+	endif
+
+	SetFunctionValue iWeekday
+
+end

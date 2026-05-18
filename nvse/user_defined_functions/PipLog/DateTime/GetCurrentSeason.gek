@@ -1,0 +1,49 @@
+begin function { short iDay, short iMonth, short iYear }
+
+	; Returns the current season as a 0-indexed integer.
+	; 0 = Spring, 1 = Summer, 2 = Autumn, 3 = Winter.
+	;
+	; Compares the given date against the four astronomical boundary dates stored
+	; as positional arrays in aux vars by PLC_TickSync. Each array is [month, day, year]
+	; with a 0-indexed month.
+	;
+	; A boundary is "in the past" when GetDaysBetween (signed) returns >= 0.
+	; Season is determined by which pair of boundaries straddles the given date.
+
+	; UDFs
+
+	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
+	ref GetSeasonBoundaryUDF = CompileScript "PipLog\DateTime\GetSeasonBoundary.gek"
+
+	; State
+
+	array_var aVernalEquinox = (Call GetSeasonBoundaryUDF iYear 1)
+	array_var aSummerSolstice = (Call GetSeasonBoundaryUDF iYear 2)
+	array_var aAutumnalEquinox = (Call GetSeasonBoundaryUDF iYear 3)
+	array_var aWinterSolstice = (Call GetSeasonBoundaryUDF iYear 4)
+
+	; Main
+
+	short iDaysSinceSpring = (Call GetDaysBetweenUDF iDay iMonth iYear aVernalEquinox[1] aVernalEquinox[0] aVernalEquinox[2] 1)
+	short iDaysSinceSummer = (Call GetDaysBetweenUDF iDay iMonth iYear aSummerSolstice[1] aSummerSolstice[0] aSummerSolstice[2] 1)
+	short iDaysSinceAutumn = (Call GetDaysBetweenUDF iDay iMonth iYear aAutumnalEquinox[1] aAutumnalEquinox[0] aAutumnalEquinox[2] 1)
+	short iDaysSinceWinter = (Call GetDaysBetweenUDF iDay iMonth iYear aWinterSolstice[1] aWinterSolstice[0] aWinterSolstice[2] 1)
+
+	if eval iDaysSinceSpring >= 0 && iDaysSinceSummer < 0
+		SetFunctionValue 0 ; Spring
+	elseif eval iDaysSinceSummer >= 0 && iDaysSinceAutumn < 0
+		SetFunctionValue 1 ; Summer
+	elseif eval iDaysSinceAutumn >= 0 && iDaysSinceWinter < 0
+		SetFunctionValue 2 ; Autumn
+	else
+		SetFunctionValue 3 ; Winter
+	endif
+
+	; Clean-Up
+
+	let aVernalEquinox := Ar_Null
+	let aSummerSolstice := Ar_Null
+	let aAutumnalEquinox := Ar_Null
+	let aWinterSolstice := Ar_Null
+
+end

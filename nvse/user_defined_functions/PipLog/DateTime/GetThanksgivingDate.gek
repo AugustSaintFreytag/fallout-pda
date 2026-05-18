@@ -1,0 +1,40 @@
+begin function { short iYear }
+
+	; Returns the date of Thanksgiving for the given year as a stringmap,
+	; or Ar_Null if Thanksgiving is disabled in the INI (Events:bThanksgiving = 0).
+	;
+	; Thanksgiving falls on the fourth Thursday of November (month index 10, 0-indexed).
+	;
+	; Return format: stringmap { "day": short, "month": short (0-indexed), "name": "Thanksgiving" }
+
+	; UDFs
+
+	ref GetDayOfWeekAltUDF = CompileScript "PipLog\DateTime\GetDayOfWeekAlt.gek"
+
+	; Config
+
+	if GetINIFloat_Cached "Events:bThanksgiving" "Config\SD_Calendar\SD_Calendar.ini" == 0
+		SetFunctionValue Ar_Null
+		return
+	endif
+
+	; Main — find the weekday of November 1st to locate the first Thursday
+
+	short iNovemberFirstWeekday = (Call GetDayOfWeekAltUDF 1 10 iYear)
+
+	; Thursday = weekday 4
+	short iFirstThursday
+	if iNovemberFirstWeekday == 4
+		let iFirstThursday := 1
+	elseif iNovemberFirstWeekday < 4
+		let iFirstThursday := (4 - iNovemberFirstWeekday) + 1
+	else
+		let iFirstThursday := (11 - iNovemberFirstWeekday) + 1
+	endif
+
+	; Fourth Thursday is always 21 days after the first
+	short iThanksgivingDay = iFirstThursday + 21
+
+	SetFunctionValue (Ar_Map "day"::iThanksgivingDay, "month"::10, "name"::"Thanksgiving")
+
+end

@@ -1,0 +1,26 @@
+begin function { short iMonth, short bAbbreviated }
+
+	; Returns the English name for iMonth (0-indexed: 0 = January, 11 = December).
+	; If bAbbreviated is 1, returns a 3-character uppercase abbreviation (e.g. "JAN").
+	; Caller is responsible for Sv_Destruct on the returned string.
+	;
+	; Note: the original plugin used custom GMST records (sMonthJanuary etc.) for
+	; localisation. Without the ESP, names are hardcoded to English here.
+
+	; Main
+
+	array_var aMonthNames = Ar_List "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+	string_var sMonthName = aMonthNames[iMonth]
+
+	if bAbbreviated
+		Sv_Erase sMonthName, 3
+		Sv_ToUpper sMonthName
+	endif
+
+	SetFunctionValue sMonthName
+
+	; Clean-Up
+
+	let aMonthNames := Ar_Null
+
+end

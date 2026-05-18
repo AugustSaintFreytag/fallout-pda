@@ -1,0 +1,88 @@
+begin function { short iYear, short iPhase }
+
+	; Returns the calendar date of the requested astronomical event for the given year.
+	; iPhase: 1 = Vernal Equinox, 2 = Summer Solstice, 3 = Autumnal Equinox, 4 = Winter Solstice.
+	; Returns a positional array [month, day, year] where month is 0-indexed.
+	; Returns nothing (caller gets 0) on invalid input.
+	;
+	; Uses Meeus-style Julian Day number approximations. Hand-tuned day offsets are
+	; applied for Vernal, Summer, and Autumnal results to compensate for systematic
+	; undershoot in the formula — Winter is accurate as-is.
+
+	; Main
+
+	if eval iPhase < 1 || iPhase > 4 || iYear < 1
+		;PrintC "PLC_GetAstronomicalDate: invalid input — phase %g, year %g." iPhase iYear
+		return
+	endif
+
+	; Centuries since J2000 epoch — required by all four Meeus formulas
+	float fCenturiesSinceMillenium = (iYear - 2000) / 100.0
+
+	float fJulianDay = 0
+
+	if iPhase == 1
+		; Vernal Equinox — ~March 20
+		let fJulianDay := 2451623.80984 + 365242.37404 * fCenturiesSinceMillenium + 0.05169 * fCenturiesSinceMillenium^2 - 0.00411 * fCenturiesSinceMillenium^3 - 0.00057 * fCenturiesSinceMillenium^4
+	elseif iPhase == 2
+		; Summer Solstice — ~June 20
+		let fJulianDay := 2451716.56767 + 365241.62603 * fCenturiesSinceMillenium + 0.00350 * fCenturiesSinceMillenium^2 + 0.00950 * fCenturiesSinceMillenium^3 - 0.00035 * fCenturiesSinceMillenium^4
+	elseif iPhase == 3
+		; Autumnal Equinox — ~September 22
+		let fJulianDay := 2451810.21715 + 365242.01767 * fCenturiesSinceMillenium - 0.11575 * fCenturiesSinceMillenium^2 + 0.00337 * fCenturiesSinceMillenium^3 + 0.00078 * fCenturiesSinceMillenium^4
+	elseif iPhase == 4
+		; Winter Solstice — ~December 21
+		let fJulianDay := 2451900.05952 + 365242.74049 * fCenturiesSinceMillenium - 0.06223 * fCenturiesSinceMillenium^2 - 0.00823 * fCenturiesSinceMillenium^3 + 0.00032 * fCenturiesSinceMillenium^4
+	endif
+
+	; Julian Day Number → Gregorian conversion (Meeus, Chapter 7)
+	short iJulianDayNumber = Floor(fJulianDay + 0.5)
+	float fFractionalDay = (fJulianDay + 0.5) - iJulianDayNumber
+
+	short iAdjustedJulianDay
+	if iJulianDayNumber < 2299161
+		let iAdjustedJulianDay := iJulianDayNumber
+	else
+		short iAlpha = Floor((iJulianDayNumber - 1867216.25) / 36524.25)
+		let iAdjustedJulianDay := iJulianDayNumber + 1 + iAlpha - Floor(iAlpha / 4)
+	endif
+
+	short iB = iAdjustedJulianDay + 1524
+	short iC = Floor((iB - 122.1) / 365.25)
+	short iD = Floor(365.25 * iC)
+	short iE = Floor((iB - iD) / 30.6001)
+
+	short iDay = iB - iD - Floor(30.6001 * iE) + fFractionalDay
+	short iMonth
+
+	if iE < 14
+		let iMonth := iE - 1
+	else
+		let iMonth := iE - 13
+	endif
+
+	let iMonth -= 1 ; Convert to 0-indexed for Fallout
+
+	if iMonth < 0
+		let iMonth += 12
+		let iYear -= 1
+	endif
+
+	; Hand-tuned corrections for formula undershoot (Winter needs none)
+	if iMonth == 2		; March — Vernal
+		let iDay += 1
+	elseif iMonth == 5	; June — Summer
+		let iDay += 2
+	elseif iMonth == 8	; September — Autumnal
+		let iDay += 2
+	endif
+
+	array_var aDate = Ar_Construct "array"
+	
+	Ar_Append aDate, iMonth
+	Ar_Append aDate, iDay
+	Ar_Append aDate, iYear
+
+	SetFunctionValue aDate
+
+end

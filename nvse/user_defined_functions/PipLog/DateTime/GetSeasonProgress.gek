@@ -1,0 +1,63 @@
+begin function { short iDay, short iMonth, short iYear }
+
+	; Returns how far through the current season the given date is, as a float from
+	; 0.0 (season start) to 1.0 (season end).
+	;
+	; Reads the current season index and all four boundary arrays from aux vars
+	; written by PLC_TickSync. Each boundary is a positional array [month, day, year]
+	; with a 0-indexed month.
+	;
+	; For Winter, the season-end boundary (Vernal Equinox) is advanced by one year
+	; using a local copy so the persisted array is never mutated.
+
+	; UDFs
+
+	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
+
+	; State
+
+	short iCurrentSeason = Player.AuxiliaryVariableGetFloat "PLC_iCurrentSeason"
+	array_var aVernalEquinox = Player.AuxiliaryVariableGetAsArray "PLC_aVernalEquinox"
+	array_var aSummerSolstice = Player.AuxiliaryVariableGetAsArray "PLC_aSummerSolstice"
+	array_var aAutumnalEquinox = Player.AuxiliaryVariableGetAsArray "PLC_aAutumnalEquinox"
+	array_var aWinterSolstice = Player.AuxiliaryVariableGetAsArray "PLC_aWinterSolstice"
+
+	; Main — resolve season start and end boundaries
+
+	array_var aSeasonStart
+	array_var aSeasonEnd
+
+	if iCurrentSeason == 0
+		let aSeasonStart := aVernalEquinox
+		let aSeasonEnd := aSummerSolstice
+	elseif iCurrentSeason == 1
+		let aSeasonStart := aSummerSolstice
+		let aSeasonEnd := aAutumnalEquinox
+	elseif iCurrentSeason == 2
+		let aSeasonStart := aAutumnalEquinox
+		let aSeasonEnd := aWinterSolstice
+	else
+		; Winter: start at Winter Solstice, end at next year's Vernal Equinox
+		let aSeasonStart := aWinterSolstice
+		let aSeasonEnd := Ar_Copy aVernalEquinox
+		let aSeasonEnd[2] += 1
+	endif
+
+	short iDaysIntoSeason = (Call GetDaysBetweenUDF iDay iMonth iYear aSeasonStart[1] aSeasonStart[0] aSeasonStart[2] 1)
+	short iTotalSeasonDays = (Call GetDaysBetweenUDF aSeasonEnd[1] aSeasonEnd[0] aSeasonEnd[2] aSeasonStart[1] aSeasonStart[0] aSeasonStart[2] 1)
+
+	float fSeasonProgress = iDaysIntoSeason * 1.0 / iTotalSeasonDays
+
+	SetFunctionValue fSeasonProgress
+
+	; Clean-Up
+
+	let aVernalEquinox := Ar_Null
+	let aSummerSolstice := Ar_Null
+	let aAutumnalEquinox := Ar_Null
+	let aWinterSolstice := Ar_Null
+	if iCurrentSeason == 3
+		let aSeasonEnd := Ar_Null
+	endif
+
+end

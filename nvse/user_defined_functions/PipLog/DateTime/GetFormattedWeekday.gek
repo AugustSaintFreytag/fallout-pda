@@ -1,0 +1,20 @@
+begin function { short iWeekday }
+
+	; Returns the English day name for iWeekday (0-indexed: 0 = Sunday, 6 = Saturday).
+	; Caller is responsible for Sv_Destruct on the returned string.
+	;
+	; Note: the original plugin used custom GMST records (sDaySunday etc.) for
+	; localisation. Without the ESP, names are hardcoded to English here.
+
+	; Main
+
+	array_var aDayNames = Ar_List "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+	string_var sDayName = aDayNames[iWeekday]
+
+	SetFunctionValue sDayName
+
+	; Clean-Up
+
+	let aDayNames := Ar_Null
+
+end

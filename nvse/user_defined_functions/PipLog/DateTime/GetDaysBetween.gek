@@ -1,0 +1,75 @@
+begin function { short iRecentDay, short iRecentMonth, short iRecentYear, short iPastDay, short iPastMonth, short iPastYear, short iSigned }
+
+	; Returns the number of days between two dates.
+	;
+	; iSigned == 0: result is always non-negative regardless of date order.
+	; iSigned == 1: result is signed — positive if the recent date is after the past date,
+	;               negative if it is before, zero if identical.
+	;
+	; iMonth parameters are 0-indexed, matching Fallout's GameMonth.
+
+	; UDFs
+
+	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
+	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
+
+	; Main
+
+	if iSigned
+		; If the "recent" date is actually earlier, recurse with dates swapped and negate
+		if eval iRecentYear < iPastYear || (iRecentYear == iPastYear && iRecentMonth < iPastMonth) || (iRecentYear == iPastYear && iRecentMonth == iPastMonth && iRecentDay < iPastDay)
+			SetFunctionValue (-(Call GetDaysBetweenUDF iPastDay iPastMonth iPastYear iRecentDay iRecentMonth iRecentYear 1))
+			return
+		endif
+	else
+		; For unsigned, swap so that "recent" is always the later date
+		if eval iPastYear > iRecentYear || (iPastYear == iRecentYear && iPastMonth > iRecentMonth) || (iPastYear == iRecentYear && iPastMonth == iRecentMonth && iPastDay > iRecentDay)
+			short iSwapDay = iRecentDay
+			short iSwapMonth = iRecentMonth
+			short iSwapYear = iRecentYear
+
+			let iRecentDay := iPastDay
+			let iRecentMonth := iPastMonth
+			let iRecentYear := iPastYear
+			let iPastDay := iSwapDay
+			let iPastMonth := iSwapMonth
+			let iPastYear := iSwapYear
+		endif
+	endif
+
+	short iDaySum = 0
+
+	; Accumulate full years from recent back toward past
+	short iYearDifference = iRecentYear - iPastYear
+	
+	while iYearDifference > 0
+		if eval (iRecentYear % 4 == 0) && ((iRecentYear % 100 != 0) || (iRecentYear % 400 == 0))
+			let iDaySum += 366
+		else
+			let iDaySum += 365
+		endif
+		let iRecentYear -= 1
+		let iYearDifference -= 1
+	loop
+
+	; Accumulate full months between the two dates within the remaining year span
+	short iMonthDifference = iRecentMonth - iPastMonth
+
+	while iMonthDifference > 0
+		let iRecentMonth -= 1
+		let iDaySum += (Call GetDaysInMonthUDF iRecentYear iRecentMonth)
+		let iMonthDifference -= 1
+	loop
+
+	while iMonthDifference < 0
+		let iDaySum += (Call GetDaysInMonthUDF iPastYear iPastMonth)
+		let iPastMonth += 1
+		let iMonthDifference += 1
+	loop
+
+	; Add the remaining day offset
+	let iDaySum += (iRecentDay - iPastDay)
+
+	SetFunctionValue iDaySum
+
+end

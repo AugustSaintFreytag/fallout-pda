@@ -1,0 +1,51 @@
+begin function { short iYear, short iPhase }
+
+	; Returns the astronomical boundary date for the given season phase as a positional array [month, day, year].
+	; Month is 0-indexed. Phases: 1 = Vernal Equinox, 2 = Summer Solstice, 3 = Autumnal Equinox, 4 = Winter Solstice.
+	;
+	; Reads from aux var cache when the cached year matches iYear.
+	; If iYear is the current game year, a freshly computed result is written back to cache.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref GetAstronomicalDateUDF = CompileScript "PipLog\DateTime\GetAstronomicalDate.gek"
+
+	; State
+
+	string_var sKey = "PLC_aVernalEquinox"
+
+	if iPhase == 2
+		let sKey := "PLC_aSummerSolstice"
+	elseif iPhase == 3
+		let sKey := "PLC_aAutumnalEquinox"
+	elseif iPhase == 4
+		let sKey := "PLC_aWinterSolstice"
+	endif
+
+	; Main
+
+	array_var aBoundary = Player.AuxiliaryVariableGetAsArray ($sKey)
+
+	if eval Ar_Size aBoundary != -1 && aBoundary[2] == iYear
+		SetFunctionValue aBoundary
+
+		; Clean-Up
+
+		Sv_Destruct sKey
+		return
+	endif
+
+	let aBoundary := (Call GetAstronomicalDateUDF iYear iPhase)
+
+	if iYear == GameYear
+		Player.AuxiliaryVariableSetFromArray ($sKey) aBoundary
+	endif
+
+	SetFunctionValue aBoundary
+
+	; Clean-Up
+
+	Sv_Destruct sKey
+
+end

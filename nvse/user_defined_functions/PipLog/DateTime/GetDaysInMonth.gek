@@ -1,0 +1,23 @@
+begin function { short iYear, short iMonth }
+
+	; Returns the number of days in the given month.
+	; iMonth is 0-indexed (0 = January, 11 = December), matching Fallout's GameMonth.
+	; Correctly handles leap years for February (iMonth == 1).
+
+	; Main
+
+	if iMonth == 1
+		; Leap year: divisible by 4, except century years not divisible by 400
+		if eval (iYear % 4 == 0) && ((iYear % 100 != 0) || (iYear % 400 == 0))
+			SetFunctionValue 29
+		else
+			SetFunctionValue 28
+		endif
+	elseif iMonth == 3 || iMonth == 5 || iMonth == 8 || iMonth == 10
+		; April, June, September, November — 30 days
+		SetFunctionValue 30
+	else
+		SetFunctionValue 31
+	endif
+
+end
