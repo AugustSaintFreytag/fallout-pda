@@ -1,0 +1,20 @@
+begin function { array_var aHolidays }
+
+	; Registers each holiday in aHolidays into global event storage.
+	; aHolidays should be a positional array of event stringmaps as returned by GetHolidays.
+
+	; UDFs
+
+	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
+
+	; Main
+
+	short iIndex = 0
+	short iCount = Ar_Size aHolidays
+
+	while iIndex < iCount
+		Call AddEventUDF aHolidays[iIndex] 0
+		let iIndex += 1
+	loop
+
+end

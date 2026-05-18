@@ -1,0 +1,43 @@
+begin function {}
+
+	; Reads holiday definitions from the holidays JSON config file.
+	; Returns a positional array of event stringmaps, each with "id", "date", and "name" fields.
+	; Returns an empty array if the JSON file could not be loaded.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
+
+	; Main
+
+	array_var aJSON = ReadFromJSON "data\config\PipLog\events\holidays.json" "" 0 0
+	array_var aHolidays = Ar_Construct "array"
+
+	if Ar_Size aJSON == -1
+		;PrintC "GetHolidays: failed to load data\config\PipLog\events\holidays.json"
+		SetFunctionValue aHolidays
+		return
+	endif
+
+	short iIndex = 0
+	short iCount = Ar_Size aJSON
+
+	while iIndex < iCount
+		array_var aEntry = aJSON[iIndex]
+		array_var aEvent = (Call CreateEventUDF aEntry["date"] aEntry["name"])
+
+		Ar_Append aHolidays, aEvent
+
+		let aEvent := Ar_Null
+		let aEntry := Ar_Null
+		let iIndex += 1
+	loop
+
+	SetFunctionValue aHolidays
+
+	; Clean-Up
+
+	let aJSON := Ar_Null
+
+end
