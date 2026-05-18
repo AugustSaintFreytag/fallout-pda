@@ -1,0 +1,84 @@
+begin function { string_var sEventId, short bIsPlayerEvent }
+
+	; Removes the event with the given id from both by-id and by-date registries.
+	; Does nothing if the event id is not found in storage.
+	; Pass bIsPlayerEvent = 1 for player events, 0 for global events.
+
+	; UDFs
+
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+	ref RemoveEventIdFromListUDF = CompileScript "PipLog\Event\RemoveEventIdFromList.gek"
+
+	; State
+
+	string_var sKeyById = "*PLC_aGlobalEventsById"
+	string_var sKeyByDate = "*PLC_aGlobalEventsByDate"
+
+	if bIsPlayerEvent
+		let sKeyById := "PLC_aPlayerEventsById"
+		let sKeyByDate := "PLC_aPlayerEventsByDate"
+	endif
+
+	; Main
+
+	array_var aStoredEventsById = Player.AuxStringMapArrayGetAsArray ($sKeyById)
+
+	if Ar_Size aStoredEventsById == -1
+		Sv_Destruct sKeyById, sKeyByDate
+		return
+	endif
+
+	if !(Ar_HasKey aStoredEventsById, sEventId)
+		Sv_Destruct sKeyById, sKeyByDate
+		let aStoredEventsById := Ar_Null
+		return
+	endif
+
+	; Decode the stored event to retrieve its date for the by-date index
+
+	string_var sEncodedEvent = aStoredEventsById[sEventId]
+	array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+	if Ar_Size aEvent == -1
+		Sv_Destruct sKeyById, sKeyByDate, sEncodedEvent
+		let aStoredEventsById := Ar_Null
+		return
+	endif
+
+	string_var sEventDate = aEvent["date"]
+
+	; Remove from the by-id registry
+
+	Ar_Erase aStoredEventsById, sEventId
+	Player.AuxStringMapArraySetFromArray ($sKeyById) aStoredEventsById
+
+	; Update the by-date index
+
+	array_var aStoredEventIdsByDate = Player.AuxStringMapArrayGetAsArray ($sKeyByDate)
+
+	if Ar_Size aStoredEventIdsByDate != -1
+		if Ar_HasKey aStoredEventIdsByDate, sEventDate
+			string_var sCurrentIds = aStoredEventIdsByDate[sEventDate]
+			string_var sUpdatedIds = (Call RemoveEventIdFromListUDF sCurrentIds sEventId)
+
+			if Sv_Length sUpdatedIds == 0
+				Ar_Erase aStoredEventIdsByDate, sEventDate
+			else
+				let aStoredEventIdsByDate[sEventDate] = sUpdatedIds
+			endif
+
+			Player.AuxStringMapArraySetFromArray ($sKeyByDate) aStoredEventIdsByDate
+
+			Sv_Destruct sCurrentIds, sUpdatedIds
+		endif
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sKeyById, sKeyByDate, sEncodedEvent, sEventDate
+	
+	let aStoredEventsById := Ar_Null
+	let aStoredEventIdsByDate := Ar_Null
+	let aEvent := Ar_Null
+
+end

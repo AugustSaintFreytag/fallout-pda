@@ -61,7 +61,7 @@ begin function { array_var aEvent, short bIsPlayerEvent }
 	; Clean-Up
 
 	Sv_Destruct sKeyById, sKeyByDate, sEventId, sEventDate, sEncodedEvent, sCurrentIds, sUpdatedIds
-	
+
 	let aStoredEventsById := Ar_Null
 	let aStoredEventIdsByDate := Ar_Null
 
