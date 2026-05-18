@@ -1,0 +1,22 @@
+begin function { string_var sDate }
+
+	; Splits a YYYY-MM-DD date string into its components.
+	; Returns a positional array: [0] = year, [1] = month (0-indexed), [2] = day.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; Main
+
+	array_var aParts = Sv_Split "-" sDate
+	array_var aResult = Ar_Construct "array"
+
+	Ar_Append aResult, #aParts[0]
+	Ar_Append aResult, (#aParts[1] - 1)
+	Ar_Append aResult, #aParts[2]
+
+	SetFunctionValue aResult
+
+	; Clean-Up
+
+	let aParts := Ar_Null
+
+end
