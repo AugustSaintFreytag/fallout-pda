@@ -16,17 +16,11 @@ begin function { short iDay, short iMonth, short iYear }
 
 	; Main
 
-	if Ar_Size aAllStats == -1
+	if eval (Ar_Size aAllStats == -1) || !(Ar_HasKey aAllStats, sDate)
 		SetFunctionValue aResult
 		Sv_Destruct sDate
 		let aAllStats := Ar_Null
-		return
-	endif
-
-	if !(Ar_HasKey aAllStats, sDate)
-		SetFunctionValue aResult
-		Sv_Destruct sDate
-		let aAllStats := Ar_Null
+		
 		return
 	endif
 
