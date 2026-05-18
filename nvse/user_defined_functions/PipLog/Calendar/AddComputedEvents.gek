@@ -1,0 +1,57 @@
+begin function { short iYear }
+
+	; Computes and registers algorithm-driven calendar events for the given year
+	; into the transient global event storage. Intended to be called on game load.
+	;
+	; Handles: Easter, Thanksgiving, and the player's birthday (if set).
+	; Date-variable events (Easter, Thanksgiving) use YYYY-MM-DD format.
+	; Birthday uses *-MM-DD to recur annually.
+	; All events are registered as global (bIsPlayerEvent = 0) and are transient.
+
+	; UDFs
+
+	ref GetEasterDateUDF = CompileScript "PipLog\Calendar\GetEasterDate.gek"
+	ref GetThanksgivingDateUDF = CompileScript "PipLog\Calendar\GetThanksgivingDate.gek"
+	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
+	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
+	ref GetRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetRecurringDateString.gek"
+
+	; Main — Easter
+
+	string_var sEasterDate = (Call GetEasterDateUDF iYear)
+
+	if sEasterDate != ""
+		array_var aEasterEvent = (Call CreateEventUDF sEasterDate "Easter")
+		Call AddEventUDF aEasterEvent 0
+		let aEasterEvent := Ar_Null
+	endif
+
+	Sv_Destruct sEasterDate
+
+	; Main — Thanksgiving
+
+	string_var sThanksgivingDate = (Call GetThanksgivingDateUDF iYear)
+
+	if sThanksgivingDate != ""
+		array_var aThanksgivingEvent = (Call CreateEventUDF sThanksgivingDate "Thanksgiving")
+		Call AddEventUDF aThanksgivingEvent 0
+		let aThanksgivingEvent := Ar_Null
+	endif
+
+	Sv_Destruct sThanksgivingDate
+
+	; Main — Birthday
+
+	short bBirthdaySet = Player.AuxiliaryVariableGetFloat "PLC_bBirthdaySet"
+
+	if bBirthdaySet
+		short iBirthdayMonth = Player.AuxiliaryVariableGetFloat "PLC_iBirthdayMonth"
+		short iBirthdayDay = Player.AuxiliaryVariableGetFloat "PLC_iBirthdayDay"
+		string_var sBirthdayDate = (Call GetRecurringDateStringUDF iBirthdayMonth iBirthdayDay)
+		array_var aBirthdayEvent = (Call CreateEventUDF sBirthdayDate "Birthday")
+		Call AddEventUDF aBirthdayEvent 0
+		Sv_Destruct sBirthdayDate
+		let aBirthdayEvent := Ar_Null
+	endif
+
+end

@@ -1,17 +1,20 @@
 begin function { short iYear }
 
-	; Returns the date of Easter Sunday for the given year as a stringmap,
-	; or Ar_Null if Easter is disabled in the INI (Events:bEaster = 0).
+	; Returns the date of Easter Sunday for the given year as a string,
+	; or "" if Easter is disabled in the INI (Events:bEaster = 0) or if the
+	; Vernal Equinox cannot be computed.
 	;
 	; Easter falls on the first Sunday after the first full moon on or after
 	; the Vernal Equinox. Moon phase is estimated from the current NVSE moon
 	; phase value extrapolated forward to the equinox at one phase step per 3 days.
 	;
-	; Return format: stringmap { "day": short, "month": short (0-indexed), "name": "Easter" }
+	; Return format: string "YYYY-MM-DD" (zero-padded, 1-indexed month)
+	; Caller is responsible for Sv_Destruct on the returned string.
 
 	; UDFs
 
 	ref GetAstronomicalDateUDF = CompileScript "PipLog\DateTime\GetAstronomicalDate.gek"
+	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
 	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
 	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
 	ref GetDayOfWeekAltUDF = CompileScript "PipLog\DateTime\GetDayOfWeekAlt.gek"
@@ -19,7 +22,7 @@ begin function { short iYear }
 	; Config
 
 	if GetINIFloat_Cached "Events:bEaster" "Config\PipLog\PipLog.ini" == 0
-		SetFunctionValue Ar_Null
+		SetFunctionValue ""
 		return
 	endif
 
@@ -27,7 +30,8 @@ begin function { short iYear }
 
 	array_var aVernalEquinox = (Call GetAstronomicalDateUDF iYear 1)
 	if eval !aVernalEquinox || (Ar_Size aVernalEquinox) < 3
-		SetFunctionValue Ar_Null
+		SetFunctionValue ""
+		let aVernalEquinox := Ar_Null
 		return
 	endif
 
@@ -83,8 +87,8 @@ begin function { short iYear }
 		endif
 	loop
 
-	array_var aEasterDate = Ar_Map "day"::iEasterDay, "month"::iEasterMonth, "name"::"Easter"
-	SetFunctionValue aEasterDate
+	string_var sEasterDate = (Call GetDateStringUDF iEasterYear iEasterMonth iEasterDay)
+	SetFunctionValue sEasterDate
 
 	; Clean-Up
 

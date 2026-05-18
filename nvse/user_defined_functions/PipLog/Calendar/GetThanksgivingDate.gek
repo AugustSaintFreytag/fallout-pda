@@ -1,20 +1,22 @@
 begin function { short iYear }
 
-	; Returns the date of Thanksgiving for the given year as a stringmap,
-	; or Ar_Null if Thanksgiving is disabled in the INI (Events:bThanksgiving = 0).
+	; Returns the date of Thanksgiving for the given year as a string,
+	; or "" if Thanksgiving is disabled in the INI (Events:bThanksgiving = 0).
 	;
 	; Thanksgiving falls on the fourth Thursday of November (month index 10, 0-indexed).
 	;
-	; Return format: stringmap { "day": short, "month": short (0-indexed), "name": "Thanksgiving" }
+	; Return format: string "YYYY-MM-DD" (zero-padded, 1-indexed month)
+	; Caller is responsible for Sv_Destruct on the returned string.
 
 	; UDFs
 
 	ref GetDayOfWeekAltUDF = CompileScript "PipLog\DateTime\GetDayOfWeekAlt.gek"
+	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
 
 	; Config
 
 	if GetINIFloat_Cached "Events:bThanksgiving" "Config\SD_Calendar\SD_Calendar.ini" == 0
-		SetFunctionValue Ar_Null
+		SetFunctionValue ""
 		return
 	endif
 
@@ -35,6 +37,6 @@ begin function { short iYear }
 	; Fourth Thursday is always 21 days after the first
 	short iThanksgivingDay = iFirstThursday + 21
 
-	SetFunctionValue (Ar_Map "day"::iThanksgivingDay, "month"::10, "name"::"Thanksgiving")
+	SetFunctionValue (Call GetDateStringUDF iYear 10 iThanksgivingDay)
 
 end

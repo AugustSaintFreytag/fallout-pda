@@ -1,0 +1,85 @@
+begin function { short iDay, short iMonth, short iYear }
+
+	; Returns a positional array of decoded event stringmaps for the given date.
+	; Checks both global (transient) and player (persistent) event storage.
+	; Date patterns checked: YYYY-MM-DD (year-specific), *-MM-DD (yearly recurring), *-*-DD (monthly recurring).
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+	ref GetRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetRecurringDateString.gek"
+	ref GetMonthlyDateStringUDF = CompileScript "PipLog\DateTime\GetMonthlyDateString.gek"
+	ref DecodeEventIdsFromStringUDF = CompileScript "PipLog\Event\DecodeEventIdsFromString.gek"
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+
+	ref CollectForPatternUDF = (begin function { string_var sPattern, array_var aById, array_var aByDate, array_var aAllEvents }
+
+		if Ar_Size aByDate == -1
+			return
+		endif
+
+		if !(Ar_HasKey aByDate, sPattern)
+			return
+		endif
+
+		if Ar_Size aById == -1
+			;PrintC "GetEventsForDay: by-id map is null but '%z' exists in by-date index." sPattern
+			return
+		endif
+
+		array_var aIds = (Call DecodeEventIdsFromStringUDF aByDate[sPattern])
+
+		ForEach (string_var sId) <- aIds
+			if Ar_HasKey aById, sId
+				array_var aEvent = (Call DecodeEventFromStringUDF aById[sId])
+
+				if Ar_Size aEvent != -1
+					Ar_Append aAllEvents, aEvent
+					let aEvent := Ar_Null
+				else
+					PrintC "Could not decode event '%z'." sId
+				endif
+			else
+				PrintC "Could not process event '%z' found in by-date index but missing from by-id registry." sId
+			endif
+		loop
+
+		let aIds := Ar_Null
+
+	end)
+
+	; State
+
+	string_var sDateSpecific = (Call GetDateStringUDF iYear iMonth iDay)
+	string_var sDateYearly = (Call GetRecurringDateStringUDF iMonth iDay)
+	string_var sDateMonthly = (Call GetMonthlyDateStringUDF iDay)
+
+	array_var aGlobalEventsById = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsById"
+	array_var aGlobalEventsByDate = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsByDate"
+	array_var aPlayerEventsById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
+	array_var aPlayerEventsByDate = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsByDate"
+
+	; Main
+
+	array_var aAllEvents = Ar_Construct "array"
+	array_var aPatterns = Ar_List sDateSpecific, sDateYearly, sDateMonthly
+
+	ForEach (string_var sPattern) <- aPatterns
+		Call CollectForPatternUDF sPattern aGlobalEventsById aGlobalEventsByDate aAllEvents
+		Call CollectForPatternUDF sPattern aPlayerEventsById aPlayerEventsByDate aAllEvents
+	loop
+
+	SetFunctionValue aAllEvents
+
+	; Clean-Up
+
+	Sv_Destruct sDateSpecific, sDateYearly, sDateMonthly
+
+	let aPatterns := Ar_Null
+	let aGlobalEventsById := Ar_Null
+	let aGlobalEventsByDate := Ar_Null
+	let aPlayerEventsById := Ar_Null
+	let aPlayerEventsByDate := Ar_Null
+
+end

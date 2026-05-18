@@ -2,7 +2,7 @@ begin function { short iYear, short iMonth, short iDay }
 
 	string_var sYear = $iYear
 	string_var sMonth = $(iMonth + 1)
-	string_var iDay = $iDay
+	string_var sDay = $iDay
 
 	if Sv_Length sMonth < 2
 		let sMonth := Sv_Construct "0%z" sMonth

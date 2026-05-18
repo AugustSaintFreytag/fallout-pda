@@ -1,0 +1,23 @@
+begin function { short iMonth, short iDay }
+
+	; Returns a yearly-recurring date pattern in *-MM-DD format.
+	; iMonth is 0-indexed (0 = January); output month is 1-indexed and zero-padded.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	string_var sMonth = $(iMonth + 1)
+	string_var sDay = $iDay
+
+	if Sv_Length sMonth < 2
+		let sMonth := Sv_Construct "0%z" sMonth
+	endif
+
+	if Sv_Length sDay < 2
+		let sDay := Sv_Construct "0%z" sDay
+	endif
+
+	string_var sResult = Sv_Construct "*-%z-%z" sMonth sDay
+	SetFunctionValue sResult
+
+	Sv_Destruct sMonth, sDay
+
+end
