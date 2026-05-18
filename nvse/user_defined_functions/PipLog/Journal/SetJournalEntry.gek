@@ -1,0 +1,35 @@
+begin function { array_var aJournalEntry, short iIndex }
+
+	; Encodes aJournalEntry and writes it to persistent storage at the given index.
+	; Pass iIndex == -1 to append; pass iIndex >= 0 to replace an existing entry.
+
+	; UDFs
+
+	ref EncodeJournalEntryToStringUDF = CompileScript "PipLog\Journal\EncodeJournalEntryToString.gek"
+
+	; State
+
+	array_var aEncodedEntries = Player.AuxiliaryVariableGetAsArray "PLC_aPlayerJournal"
+
+	if Ar_Size aEncodedEntries == -1
+		let aEncodedEntries := Ar_Construct "array"
+	endif
+
+	; Main
+
+	string_var sEncodedEntry = (Call EncodeJournalEntryToStringUDF aJournalEntry)
+
+	if iIndex == -1
+		Ar_Append aEncodedEntries, sEncodedEntry
+	else
+		let aEncodedEntries[iIndex] = sEncodedEntry
+	endif
+
+	Player.AuxiliaryVariableSetFromArray "PLC_aPlayerJournal" aEncodedEntries
+
+	; Clean-Up
+
+	Sv_Destruct sEncodedEntry
+	let aEncodedEntries := Ar_Null
+
+end

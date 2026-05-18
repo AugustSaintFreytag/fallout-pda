@@ -1,0 +1,44 @@
+begin function {}
+
+	; Returns all journal entries as a positional array of decoded stringmaps.
+	; Each element has fields "id", "flags", "datetime", "location", and "text".
+	; Returns an empty array if no entries are stored.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref DecodeJournalEntryFromStringUDF = CompileScript "PipLog\Journal\DecodeJournalEntryFromString.gek"
+
+	; State
+
+	array_var aEncodedEntries = Player.AuxiliaryVariableGetAsArray "PLC_aPlayerJournal"
+	array_var aJournalEntries = Ar_Construct "array"
+
+	; Main
+
+	if Ar_Size aEncodedEntries == -1
+		SetFunctionValue aJournalEntries
+		return
+	endif
+
+	short iIndex = 0
+	short iCount = Ar_Size aEncodedEntries
+
+	while iIndex < iCount
+		array_var aJournalEntry = (Call DecodeJournalEntryFromStringUDF aEncodedEntries[iIndex])
+
+		if Ar_Size aJournalEntry != -1
+			Ar_Append aJournalEntries, aJournalEntry
+		endif
+
+		let aJournalEntry := Ar_Null
+		let iIndex += 1
+	loop
+
+	SetFunctionValue aJournalEntries
+
+	; Clean-Up
+
+	let aEncodedEntries := Ar_Null
+
+end

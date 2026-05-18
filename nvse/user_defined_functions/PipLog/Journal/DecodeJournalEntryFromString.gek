@@ -1,0 +1,31 @@
+begin function { string_var sData }
+
+	; Splits a "@@@"-delimited string and reconstructs a journal entry stringmap.
+	; Returns a stringmap with fields "id", "flags", "datetime", "location", and "text".
+	; Returns Ar_Null if the encoded string is malformed (wrong field count).
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; Main
+
+	array_var aComponents = Sv_Split sData "@@@"
+
+	if Ar_Size aComponents != 5
+		let aComponents := Ar_Null
+		return
+	endif
+
+	array_var aJournalEntry = Ar_Construct "stringmap"
+
+	let aJournalEntry["id"] = aComponents[0]
+	let aJournalEntry["flags"] = aComponents[1]
+	let aJournalEntry["datetime"] = aComponents[2]
+	let aJournalEntry["location"] = aComponents[3]
+	let aJournalEntry["text"] = aComponents[4]
+
+	SetFunctionValue aJournalEntry
+
+	; Clean-Up
+
+	let aComponents := Ar_Null
+
+end

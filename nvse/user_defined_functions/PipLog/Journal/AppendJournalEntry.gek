@@ -1,0 +1,36 @@
+begin function { string_var sText }
+
+	; Captures the current datetime and player location, builds a journal entry,
+	; and appends it to persistent storage.
+	; Registered as the handler for the "SD_AddJournalEntry" modder event.
+
+	; UDFs
+
+	ref GetCurrentTimeUDF = CompileScript "PipLog\DateTime\GetCurrentTime.gek"
+	ref GetRandomIdUDF = CompileScript "PipLog\Utils\GetRandomId.gek"
+	ref SetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
+
+	; Main
+
+	string_var sId = (Call GetRandomIdUDF)
+	string_var sDatetime = (Call GetCurrentTimeUDF)
+	string_var sLocation = Player.GetLocationName
+
+	array_var aJournalEntry = Ar_Construct "stringmap"
+
+	let aJournalEntry["id"] = sId
+	let aJournalEntry["flags"] = "0"
+	let aJournalEntry["datetime"] = sDatetime
+	let aJournalEntry["location"] = sLocation
+	let aJournalEntry["text"] = sText
+
+	Call SetJournalEntryUDF aJournalEntry -1
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bShouldUpdateJournalUI" 1
+
+	; Clean-Up
+
+	Sv_Destruct sId, sDatetime, sLocation
+	let aJournalEntry := Ar_Null
+
+end
