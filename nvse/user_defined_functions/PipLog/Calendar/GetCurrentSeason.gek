@@ -13,7 +13,7 @@ begin function { short iDay, short iMonth, short iYear }
 	; UDFs
 
 	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
-	ref GetSeasonBoundaryUDF = CompileScript "PipLog\DateTime\GetSeasonBoundary.gek"
+	ref GetSeasonBoundaryUDF = CompileScript "PipLog\Calendar\GetSeasonBoundary.gek"
 
 	; State
 
