@@ -1,0 +1,132 @@
+begin function { string_var sDate }
+
+	; Compiles the display notes string for the given date.
+	; Includes formatted date header, events, completed quests, and misc stats.
+	; sDate is in YYYY-MM-DD format (1-indexed month, zero-padded).
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; UDFs
+
+	ref GetDateComponentsFromStringUDF = CompileScript "PipLog\DateTime\GetDateComponentsFromString.gek"
+	ref GetEventsForDayUDF = CompileScript "PipLog\Calendar\GetEventsForDay.gek"
+	ref GetPlayerStatValuesUDF = CompileScript "PipLog\Stats\GetPlayerStatValues.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref GetMonthNameUDF = CompileScript "PipLog\DateTime\GetMonthName.gek"
+	ref GetOrdinalSuffixUDF = CompileScript "PipLog\DateTime\GetOrdinalSuffix.gek"
+
+	; State
+
+	array_var aDate = (Call GetDateComponentsFromStringUDF sDate)
+
+	short iYear = aDate[0]
+	short iMonth = aDate[1]
+	short iDay = aDate[2]
+
+	let aDate := Ar_Null
+
+	short bHasEvents = 0
+	short bHasQuests = 0
+	short bHasStats = 0
+
+	; Main
+
+	string_var sSuffix = (Call GetOrdinalSuffixUDF iDay)
+	string_var sMonthName = (Call GetMonthNameUDF iMonth 0)
+	string_var sResult = Sv_Construct "%g%z %z, %g%r" iDay sSuffix sMonthName iYear
+
+	Sv_Destruct sSuffix, sMonthName
+
+	; Events
+
+	array_var aEvents = (Call GetEventsForDayUDF iDay iMonth iYear)
+
+	if Ar_Size aEvents > 0
+		let bHasEvents := 1
+		let sResult += "%rEvents:%r"
+
+		foreach (array_var aEvent) <- aEvents
+			string_var sEventName = aEvent["name"]
+			let sResult += $sEventName
+			let sResult += "%r"
+			Sv_Destruct sEventName
+		loop
+	endif
+
+	let aEvents := Ar_Null
+
+	; Quests
+
+	array_var aQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
+
+	if Ar_Size aQuestStats != -1
+		string_var sDate = (Call GetStorageDateStringUDF iYear iMonth iDay)
+
+		if Ar_HasKey aQuestStats, sDate
+			string_var sQuestList = aQuestStats[sDate]
+			array_var aQuestIds = Sv_Split "," sQuestList
+
+			foreach (string_var sQuestId) <- aQuestIds
+				if !bHasQuests
+					let sResult += "%rQuests:%r"
+					let bHasQuests := 1
+				endif
+
+				ref rQuest = StrToRef sQuestId
+
+				if IsFormValid rQuest
+					string_var sQuestName = GetName rQuest
+					let sResult += $sQuestName
+					let sResult += "%r"
+					Sv_Destruct sQuestName
+				else
+					let sResult += $sQuestId
+					let sResult += "%r"
+				endif
+			loop
+
+			Sv_Destruct sQuestList
+			let aQuestIds := Ar_Null
+		endif
+
+		Sv_Destruct sDate
+	endif
+
+	let aQuestStats := Ar_Null
+
+	; Misc Stats
+
+	array_var aStats = (Call GetPlayerStatValuesUDF iDay iMonth iYear)
+
+	foreach array_var aEntry <- aStats
+		string_var sCode = aEntry["key"]
+		short iCount = aEntry["value"]
+
+		if !bHasStats
+			let sResult += "%rMisc:%r"
+			let bHasStats := 1
+		endif
+
+		string_var sIniKey = Sv_Construct "STATS:%z" sCode
+		string_var sStatName = GetINIString_Cached $sIniKey "PipLog\stats\stats.ini" $sCode
+
+		let sResult += $sStatName
+		let sResult += ": "
+		let sResult += $iCount
+		let sResult += "%r"
+
+		Sv_Destruct sCode, sIniKey, sStatName
+	loop
+
+	; Return
+
+	if eval (!bHasEvents) && (!bHasQuests) && (!bHasStats)
+		let sResult += "%rNo events.%r"
+	endif
+
+	SetFunctionValue sResult
+
+	; Clean-Up
+
+	let aStats := Ar_Null
+
+end
