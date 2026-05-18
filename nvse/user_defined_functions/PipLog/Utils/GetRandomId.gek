@@ -1,0 +1,18 @@
+begin function {}
+
+	; Generates and returns a random ID string in the format "NNNN-NNNN-NNNN-NNNN".
+	; Suitable for use as a unique event or entry identifier.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; Main
+
+	short iA = Rand 1000 9999
+	short iB = Rand 1000 9999
+	short iC = Rand 1000 9999
+	short iD = Rand 1000 9999
+
+	string_var sId = Sv_Construct "%g-%g-%g-%g" iA iB iC iD
+
+	SetFunctionValue sId
+
+end
