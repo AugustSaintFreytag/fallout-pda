@@ -13,6 +13,8 @@ begin function { short iDay, short iMonth, short iYear }
 	ref DecodeEventIdsFromStringUDF = CompileScript "PipLog\Event\DecodeEventIdsFromString.gek"
 	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
 
+	; UDFs (Local)
+
 	ref CollectForPatternUDF = (begin function { string_var sPattern, array_var aById, array_var aByDate, array_var aAllEvents }
 
 		if Ar_Size aByDate == -1
