@@ -1,0 +1,56 @@
+begin function { short iDay, short iMonth, short iYear }
+
+	; Returns a StringMap { statCodeStr: count } for the given date.
+	; Returns an empty StringMap if no stats have been recorded for that day.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+
+	; State
+
+	string_var sDate = (Call GetDateStringUDF iYear iMonth iDay)
+	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
+	array_var aResult = Ar_Construct "stringmap"
+
+	; Main
+
+	if Ar_Size aAllStats == -1
+		SetFunctionValue aResult
+		Sv_Destruct sDate
+		let aAllStats := Ar_Null
+		return
+	endif
+
+	if !(Ar_HasKey aAllStats, sDate)
+		SetFunctionValue aResult
+		Sv_Destruct sDate
+		let aAllStats := Ar_Null
+		return
+	endif
+
+	string_var sEncoded = aAllStats[sDate]
+	array_var aPairs = Sv_Split "," sEncoded
+
+	foreach (array_var aPair) <- aPairs
+		string_var sPair = aPair["value"]
+		array_var aParts = Sv_Split ":" sPair
+		
+		if Ar_Size aParts == 2
+			short iCount = aParts[1]
+			let aResult[aParts[0]] := iCount
+		endif
+		
+		let aParts := Ar_Null
+	loop
+
+	SetFunctionValue aResult
+
+	; Clean-Up
+
+	Sv_Destruct sDate, sEncoded
+	let aAllStats := Ar_Null
+	let aPairs := Ar_Null
+
+end

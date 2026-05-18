@@ -1,0 +1,65 @@
+begin function { short iStatCode, short iModVal }
+
+	; Increments a daily gameplay stat by the given delta.
+	; Stats are stored per-day in PLC_aPlayerStats, encoded as "code:count,code:count,...".
+
+	; UDFs
+
+	ref GetPlayerStatValuesUDF = CompileScript "PipLog\Stats\GetPlayerStatValues.gek"
+	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+
+	; State
+
+	string_var sStatCode = $iStatCode
+
+	short iYear = GameYear
+	short iMonth = GameMonth - 1
+	short iDay = GameDay
+
+	array_var aStats = (Call GetPlayerStatValuesUDF iDay iMonth iYear)
+
+	; Main
+
+	if Ar_HasKey aStats, sStatCode
+		short iPrevVal = aStats[sStatCode]
+		let aStats[sStatCode] := iPrevVal + iModVal
+	else
+		let aStats[sStatCode] := iModVal
+	endif
+
+	; Re-encode to CSV string
+
+	string_var sEncoded = ""
+
+	ForEach array_var aEntry <- aStats
+		string_var sCode = aEntry["key"]
+		short iVal = aEntry["value"]
+
+		if sEncoded != ""
+			let sEncoded += ","
+		endif
+		
+		let sEncoded += sCode + ":" + $iVal
+		Sv_Destruct sCode
+	loop
+
+	; Write back
+
+	string_var sDate = (Call GetDateStringUDF iYear iMonth iDay)
+	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
+
+	if Ar_Size aAllStats == -1
+		let aAllStats := Ar_Construct "stringmap"
+	endif
+
+	let aAllStats[sDate] := sEncoded
+	Player.AuxStringMapArraySetFromArray "PLC_aPlayerStats" aAllStats
+
+	; Clean-Up
+
+	Sv_Destruct sStatCode, sEncoded, sDate
+
+	let aStats := Ar_Null
+	let aAllStats := Ar_Null
+
+end
