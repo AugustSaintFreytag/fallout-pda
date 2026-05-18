@@ -1,0 +1,15 @@
+begin function { short iYear, short iMonth, short iDay }
+
+	; Returns a zero-padded YYYY.MM.DD date string for display purposes.
+	; iMonth is 0-indexed; output month is 1-indexed.
+	; Delegates to GetDateString with "." as the delimiter.
+
+	; UDFs
+
+	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+
+	; Main
+
+	SetFunctionValue (Call GetDateStringUDF iYear iMonth iDay ".")
+
+end

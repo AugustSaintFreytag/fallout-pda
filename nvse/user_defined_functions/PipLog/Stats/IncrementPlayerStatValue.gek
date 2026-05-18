@@ -6,7 +6,7 @@ begin function { short iStatCode, short iModVal }
 	; UDFs
 
 	ref GetPlayerStatValuesUDF = CompileScript "PipLog\Stats\GetPlayerStatValues.gek"
-	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 
 	; State
 
@@ -45,7 +45,7 @@ begin function { short iStatCode, short iModVal }
 
 	; Write back
 
-	string_var sDate = (Call GetDateStringUDF iYear iMonth iDay)
+	string_var sDate = (Call GetStorageDateStringUDF iYear iMonth iDay)
 	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
 
 	if Ar_Size aAllStats == -1

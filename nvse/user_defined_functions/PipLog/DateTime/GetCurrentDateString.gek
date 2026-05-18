@@ -2,11 +2,11 @@ begin function { short bIncludeTime }
 
 	; UDFs
 
-	ref GetDateStringUDF = CompileScript "PipLog\datetime\GetDateString.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 
 	; Main
 
-	string_var sDate = Call GetDateStringUDF GameYear GameMonth GameDay
+	string_var sDate = Call GetStorageDateStringUDF GameYear GameMonth GameDay
 	SetFunctionValue sDate
 
 	; Clean-Up

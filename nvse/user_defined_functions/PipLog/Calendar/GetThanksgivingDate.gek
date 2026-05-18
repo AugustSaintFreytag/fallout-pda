@@ -11,7 +11,7 @@ begin function { short iYear }
 	; UDFs
 
 	ref GetDayOfWeekAltUDF = CompileScript "PipLog\DateTime\GetDayOfWeekAlt.gek"
-	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 
 	; Config
 
@@ -37,6 +37,6 @@ begin function { short iYear }
 	; Fourth Thursday is always 21 days after the first
 	short iThanksgivingDay = iFirstThursday + 21
 
-	SetFunctionValue (Call GetDateStringUDF iYear 10 iThanksgivingDay)
+	SetFunctionValue (Call GetStorageDateStringUDF iYear 10 iThanksgivingDay)
 
 end

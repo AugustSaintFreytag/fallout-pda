@@ -1,4 +1,9 @@
-begin function { short iYear, short iMonth, short iDay }
+begin function { short iYear, short iMonth, short iDay, string_var sDelimiter }
+
+	; Returns a zero-padded date string using the given delimiter.
+	; iMonth is 0-indexed; output month is 1-indexed.
+	; Example: GetDateString 2277 0 1 "-" -> "2277-01-01"
+	; Example: GetDateString 2277 0 1 "." -> "2277.01.01"
 
 	string_var sYear = $iYear
 	string_var sMonth = $(iMonth + 1)
@@ -12,8 +17,11 @@ begin function { short iYear, short iMonth, short iDay }
 		let sDay := Sv_Construct "0%z" sDay
 	endif
 
-	; Format: YYYY-MM-DD
-	string_var sResult = Sv_Construct "%z-%z-%z" sYear sMonth sDay
+	string_var sResult = Sv_Construct "%z%z%z%z%z" sYear sDelimiter sMonth sDelimiter sDay
 	SetFunctionValue sResult
+
+	; Clean-Up
+
+	Sv_Destruct sYear, sMonth, sDay
 
 end

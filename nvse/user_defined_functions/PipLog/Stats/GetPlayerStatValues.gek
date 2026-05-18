@@ -6,11 +6,11 @@ begin function { short iDay, short iMonth, short iYear }
 
 	; UDFs
 
-	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 
 	; State
 
-	string_var sDate = (Call GetDateStringUDF iYear iMonth iDay)
+	string_var sDate = (Call GetStorageDateStringUDF iYear iMonth iDay)
 	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
 	array_var aResult = Ar_Construct "stringmap"
 

@@ -14,7 +14,7 @@ begin function { short iYear }
 	; UDFs
 
 	ref GetAstronomicalDateUDF = CompileScript "PipLog\DateTime\GetAstronomicalDate.gek"
-	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
 	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
 	ref GetDayOfWeekAltUDF = CompileScript "PipLog\DateTime\GetDayOfWeekAlt.gek"
@@ -87,7 +87,7 @@ begin function { short iYear }
 		endif
 	loop
 
-	string_var sEasterDate = (Call GetDateStringUDF iEasterYear iEasterMonth iEasterDay)
+	string_var sEasterDate = (Call GetStorageDateStringUDF iEasterYear iEasterMonth iEasterDay)
 	SetFunctionValue sEasterDate
 
 	; Clean-Up

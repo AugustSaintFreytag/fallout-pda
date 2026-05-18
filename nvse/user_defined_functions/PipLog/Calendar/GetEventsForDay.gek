@@ -7,7 +7,7 @@ begin function { short iDay, short iMonth, short iYear }
 
 	; UDFs
 
-	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetRecurringDateString.gek"
 	ref GetMonthlyDateStringUDF = CompileScript "PipLog\DateTime\GetMonthlyDateString.gek"
 	ref DecodeEventIdsFromStringUDF = CompileScript "PipLog\Event\DecodeEventIdsFromString.gek"
@@ -51,7 +51,7 @@ begin function { short iDay, short iMonth, short iYear }
 
 	; State
 
-	string_var sDateSpecific = (Call GetDateStringUDF iYear iMonth iDay)
+	string_var sDateSpecific = (Call GetStorageDateStringUDF iYear iMonth iDay)
 	string_var sDateYearly = (Call GetRecurringDateStringUDF iMonth iDay)
 	string_var sDateMonthly = (Call GetMonthlyDateStringUDF iDay)
 

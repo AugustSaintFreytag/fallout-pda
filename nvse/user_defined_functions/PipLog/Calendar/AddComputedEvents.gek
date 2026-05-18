@@ -20,7 +20,7 @@ begin function { short iYear }
 
 	string_var sEasterDate = (Call GetEasterDateUDF iYear)
 
-	if sEasterDate != ""
+	if eval sEasterDate != ""
 		array_var aEasterEvent = (Call CreateEventUDF sEasterDate "Easter")
 		Call AddEventUDF aEasterEvent 0
 		let aEasterEvent := Ar_Null
@@ -32,7 +32,7 @@ begin function { short iYear }
 
 	string_var sThanksgivingDate = (Call GetThanksgivingDateUDF iYear)
 
-	if sThanksgivingDate != ""
+	if eval sThanksgivingDate != ""
 		array_var aThanksgivingEvent = (Call CreateEventUDF sThanksgivingDate "Thanksgiving")
 		Call AddEventUDF aThanksgivingEvent 0
 		let aThanksgivingEvent := Ar_Null
@@ -42,14 +42,17 @@ begin function { short iYear }
 
 	; Main — Birthday
 
-	short bBirthdaySet = Player.AuxiliaryVariableGetFloat "PLC_bBirthdaySet"
+	short bDidSetBirthday = Player.AuxiliaryVariableGetFloat "PLC_bDidSetBirthday"
 
-	if bBirthdaySet
+	if eval bDidSetBirthday
 		short iBirthdayMonth = Player.AuxiliaryVariableGetFloat "PLC_iBirthdayMonth"
 		short iBirthdayDay = Player.AuxiliaryVariableGetFloat "PLC_iBirthdayDay"
+		
 		string_var sBirthdayDate = (Call GetRecurringDateStringUDF iBirthdayMonth iBirthdayDay)
 		array_var aBirthdayEvent = (Call CreateEventUDF sBirthdayDate "Birthday")
+
 		Call AddEventUDF aBirthdayEvent 0
+		
 		Sv_Destruct sBirthdayDate
 		let aBirthdayEvent := Ar_Null
 	endif
