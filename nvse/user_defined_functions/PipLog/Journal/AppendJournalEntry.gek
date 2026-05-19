@@ -18,13 +18,13 @@ begin function { string_var sText }
 
 	array_var aJournalEntry = Ar_Construct "stringmap"
 
-	let aJournalEntry["id"] = sId
-	let aJournalEntry["flags"] = "0"
-	let aJournalEntry["datetime"] = sDatetime
-	let aJournalEntry["location"] = sLocation
-	let aJournalEntry["text"] = sText
+	let aJournalEntry["id"] := sId
+	let aJournalEntry["flags"] := "0"
+	let aJournalEntry["datetime"] := sDatetime
+	let aJournalEntry["location"] := sLocation
+	let aJournalEntry["text"] := sText
 
-	Call SetJournalEntryUDF aJournalEntry -1
+	Call SetJournalEntryUDF aJournalEntry (-1)
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bShouldUpdateJournalUI" 1
 

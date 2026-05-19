@@ -11,26 +11,30 @@ begin function {}
 
 	; Main
 
-	array_var aJSON = ReadFromJSON "data\config\PipLog\events\holidays.json" "" 0 0
 	array_var aHolidays = Ar_Construct "array"
 
-	if Ar_Size aJSON == -1
+	array_var aFileContents = ReadFromJSON "data\config\PipLog\events\holidays.json" "" 0 0
+	short iNumEntries = Ar_Size aFileContents
+
+	if iNumEntries == -1
 		Print "Could not load holidays from file 'data\config\PipLog\events\holidays.json'."
 		SetFunctionValue aHolidays
 		return
 	endif
 
 	short iIndex = 0
-	short iCount = Ar_Size aJSON
 
-	while iIndex < iCount
-		array_var aEntry = aJSON[iIndex]
-		array_var aEvent = (Call CreateEventUDF aEntry["date"] aEntry["name"])
+	while iIndex < iNumEntries
+		array_var aEntry = aFileContents[iIndex]
+		string_var sDate = aEntry["date"]
+		string_var sName = aEntry["name"]
+		array_var aEvent = (Call CreateEventUDF sDate sName)
 
 		Ar_Append aHolidays, aEvent
 
 		let aEvent := Ar_Null
 		let aEntry := Ar_Null
+		Sv_Destruct sDate, sName
 		let iIndex += 1
 	loop
 
@@ -38,6 +42,6 @@ begin function {}
 
 	; Clean-Up
 
-	let aJSON := Ar_Null
+	let aFileContents := Ar_Null
 
 end

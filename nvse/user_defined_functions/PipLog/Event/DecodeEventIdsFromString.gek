@@ -8,12 +8,12 @@ begin function { string_var sIdList }
 
 	array_var aIds = Ar_Construct "array"
 
-	if sIdList == ""
+	if eval sIdList == ""
 		SetFunctionValue aIds
 		return
 	endif
 
-	let aIds := Sv_Split sIdList ","
+	let aIds := (Sv_Split sIdList, ",")
 
 	SetFunctionValue aIds
 

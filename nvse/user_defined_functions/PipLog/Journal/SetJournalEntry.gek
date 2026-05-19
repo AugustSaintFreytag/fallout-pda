@@ -11,7 +11,7 @@ begin function { array_var aJournalEntry, short iIndex }
 
 	array_var aEncodedEntries = Player.AuxiliaryVariableGetAsArray "PLC_aPlayerJournal"
 
-	if Ar_Size aEncodedEntries == -1
+	if eval (Ar_Size aEncodedEntries) == -1
 		let aEncodedEntries := Ar_Construct "array"
 	endif
 
@@ -22,7 +22,7 @@ begin function { array_var aJournalEntry, short iIndex }
 	if iIndex == -1
 		Ar_Append aEncodedEntries, sEncodedEntry
 	else
-		let aEncodedEntries[iIndex] = sEncodedEntry
+		let aEncodedEntries[iIndex] := sEncodedEntry
 	endif
 
 	Player.AuxiliaryVariableSetFromArray "PLC_aPlayerJournal" aEncodedEntries

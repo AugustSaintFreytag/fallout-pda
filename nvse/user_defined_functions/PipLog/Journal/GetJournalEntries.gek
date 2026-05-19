@@ -16,23 +16,22 @@ begin function {}
 
 	; Main
 
-	if Ar_Size aEncodedEntries == -1
+	if eval (Ar_Size aEncodedEntries) == -1
 		SetFunctionValue aJournalEntries
+
+		let aEncodedEntries := Ar_Null
 		return
 	endif
 
-	short iIndex = 0
-	short iCount = Ar_Size aEncodedEntries
+	foreach (array_var aElement) <- aEncodedEntries
+		string_var sEncodedEntry = aElement["value"]
+		array_var aEntry = (Call DecodeJournalEntryFromStringUDF sEncodedEntry)
 
-	while iIndex < iCount
-		array_var aJournalEntry = (Call DecodeJournalEntryFromStringUDF aEncodedEntries[iIndex])
-
-		if Ar_Size aJournalEntry != -1
-			Ar_Append aJournalEntries, aJournalEntry
+		if eval (Ar_Size aEntry) != -1
+			Ar_Append aJournalEntries, aEntry
 		endif
 
-		let aJournalEntry := Ar_Null
-		let iIndex += 1
+		let aEntry := Ar_Null
 	loop
 
 	SetFunctionValue aJournalEntries

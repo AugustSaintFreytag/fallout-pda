@@ -8,25 +8,19 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 
 	; Guards
 
-	if !(IsMenuOpen 1023)
+	if eval !(MenuMode 1023)
 		return
 	endif
 
-	if GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab" != 3
+	if eval (GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab") != 3
 		return
 	endif
 
-	if Menumode 3
+	if eval (Player.AuxTimerTimeLeft "PLC_MenuClickDebounceTimer") > 0
 		return
 	endif
 
-	float fNow = GetCurrentRealTime
-
-	if fNow - Player.AuxiliaryVariableGetFloat "*PLC_fLastClickRealTime" < 0.15
-		return
-	endif
-
-	Player.AuxiliaryVariableSetFloat "*PLC_fLastClickRealTime" fNow
+	Player.AuxTimerStart "PLC_MenuClickDebounceTimer" 0.15
 
 	; UDFs
 
@@ -59,9 +53,9 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 			Call OnTileDeselectUDF
 			StopSound UIMenuCancel
 			PlaySound UIPipBoySelect 1
-		elseif eval (GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled" == 1)
+		elseif eval (GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled") == 1
 			if eval (iTileID == 511 && bButton2Target)
-				if eval (GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" == 0)
+				if eval (GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled") == 0
 					short bToggled2 = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled"
 					SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" (1 - bToggled2)
 				endif

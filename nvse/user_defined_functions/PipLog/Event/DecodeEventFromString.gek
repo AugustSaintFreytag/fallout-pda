@@ -9,7 +9,7 @@ begin function { string_var sData }
 
 	array_var aComponents = Sv_Split sData "@@@"
 
-	if eval Ar_Size aComponents != 3
+	if eval (Ar_Size aComponents) != 3
 		PrintC "Could not decode event from string '%z', invalid format." sData
 
 		SetFunctionValue Ar_Null
@@ -19,9 +19,9 @@ begin function { string_var sData }
 
 	array_var aEvent = Ar_Construct "stringmap"
 
-	let aEvent["id"] = aComponents[0]
-	let aEvent["date"] = aComponents[1]
-	let aEvent["name"] = aComponents[2]
+	let aEvent["id"] := aComponents[0]
+	let aEvent["date"] := aComponents[1]
+	let aEvent["name"] := aComponents[2]
 
 	SetFunctionValue aEvent
 

@@ -16,7 +16,7 @@ begin function { short iDay, short iMonth, short iYear }
 
 	; Main
 
-	if eval (Ar_Size aAllStats == -1) || !(Ar_HasKey aAllStats, sDate)
+	if eval (Ar_Size aAllStats) == -1 || !(Ar_HasKey aAllStats, sDate)
 		SetFunctionValue aResult
 		Sv_Destruct sDate
 		let aAllStats := Ar_Null
@@ -27,11 +27,11 @@ begin function { short iDay, short iMonth, short iYear }
 	string_var sEncoded = aAllStats[sDate]
 	array_var aPairs = Sv_Split "," sEncoded
 
-	foreach (array_var aPair) <- aPairs
-		string_var sPair = aPair["value"]
-		array_var aParts = Sv_Split ":" sPair
+	foreach array_var aElement <- aPairs
+		string_var sPair = aElement["value"]
+		array_var aParts = Sv_Split ":", sPair
 		
-		if Ar_Size aParts == 2
+		if eval (Ar_Size aParts) == 2
 			short iCount = aParts[1]
 			let aResult[aParts[0]] := iCount
 		endif

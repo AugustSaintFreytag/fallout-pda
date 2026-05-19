@@ -1,0 +1,20 @@
+begin function { string_var sInput }
+
+	; UDFs
+
+	ref SetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
+
+	; Handler
+
+	short iEditEntryIndex = Player.AuxiliaryVariableGetFloat "*PLC_iEditEntryIndex"
+	string_var sJournalEntryKey = Sv_Construct "PLC_aJournalEntry%g" iEditEntryIndex
+	array_var aJournalEntry = Player.AuxiliaryVariableGetAsArray ($sJournalEntryKey)
+
+	let aJournalEntry[1] := sInput
+	Call SetJournalEntryUDF aJournalEntry iEditEntryIndex
+	Player.AuxiliaryVariableSetFloat "*PLC_bShouldUpdateJournalUI" 1
+
+	Sv_Destruct sJournalEntryKey
+	let aJournalEntry := Ar_Null
+
+end

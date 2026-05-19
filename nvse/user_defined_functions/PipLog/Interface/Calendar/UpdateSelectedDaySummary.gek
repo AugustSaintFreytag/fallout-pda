@@ -9,11 +9,11 @@ begin function { string_var sDate }
 
 	; Main
 
-	string_var sNotesStr = (Call GetCalendarSummaryStringUDF sDate)
+	string_var sSummary = (Call GetCalendarSummaryStringUDF sDate)
 
-	short iTotalLines = Sv_Count "%r" sNotesStr
-	short iTotalLinesFromChars = Sv_Length sNotesStr / 32
-	float fScrollDelta = 1.01 * (iTotalLinesFromChars + iTotalLines) + 8
+	short iNumLines = (Sv_Count, "%r" sSummary)
+	short iNumLinesFromChars = ((Sv_Length sSummary) / 32)
+	float fScrollDelta = ((iNumLinesFromChars + iNumLines) + 8)
 
 	if fScrollDelta < 10
 		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\visible" 0
@@ -23,10 +23,10 @@ begin function { string_var sDate }
 		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\_ScrollDelta" fScrollDelta
 	endif
 
-	SetUIStringAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_DataText\string" $sNotesStr
+	SetUIStringAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_DataText\string" ($sSummary)
 
 	; Clean-Up
 
-	Sv_Destruct sNotesStr
+	Sv_Destruct sSummary
 
 end

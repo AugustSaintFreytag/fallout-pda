@@ -5,7 +5,7 @@ begin function { ref rQuest }
 	; Date keys map to comma-separated editor ID strings, e.g. "VMS01,FFGoodsprings".
 	; Deduplicates — the same quest will not be recorded twice on the same day.
 
-	if !(IsFormValid rQuest)
+	if eval !(IsFormValid rQuest)
 		return
 	endif
 
@@ -25,17 +25,17 @@ begin function { ref rQuest }
 
 	; Main
 
-	if Ar_Size aQuestStats == -1
+	if eval (Ar_Size aQuestStats) == -1
 		let aQuestStats := Ar_Construct "stringmap"
 	endif
 
-	if Ar_HasKey aQuestStats, sDate
+	if eval (Ar_HasKey aQuestStats, sDate)
 		string_var sExisting = aQuestStats[sDate]
 		array_var aParts = Sv_Split "," sExisting
 
-		short bAlreadyRecorded = (Ar_Find sQuestId, aParts) != Ar_BadNumericIndex
+		short bAlreadyRecorded = eval (Ar_Find sQuestId, aParts) != Ar_BadNumericIndex
 
-		if !bAlreadyRecorded
+		if eval !bAlreadyRecorded
 			let aQuestStats[sDate] := Sv_Construct "%z,%z" sExisting sQuestId
 			Player.AuxStringMapArraySetFromArray "PLC_aPlayerQuestStats" aQuestStats
 		endif

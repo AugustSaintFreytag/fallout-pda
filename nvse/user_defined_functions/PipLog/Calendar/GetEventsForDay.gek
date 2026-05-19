@@ -10,44 +10,7 @@ begin function { short iDay, short iMonth, short iYear }
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetRecurringDateString.gek"
 	ref GetMonthlyDateStringUDF = CompileScript "PipLog\DateTime\GetMonthlyDateString.gek"
-	ref DecodeEventIdsFromStringUDF = CompileScript "PipLog\Event\DecodeEventIdsFromString.gek"
-	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
-
-	; UDFs (Local)
-
-	ref CollectForPatternUDF = (begin function { string_var sPattern, array_var aById, array_var aByDate, array_var aAllEvents }
-		if Ar_Size aByDate == -1
-			return
-		endif
-
-		if !(Ar_HasKey aByDate, sPattern)
-			return
-		endif
-
-		if Ar_Size aById == -1
-			;PrintC "GetEventsForDay: by-id map is null but '%z' exists in by-date index." sPattern
-			return
-		endif
-
-		array_var aIds = (Call DecodeEventIdsFromStringUDF aByDate[sPattern])
-
-		foreach (string_var sId) <- aIds
-			if Ar_HasKey aById, sId
-				array_var aEvent = (Call DecodeEventFromStringUDF aById[sId])
-
-				if Ar_Size aEvent != -1
-					Ar_Append aAllEvents, aEvent
-					let aEvent := Ar_Null
-				else
-					PrintC "Could not decode event '%z'." sId
-				endif
-			else
-				PrintC "Could not process event '%z' found in by-date index but missing from by-id registry." sId
-			endif
-		loop
-
-		let aIds := Ar_Null
-	end)
+	ref CollectEventsForPatternUDF = CompileScript "PipLog\Calendar\CollectEventsForPattern.gek"
 
 	; State
 
@@ -61,13 +24,14 @@ begin function { short iDay, short iMonth, short iYear }
 	array_var aPlayerEventsByDate = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsByDate"
 
 	; Main
-
+	
 	array_var aAllEvents = Ar_Construct "array"
 	array_var aPatterns = Ar_List sDateSpecific, sDateYearly, sDateMonthly
 
-	foreach (string_var sPattern) <- aPatterns
-		Call CollectForPatternUDF sPattern aGlobalEventsById aGlobalEventsByDate aAllEvents
-		Call CollectForPatternUDF sPattern aPlayerEventsById aPlayerEventsByDate aAllEvents
+	foreach (array_var aEntry) <- aPatterns
+		string_var sPattern = aEntry["value"]
+		Call CollectEventsForPatternUDF sPattern aGlobalEventsById aGlobalEventsByDate aAllEvents
+		Call CollectEventsForPatternUDF sPattern aPlayerEventsById aPlayerEventsByDate aAllEvents
 	loop
 
 	SetFunctionValue aAllEvents

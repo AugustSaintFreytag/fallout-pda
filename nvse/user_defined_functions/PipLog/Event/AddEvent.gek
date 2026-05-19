@@ -15,7 +15,7 @@ begin function { array_var aEvent, short bIsPlayerEvent }
 	string_var sKeyById = "*PLC_aGlobalEventsById"
 	string_var sKeyByDate = "*PLC_aGlobalEventsByDate"
 
-	if bIsPlayerEvent
+	if eval bIsPlayerEvent
 		let sKeyById := "PLC_aPlayerEventsById"
 		let sKeyByDate := "PLC_aPlayerEventsByDate"
 	endif
@@ -30,11 +30,11 @@ begin function { array_var aEvent, short bIsPlayerEvent }
 
 	array_var aStoredEventsById = Player.AuxStringMapArrayGetAsArray ($sKeyById)
 
-	if Ar_Size aStoredEventsById == -1
+	if eval (Ar_Size aStoredEventsById) == -1
 		let aStoredEventsById := Ar_Construct "stringmap"
 	endif
 
-	let aStoredEventsById[sEventId] = sEncodedEvent
+	let aStoredEventsById[sEventId] := sEncodedEvent
 
 	Player.AuxStringMapArraySetFromArray ($sKeyById) aStoredEventsById
 
@@ -42,19 +42,19 @@ begin function { array_var aEvent, short bIsPlayerEvent }
 
 	array_var aStoredEventIdsByDate = Player.AuxStringMapArrayGetAsArray ($sKeyByDate)
 
-	if Ar_Size aStoredEventIdsByDate == -1
+	if eval (Ar_Size aStoredEventIdsByDate) == -1
 		let aStoredEventIdsByDate := Ar_Construct "stringmap"
 	endif
 
 	string_var sCurrentIds = ""
 
-	if Ar_HasKey aStoredEventIdsByDate, sEventDate
+	if eval (Ar_HasKey aStoredEventIdsByDate, sEventDate)
 		let sCurrentIds := aStoredEventIdsByDate[sEventDate]
 	endif
 
 	string_var sUpdatedIds = (Call AppendEventIdToListUDF sCurrentIds sEventId)
 
-	let aStoredEventIdsByDate[sEventDate] = sUpdatedIds
+	let aStoredEventIdsByDate[sEventDate] := sUpdatedIds
 
 	Player.AuxStringMapArraySetFromArray ($sKeyByDate) aStoredEventIdsByDate
 

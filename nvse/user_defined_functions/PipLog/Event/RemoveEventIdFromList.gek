@@ -11,15 +11,15 @@ begin function { string_var sIdList, string_var sId }
 
 	; Main
 
-	if sIdList == ""
+	if eval sIdList == ""
 		SetFunctionValue sIdList
 		return
 	endif
 
 	array_var aIds = (Call DecodeEventIdsFromStringUDF sIdList)
-	short iIndex = Ar_Find sId, aIds
+	short iIndex = (Ar_Find sId, aIds)
 
-	if iIndex == Ar_BadNumericIndex
+	if eval iIndex == Ar_BadNumericIndex
 		SetFunctionValue sIdList
 		let aIds := Ar_Null
 		return
@@ -27,7 +27,7 @@ begin function { string_var sIdList, string_var sId }
 
 	Ar_Erase aIds, iIndex
 
-	string_var sNewIdList = Sv_Join aIds ","
+	string_var sNewIdList = (Sv_Join aIds, ",")
 
 	SetFunctionValue sNewIdList
 

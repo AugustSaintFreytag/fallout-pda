@@ -13,6 +13,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 	; UDFs
 
 	ref SetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
+	ref OnEditJournalEntryConfirmUDF = CompileScript "PipLog\Interface\Journal\OnEditJournalEntryConfirm.gek"
 
 	; State
 
@@ -42,21 +43,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 	array_var aJournalEntry = Player.AuxiliaryVariableGetAsArray ($sJournalEntryKey)
 	Sv_Destruct sJournalEntryKey
 
-	ShowTextInputMenu (begin function { string_var sInput }
-		ref InnerSetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
-
-		short iEditEntryIndex = Player.AuxiliaryVariableGetFloat "*PLC_iEditEntryIndex"
-		string_var sJournalEntryKey = Sv_Construct "PLC_aJournalEntry%g" iEditEntryIndex
-		array_var aJournalEntry = Player.AuxiliaryVariableGetAsArray ($sJournalEntryKey)
-
-		let aJournalEntry[1] := sInput
-		Call InnerSetJournalEntryUDF aJournalEntry iEditEntryIndex
-		Player.AuxiliaryVariableSetFloat "*PLC_bShouldUpdateJournalUI" 1
-
-		Sv_Destruct sJournalEntryKey
-		let aJournalEntry := Ar_Null
-	end) 700 500 "Entry:"
-
+	ShowTextInputMenu OnEditJournalEntryConfirmUDF 700 500 "Entry:"
 	SetTextInputString "%z" aJournalEntry[1]
 
 	; Clean-Up

@@ -6,11 +6,7 @@ begin function { short bIncludeTime }
 
 	; Main
 
-	string_var sDate = Call GetStorageDateStringUDF GameYear GameMonth GameDay
+	string_var sDate = (Call GetStorageDateStringUDF GameYear GameMonth GameDay)
 	SetFunctionValue sDate
-
-	; Clean-Up
-
-	Sv_Destruct sHour, sMinute, sDay, sMonth, sYear
 
 end

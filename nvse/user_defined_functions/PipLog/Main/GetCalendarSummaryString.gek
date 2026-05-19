@@ -40,14 +40,17 @@ begin function { string_var sDate }
 
 	array_var aEvents = (Call GetEventsForDayUDF iDay iMonth iYear)
 
-	if Ar_Size aEvents > 0
+	if eval (Ar_Size aEvents) > 0
 		let bHasEvents := 1
 		let sResult += "%rEvents:%r"
 
-		foreach (array_var aEvent) <- aEvents
+		foreach (array_var aElement) <- aEvents
+			array_var aEvent = aElement["value"]
 			string_var sEventName = aEvent["name"]
+
 			let sResult += $sEventName
 			let sResult += "%r"
+			
 			Sv_Destruct sEventName
 		loop
 	endif
@@ -58,22 +61,24 @@ begin function { string_var sDate }
 
 	array_var aQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
 
-	if Ar_Size aQuestStats != -1
+	if eval (Ar_Size aQuestStats) != -1
 		string_var sDate = (Call GetStorageDateStringUDF iYear iMonth iDay)
 
-		if Ar_HasKey aQuestStats, sDate
+		if eval (Ar_HasKey aQuestStats, sDate)
 			string_var sQuestList = aQuestStats[sDate]
 			array_var aQuestIds = Sv_Split "," sQuestList
 
-			foreach (string_var sQuestId) <- aQuestIds
-				if !bHasQuests
+			foreach (array_var aElement) <- aQuestIds
+				string_var sQuestId = aElement["value"]
+
+				if eval !bHasQuests
 					let sResult += "%rQuests:%r"
 					let bHasQuests := 1
 				endif
 
-				ref rQuest = StrToRef sQuestId
+				ref rQuest = (StringToRef sQuestId)
 
-				if IsFormValid rQuest
+				if eval (IsFormValid rQuest)
 					string_var sQuestName = GetName rQuest
 					let sResult += $sQuestName
 					let sResult += "%r"
@@ -97,17 +102,17 @@ begin function { string_var sDate }
 
 	array_var aStats = (Call GetPlayerStatValuesUDF iDay iMonth iYear)
 
-	foreach array_var aEntry <- aStats
-		string_var sCode = aEntry["key"]
-		short iCount = aEntry["value"]
+	foreach array_var aElement <- aStats
+		string_var sCode = aElement["key"]
+		short iCount = aElement["value"]
 
-		if !bHasStats
+		if eval !bHasStats
 			let sResult += "%rMisc:%r"
 			let bHasStats := 1
 		endif
 
 		string_var sIniKey = Sv_Construct "STATS:%z" sCode
-		string_var sStatName = GetINIString_Cached $sIniKey "PipLog\stats\stats.ini" $sCode
+		string_var sStatName = GetINIString_Cached ($sIniKey) "PipLog\stats\stats.ini" ($sCode)
 
 		let sResult += $sStatName
 		let sResult += ": "

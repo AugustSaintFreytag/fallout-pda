@@ -13,7 +13,7 @@ begin function { short iYear, short iPhase }
 
 	; State
 
-	string_var sKey = "PLC_aVernalEquinox"
+	string_var sKey = ""
 
 	if iPhase == 2
 		let sKey := "PLC_aSummerSolstice"
@@ -21,19 +21,25 @@ begin function { short iYear, short iPhase }
 		let sKey := "PLC_aAutumnalEquinox"
 	elseif iPhase == 4
 		let sKey := "PLC_aWinterSolstice"
+	else
+		let sKey := "PLC_aVernalEquinox"
 	endif
 
 	; Main
 
 	array_var aBoundary = Player.AuxiliaryVariableGetAsArray ($sKey)
+	short iBoundarySize = Ar_Size aBoundary
 
-	if eval Ar_Size aBoundary != -1 && aBoundary[2] == iYear
-		SetFunctionValue aBoundary
+	if iBoundarySize != -1
+		short iBoundaryYear = aBoundary[2]
 
-		; Clean-Up
+		if iBoundaryYear == iYear
+			SetFunctionValue aBoundary
+			Sv_Destruct sKey
+			return
+		endif
 
-		Sv_Destruct sKey
-		return
+		let aBoundary := Ar_Null
 	endif
 
 	let aBoundary := (Call GetAstronomicalDateUDF iYear iPhase)

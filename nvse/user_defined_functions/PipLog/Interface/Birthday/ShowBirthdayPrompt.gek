@@ -7,22 +7,28 @@ begin function {}
 	; Guards against re-showing within the same session via a transient flag.
 	; Currently still uses the internal storage ISO format.
 
-	if eval !(IsMenuOpen 1024)
-		return
-	endif
-
-	if eval Player.AuxiliaryVariableGetFloat "PLC_bDidSetBirthday" == 1
-		return
-	endif
-
-	if eval Player.AuxiliaryVariableGetFloat "*PLC_bDidShowBirthdayPrompt" == 1
-		return
-	endif
-
+	
 	; UDFs
 
 	ref OnBirthdayInputConfirmUDF = CompileScript "PipLog\Interface\Birthday\OnBirthdayInputConfirm.gek"
 	ref GetDisplayDateStringUDF = CompileScript "PipLog\DateTime\GetDisplayDateString.gek"
+
+	; Main
+
+	if eval !(MenuMode 1024)
+		return
+	endif
+
+	short bDidSetBirthday = Player.AuxiliaryVariableGetFloat "PLC_bDidSetBirthday"
+	short bDidShowBirthdayPrompt = Player.AuxiliaryVariableGetFloat "*PLC_bDidShowBirthdayPrompt"
+
+	if eval (bDidSetBirthday)
+		return
+	endif
+
+	if eval (bDidShowBirthdayPrompt)
+		return
+	endif
 
 	; State
 
@@ -38,13 +44,13 @@ begin function {}
 
 	string_var sDefault = (Call GetDisplayDateStringUDF iDefaultYear iDefaultMonth iDefaultDay)
 
-	; Main
+	; Prompt
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bDidShowBirthdayPrompt" 1
 
 	ShowTextInputMenu OnBirthdayInputConfirmUDF 400 150 "Enter your character's birthday (YYYY.MM.DD):"
 	
-	SetTextInputString $sDefault
+	SetTextInputString ($sDefault)
 	SetTextInputExtendedProps 0 0 10 10 3
 
 	; Clean-Up

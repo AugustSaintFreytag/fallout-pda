@@ -13,7 +13,7 @@ begin function { string_var sInput }
 
 	array_var aParts = Sv_Split "." sInput
 
-	if Ar_Size aParts != 3
+	if eval (Ar_Size aParts) != 3
 		let aParts := Ar_Null
 		return
 	endif

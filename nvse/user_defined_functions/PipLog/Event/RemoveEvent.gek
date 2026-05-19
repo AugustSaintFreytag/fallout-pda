@@ -14,7 +14,7 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 	string_var sKeyById = "*PLC_aGlobalEventsById"
 	string_var sKeyByDate = "*PLC_aGlobalEventsByDate"
 
-	if bIsPlayerEvent
+	if eval bIsPlayerEvent
 		let sKeyById := "PLC_aPlayerEventsById"
 		let sKeyByDate := "PLC_aPlayerEventsByDate"
 	endif
@@ -23,12 +23,14 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 
 	array_var aStoredEventsById = Player.AuxStringMapArrayGetAsArray ($sKeyById)
 
-	if Ar_Size aStoredEventsById == -1
+	if eval (Ar_Size aStoredEventsById) == -1
 		Sv_Destruct sKeyById, sKeyByDate
 		return
 	endif
 
-	if !(Ar_HasKey aStoredEventsById, sEventId)
+	short bHasEvent = Ar_HasKey aStoredEventsById, sEventId
+
+	if eval !bHasEvent
 		Sv_Destruct sKeyById, sKeyByDate
 		let aStoredEventsById := Ar_Null
 		return
@@ -39,7 +41,7 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 	string_var sEncodedEvent = aStoredEventsById[sEventId]
 	array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
 
-	if Ar_Size aEvent == -1
+	if eval (Ar_Size aEvent) == -1
 		Sv_Destruct sKeyById, sKeyByDate, sEncodedEvent
 		let aStoredEventsById := Ar_Null
 		return
@@ -56,15 +58,18 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 
 	array_var aStoredEventIdsByDate = Player.AuxStringMapArrayGetAsArray ($sKeyByDate)
 
-	if Ar_Size aStoredEventIdsByDate != -1
-		if Ar_HasKey aStoredEventIdsByDate, sEventDate
+	if eval (Ar_Size aStoredEventIdsByDate) != -1
+		short bHasEventDate = Ar_HasKey aStoredEventIdsByDate, sEventDate
+
+		if eval bHasEventDate
 			string_var sCurrentIds = aStoredEventIdsByDate[sEventDate]
 			string_var sUpdatedIds = (Call RemoveEventIdFromListUDF sCurrentIds sEventId)
+			short iUpdatedIdsLength = (Sv_Length sUpdatedIds)
 
-			if Sv_Length sUpdatedIds == 0
+			if iUpdatedIdsLength == 0
 				Ar_Erase aStoredEventIdsByDate, sEventDate
 			else
-				let aStoredEventIdsByDate[sEventDate] = sUpdatedIds
+				let aStoredEventIdsByDate[sEventDate] := sUpdatedIds
 			endif
 
 			Player.AuxStringMapArraySetFromArray ($sKeyByDate) aStoredEventIdsByDate
@@ -76,7 +81,7 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 	; Clean-Up
 
 	Sv_Destruct sKeyById, sKeyByDate, sEncodedEvent, sEventDate
-	
+
 	let aStoredEventsById := Ar_Null
 	let aStoredEventIdsByDate := Ar_Null
 	let aEvent := Ar_Null

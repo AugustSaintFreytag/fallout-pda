@@ -12,11 +12,11 @@ begin function { string_var sIdList, string_var sId }
 
 	array_var aIds = Ar_Construct "array"
 
-	if sIdList != ""
+	if eval (Sv_Length sIdList > 0)
 		let aIds := (Call DecodeEventIdsFromStringUDF sIdList)
 	endif
 
-	if (Ar_Find sId, aIds) != Ar_BadNumericIndex
+	if eval (Ar_Find sId, aIds != Ar_BadNumericIndex)
 		SetFunctionValue sIdList
 		let aIds := Ar_Null
 		return

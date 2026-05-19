@@ -1,0 +1,63 @@
+begin function { string_var sPattern, array_var aById, array_var aByDate, array_var aAllEvents }
+
+	; Collects and decodes all events matching sPattern from aByDate into aAllEvents.
+	; Returns early if aByDate is unset or has no entry for sPattern.
+	; aAllEvents is modified in-place; caller owns it.
+
+	; UDFs
+
+	ref DecodeEventIdsFromStringUDF = CompileScript "PipLog\Event\DecodeEventIdsFromString.gek"
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+
+	; Main
+
+	if eval (Ar_Size aByDate) == -1
+		return
+	endif
+
+	short bHasPattern = Ar_HasKey aByDate, sPattern
+
+	if eval !bHasPattern
+		return
+	endif
+
+	if eval (Ar_Size aById) == -1
+		PrintC "PipLog: by-id registry unset but '%z' exists in by-date index." sPattern
+		return
+	endif
+
+	string_var sEncodedIds = aByDate[sPattern]
+	array_var aIds = (Call DecodeEventIdsFromStringUDF sEncodedIds)
+
+	foreach (array_var aEntry) <- aIds
+		string_var sId = aEntry["value"]
+		short bHasEvent = Ar_HasKey aById, sId
+
+		if eval !bHasEvent
+			PrintC "Event '%z' exists in by-date index but is missing from by-id registry." sId
+			Sv_Destruct sId
+		continue
+		endif
+
+		string_var sEncodedEvent = aById[sId]
+		array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+		if eval (Ar_Size aEvent) == -1
+			PrintC "Could not decode event '%z', entry has invalid size." sId
+			Sv_Destruct sId, sEncodedEvent
+			let aEvent := Ar_Null
+			continue
+		endif
+
+		Ar_Append aAllEvents, aEvent
+
+		let aEvent := Ar_Null
+		Sv_Destruct sId, sEncodedEvent
+	loop
+
+	; Clean-Up
+
+	Sv_Destruct sEncodedIds
+	let aIds := Ar_Null
+
+end

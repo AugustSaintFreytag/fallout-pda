@@ -13,13 +13,23 @@ begin function {}
 	short iMonth = 0
 	short iDayOfYear = 1
 
+	array_var aDaysPerMonth = Ar_Construct "stringmap"
+
 	; Main
 
-	while eval iDay != GameDay || iMonth != GameMonth
+	while eval (iDay != GameDay) || (iMonth != GameMonth)
 		let iDay += 1
 		let iDayOfYear += 1
 
-		if iDay > (Call GetDaysInMonthUDF GameYear iMonth)
+		if eval !(Ar_HasKey aDaysPerMonth ($iMonth))
+			; Cache locally to only compute days in month once per month.
+			short iDaysInMonth = (Call GetDaysInMonthUDF GameYear iMonth)
+			let aDaysPerMonth[$iMonth] := iDaysInMonth
+		endif
+
+		short iDaysInMonth = aDaysPerMonth[$iMonth]
+
+		if iDay > iDaysInMonth
 			let iDay := 1
 			let iMonth += 1
 		endif

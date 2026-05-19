@@ -21,25 +21,26 @@ begin function {}
 	; Main
 
 	Call OnTileDeselectUDF
-	
+
 	UnloadUIComponent "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids"
 	AddTileFromTemplate "MapMenu/CM_MainRect/CM_CalendarRect|CM_GridParent_Template|CM_CalendarGrids"
 
 	if iCalendarYear == 0
 		let iCalendarYear := GameYear
 		let iCalendarMonth := GameMonth
+
 		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarYear" iCalendarYear
 		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarMonth" iCalendarMonth
 	endif
 
 	; Adjacent months
 
-	short iPrevMonth = iCalendarMonth - 1
-	short iPrevYear = iCalendarYear
+	short iPreviousMonth = iCalendarMonth - 1
+	short iPreviousYear = iCalendarYear
 
-	if iPrevMonth < 0
-		let iPrevMonth := 11
-		let iPrevYear -= 1
+	if iPreviousMonth < 0
+		let iPreviousMonth := 11
+		let iPreviousYear -= 1
 	endif
 
 	short iNextMonth = iCalendarMonth + 1
@@ -50,27 +51,27 @@ begin function {}
 		let iNextYear += 1
 	endif
 
-	short iDaysInMonth = (Call GetDaysInMonthUDF iCalendarYear iCalendarMonth)
-	short iDaysInPrevMonth = (Call GetDaysInMonthUDF iPrevYear iPrevMonth)
+	short iDaysInCurrentMonth = (Call GetDaysInMonthUDF iCalendarYear iCalendarMonth)
+	short iDaysInPreviousMonth = (Call GetDaysInMonthUDF iPreviousYear iPreviousMonth)
 
 	; Month title
 
-	string_var sMonthPath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_MonthTitle/_month_%g" iCalendarMonth
-	string_var sMonthName = GetUIString $sMonthPath
-	string_var sTitle = Sv_Construct "%z %g" sMonthName iCalendarYear
+	string_var sMonthTitlePath = (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_MonthTitle/_month_%g" iCalendarMonth)
+	string_var sMonthName = GetUIString ($sMonthTitlePath)
+	string_var sMonthTitle = Sv_Construct "%z %g" sMonthName iCalendarYear
 
-	SetUIStringAlt "MapMenu/CM_MainRect/CM_CalendarRect/CM_MonthTitle/string" $sTitle
-	Sv_Destruct sMonthPath, sMonthName, sTitle
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_CalendarRect/CM_MonthTitle/string" ($sMonthTitle)
+	Sv_Destruct sMonthTitlePath, sMonthName, sMonthTitle
 
 	; Grid start position
 
-	short iFirstWeekday = (Call GetDayOfWeekUDF 1 iCalendarMonth iCalendarYear)
-	short iGridDay = 1
-	short iInMonth = 0
+	short iFirstDayOfWeek = (Call GetDayOfWeekUDF 1 iCalendarMonth iCalendarYear)
+	short iTileDay = 1
+	short iMonthOffset = 0
 
-	if iFirstWeekday > 0
-		let iGridDay := iDaysInPrevMonth - iFirstWeekday + 1
-		let iInMonth := -1
+	if iFirstDayOfWeek > 0
+		let iTileDay := iDaysInPreviousMonth - iFirstDayOfWeek + 1
+		let iMonthOffset := -1
 	endif
 
 	; Today's date for tile highlighting
@@ -81,104 +82,95 @@ begin function {}
 
 	; Grid layout
 
-	short iTileDims = 52
-	short iTilesInRow = 0
-	short iTileY = 0
-	short iNumBuiltTiles = 0
+	short iTileSize = 52
+	short iTilesInCurrentRow = 0
+	short iTileRowY = 0
+	short iBuiltTileCount = 0
 
-	short iGridMonth = 0
-	short iGridYear = 0
-	
-	string_var sTileName = ""
-	string_var sAddCmd = ""
-	string_var sBase = ""
-	string_var sProp = ""
+	short iTileMonth = 0
+	short iTileYear = 0
 
-	while iNumBuiltTiles < 42
+	string_var sTileDate = ""
+	string_var sTileInsertCommand = ""
+	string_var sTileBasePath = ""
+	string_var sTilePropertyPath = ""
 
-		if iTilesInRow == 7
-			let iTilesInRow := 0
-			let iTileY += iTileDims
+	while iBuiltTileCount < 42
+		if iTilesInCurrentRow == 7
+			let iTilesInCurrentRow := 0
+			let iTileRowY += iTileSize
 		endif
 
-		if iInMonth == -1
-			let iGridMonth := iPrevMonth
-			let iGridYear := iPrevYear
-		elseif iInMonth == 0
-			let iGridMonth := iCalendarMonth
-			let iGridYear := iCalendarYear
+		if iMonthOffset == -1
+			let iTileMonth := iPreviousMonth
+			let iTileYear := iPreviousYear
+		elseif iMonthOffset == 0
+			let iTileMonth := iCalendarMonth
+			let iTileYear := iCalendarYear
 		else
-			let iGridMonth := iNextMonth
-			let iGridYear := iNextYear
+			let iTileMonth := iNextMonth
+			let iTileYear := iNextYear
 		endif
 
-		let sTileName := (Call GetStorageDateStringUDF iGridYear iGridMonth iGridDay)
-		let sAddCmd := Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids|CM_Box_Template|%z" sTileName
-		AddTileFromTemplate $sAddCmd
+		let sTileDate := (Call GetStorageDateStringUDF iTileYear iTileMonth iTileDay)
+		let sTileInsertCommand := (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids|CM_Box_Template|%z" sTileDate)
 
-		let sBase := Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z" sTileName
+		AddTileFromTemplate ($sTileInsertCommand)
 
-		let iTilesInRow += 1
+		let sTileBasePath := Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z" sTileDate
 
-		let sProp := Sv_Construct "%z/_string1" sBase
-		SetUIStringAlt $sProp ($iGridDay)
+		let iTilesInCurrentRow += 1
 
-		let sProp := Sv_Construct "%z/x" sBase
-		SetUIFloatAlt $sProp (iTilesInRow * iTileDims)
+		let sTilePropertyPath := Sv_Construct "%z/_string1" sTileBasePath
+		SetUIStringAlt ($sTilePropertyPath) ($iTileDay)
 
-		let sProp := Sv_Construct "%z/y" sBase
-		SetUIFloatAlt $sProp iTileY
+		let sTilePropertyPath := Sv_Construct "%z/x" sTileBasePath
+		SetUIFloatAlt ($sTilePropertyPath) (iTilesInCurrentRow * iTileSize)
 
-		if iInMonth == -1
+		let sTilePropertyPath := Sv_Construct "%z/y" sTileBasePath
+		SetUIFloatAlt ($sTilePropertyPath) iTileRowY
 
-			let sProp := Sv_Construct "%z/_alpha1" sBase
-			SetUIFloatAlt $sProp 128
+		if iMonthOffset == -1
+			let sTilePropertyPath := Sv_Construct "%z/_alpha1" sTileBasePath
+			SetUIFloatAlt ($sTilePropertyPath) 128
+		elseif iMonthOffset == 0
+			let sTilePropertyPath := Sv_Construct "%z/_alpha1" sTileBasePath
+			SetUIFloatAlt ($sTilePropertyPath) 255
 
-		elseif iInMonth == 0
-
-			let sProp := Sv_Construct "%z/_alpha1" sBase
-			SetUIFloatAlt $sProp 255
-
-			if eval iCalendarMonth == iTodayMonth && iCalendarYear == iTodayYear
-
-				if iGridDay == iTodayDay
-					let sProp := Sv_Construct "%z/_day_state" sBase
-					SetUIFloatAlt $sProp GameHour
+			if eval (iCalendarMonth == iTodayMonth) && (iCalendarYear == iTodayYear)
+				if iTileDay == iTodayDay
+					let sTilePropertyPath := Sv_Construct "%z/_day_state" sTileBasePath
+					SetUIFloatAlt ($sTilePropertyPath) GameHour
 					Player.AuxiliaryVariableSetFloat "*PLC_bPulseAscending" 0
-				elseif iGridDay < iTodayDay
-					let sProp := Sv_Construct "%z/_day_state" sBase
-					SetUIFloatAlt $sProp 24
+				elseif iTileDay < iTodayDay
+					let sTilePropertyPath := Sv_Construct "%z/_day_state" sTileBasePath
+					SetUIFloatAlt ($sTilePropertyPath) 24
 				endif
-
 			endif
-
 		else
-
-			let sProp := Sv_Construct "%z/_alpha1" sBase
-			SetUIFloatAlt $sProp 150
-
+			let sTilePropertyPath := Sv_Construct "%z/_alpha1" sTileBasePath
+			SetUIFloatAlt ($sTilePropertyPath) 150
 		endif
 
-		let iGridDay += 1
+		let iTileDay += 1
 
-		if eval iInMonth == -1 && iGridDay > iDaysInPrevMonth
-			let iGridDay := 1
-			let iInMonth := 0
+		if eval (iMonthOffset == -1) && (iTileDay > iDaysInPreviousMonth)
+			let iTileDay := 1
+			let iMonthOffset := 0
 		endif
 
-		if eval iInMonth == 0 && iGridDay > iDaysInMonth
-			let iGridDay := 1
-			let iInMonth := 1
+		if eval (iMonthOffset == 0) && (iTileDay > iDaysInCurrentMonth)
+			let iTileDay := 1
+			let iMonthOffset := 1
 		endif
 
-		let iNumBuiltTiles += 1
-
+		let iBuiltTileCount += 1
 	loop
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 1
 
 	; Clean-Up
 
-	Sv_Destruct sTileName, sAddCmd, sBase, sProp
+	Sv_Destruct sTileDate, sTileInsertCommand, sTileBasePath, sTilePropertyPath
 
 end

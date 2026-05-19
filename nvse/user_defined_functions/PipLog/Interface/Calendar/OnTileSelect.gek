@@ -9,7 +9,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 
 	ref OnTileDeselectUDF = CompileScript "PipLog\Interface\Calendar\OnTileDeselect.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref ParseDateStringUDF = CompileScript "PipLog\DateTime\ParseDateString.gek"
+	ref GetDateComponentsFromStringUDF = CompileScript "PipLog\DateTime\GetDateComponentsFromString.gek"
 	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
 	; State
@@ -24,8 +24,8 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 
 	string_var sComponent = GetActiveUIComponentFullName
 
-	Sv_Replace "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/|" sComponent
-	Sv_Replace "/CM_Box_Main|" sComponent
+	Sv_Replace "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/|", sComponent
+	Sv_Replace "/CM_Box_Main|", sComponent
 
 	string_var sCurrent = ""
 
@@ -33,19 +33,19 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 		let sCurrent := (Call GetStorageDateStringUDF iSelectedYear iSelectedMonth iSelectedDay)
 	endif
 
-	if sComponent != sCurrent
+	if eval (sComponent != sCurrent)
 		if iSelectedDay >= 1
-			string_var sOldTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sCurrent
-			SetUIFloatAlt $sOldTilePath 0
+			string_var sOldTilePath = (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sCurrent)
+			SetUIFloatAlt ($sOldTilePath) 0
 			Sv_Destruct sOldTilePath
 		endif
 
-		string_var sNewTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sComponent
+		string_var sNewTilePath = (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sComponent)
 		
-		SetUIFloatAlt $sNewTilePath 1
+		SetUIFloatAlt ($sNewTilePath) 1
 		Sv_Destruct sNewTilePath
 
-		array_var aParts = (Call ParseDateStringUDF sComponent)
+		array_var aParts = (Call GetDateComponentsFromStringUDF sComponent)
 		
 		short iNewYear = aParts[0]
 		short iNewMonth = aParts[1]
@@ -57,12 +57,12 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 		Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" iNewMonth
 		Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" iNewYear
 
-		if eval iNewYear > GameYear || (iNewYear == GameYear && iNewMonth > GameMonth) || (iNewYear == GameYear && iNewMonth == GameMonth && iNewDay > GameDay)
+		if eval (iNewYear > GameYear) || ((iNewYear == GameYear) && (iNewMonth > GameMonth)) || ((iNewYear == GameYear) && (iNewMonth == GameMonth) && (iNewDay > GameDay))
 			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_WaitButton/target" 1
 			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/target" 1
 
 			array_var aPlayerReminders = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerReminders"
-			short bIsTracked = eval Ar_Size aPlayerReminders != -1 && Ar_HasKey aPlayerReminders, sComponent
+			short bIsTracked = (Ar_Size aPlayerReminders) != -1 && (Ar_HasKey aPlayerReminders, sComponent)
 
 			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/_Value" bIsTracked
 			let aPlayerReminders := Ar_Null
