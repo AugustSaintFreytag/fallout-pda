@@ -1,0 +1,25 @@
+begin function { short iEntryIndex }
+
+	; Positions a journal entry's UI row at the correct vertical offset by measuring
+	; the cumulative height of all preceding entries, then updates the scroll template height.
+
+	; Main
+
+	float fEntryY = 0
+
+	if iEntryIndex != 0
+		let fEntryY += GetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" (iEntryIndex - 1))
+		let fEntryY += GetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/height" (iEntryIndex - 1))
+	endif
+
+	SetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" iEntryIndex) fEntryY
+
+	float fEntryHeight = GetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/height" iEntryIndex)
+	float fEntryTopOffset = GetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" iEntryIndex)
+	float fScrollTemplateHeight = fEntryHeight + fEntryTopOffset + 64
+
+	;PrintC "Journal entry %g: height %.2f, total scroll height %.2f." iEntryIndex fEntryHeight fScrollTemplateHeight
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/_templateheight" fScrollTemplateHeight
+
+end

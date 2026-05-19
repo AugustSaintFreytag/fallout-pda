@@ -1,0 +1,66 @@
+begin function { short iMenuID, short iTileID, string_var sTileParam }
+
+	; Click callback (MapMenu#520).
+	; Parses the active UI component path to determine which entry was clicked,
+	; corrects for sort direction, then opens a text input menu pre-filled with
+	; the existing entry text. The closure writes the edited text back via aux vars.
+	;
+	; Uses "*PLC_iEditEntryIndex" to pass the resolved index to the closure,
+	; since the outer function's frame is no longer live when the closure executes.
+
+	Sv_Destruct sTileParam
+
+	; UDFs
+
+	ref SetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
+
+	; State
+
+	short iNumJournalEntries = Player.AuxiliaryVariableGetFloat "PLC_iNumJournalEntries"
+	short bSort = Player.AuxiliaryVariableGetFloat "PLC_bSort"
+
+	; Main — parse active component path to extract entry display index
+
+	string_var sComponent = GetActiveUIComponentFullName
+	
+	Sv_Replace "/CM_JournalEntry/EntryEdit|", sComponent
+	Sv_Replace "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry|", sComponent
+	
+	short iEntryIndex = #sComponent
+	Sv_Destruct sComponent
+
+	; Invert display index to storage index when sorted newest-first
+	if bSort == 1
+		let iEntryIndex := (iNumJournalEntries - 1) - iEntryIndex
+	endif
+
+	; Store resolved index so the async closure can read it
+	Player.AuxiliaryVariableSetFloat "*PLC_iEditEntryIndex" iEntryIndex
+
+	; Read the current entry text for pre-fill
+	string_var sJournalEntryKey = Sv_Construct "PLC_aJournalEntry%g" iEntryIndex
+	array_var aJournalEntry = Player.AuxiliaryVariableGetAsArray ($sJournalEntryKey)
+	Sv_Destruct sJournalEntryKey
+
+	ShowTextInputMenu (begin function { string_var sInput }
+		ref InnerSetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
+
+		short iEditEntryIndex = Player.AuxiliaryVariableGetFloat "*PLC_iEditEntryIndex"
+		string_var sJournalEntryKey = Sv_Construct "PLC_aJournalEntry%g" iEditEntryIndex
+		array_var aJournalEntry = Player.AuxiliaryVariableGetAsArray ($sJournalEntryKey)
+
+		let aJournalEntry[1] := sInput
+		Call InnerSetJournalEntryUDF aJournalEntry iEditEntryIndex
+		Player.AuxiliaryVariableSetFloat "*PLC_bShouldUpdateJournalUI" 1
+
+		Sv_Destruct sJournalEntryKey
+		let aJournalEntry := Ar_Null
+	end) 700 500 "Entry:"
+
+	SetTextInputString "%z" aJournalEntry[1]
+
+	; Clean-Up
+
+	let aJournalEntry := Ar_Null
+
+end

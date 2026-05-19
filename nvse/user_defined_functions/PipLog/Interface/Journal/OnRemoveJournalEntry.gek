@@ -1,0 +1,36 @@
+begin function { short iMenuID, short iTileID, string_var sTileParam }
+
+	; Click callback (MapMenu#521).
+	; Parses the active UI component path to determine which entry was clicked,
+	; corrects for sort direction, then delegates to the data-layer delete helper.
+
+	Sv_Destruct sTileParam
+
+	; UDFs
+
+	ref DeleteJournalEntryUDF = CompileScript "PipLog\Journal\DeleteJournalEntry.gek"
+
+	; State
+
+	short iNumJournalEntries = Player.AuxiliaryVariableGetFloat "PLC_iNumJournalEntries"
+	short bSort = Player.AuxiliaryVariableGetFloat "PLC_bSort"
+
+	; Main — parse active component path to extract entry display index
+
+	string_var sComponent = GetActiveUIComponentFullName
+	Sv_Replace "/CM_JournalEntry/EntryEdit|", sComponent
+	Sv_Replace "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry|", sComponent
+	
+	short iEntryIndex = #sComponent
+	Sv_Destruct sComponent
+
+	; Invert display index to storage index when sorted newest-first
+	if bSort == 1
+		let iEntryIndex := (iNumJournalEntries - 1) - iEntryIndex
+	endif
+
+	Call DeleteJournalEntryUDF iEntryIndex
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bShouldUpdateJournalUI" 1
+
+end
