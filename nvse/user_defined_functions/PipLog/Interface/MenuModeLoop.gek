@@ -1,0 +1,56 @@
+begin function {}
+
+	; Main loop for Pip-Log calendar UI. Drives calendar grid generation,
+	; today-tile pulse animation, and post-load UI initialization.
+	; Registered as a menumode SetGameMainLoopCallback (fires every frame in menu mode).
+
+	; UDFs
+
+	ref GenerateCalendarGridUDF = CompileScript "PipLog\Interface\Calendar\GenerateCalendarGrid.gek"
+	ref PulseSelectedDateTileUDF = CompileScript "PipLog\Interface\Calendar\PulseSelectedDateTile.gek"
+
+	; Main
+
+	if eval !(IsMenuOpen 1023)
+		return
+	endif
+
+	; Reset UI to defaults on the first Pip-Boy open after each game load.
+	; *PLC_bDidInitializeUI is transient (cleared on load), so this runs exactly once per session.
+	if eval (Player.AuxiliaryVariableGetFloat "*PLC_bDidInitializeUI" == 0)
+
+		Player.AuxiliaryVariableSetFloat "*PLC_bDidInitializeUI" 1
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled" 0
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 0
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/visible" 1
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonA/target" 1
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonX/target" 1
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonY/target" 1
+
+	endif
+
+	if eval (GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab" != 3)
+		if eval (Player.AuxiliaryVariableGetFloat "*PLC_bDidGenerateCalendar" == 0)
+			PrintC "PipLog: calendar render pending – not on Pip-Log tab"
+		endif
+
+		return
+	endif
+
+	short bDidGenerate = Player.AuxiliaryVariableGetFloat "*PLC_bDidGenerateCalendar"
+
+	if eval !bDidGenerate
+		Call GenerateCalendarGridUDF
+	else
+		; Only pulse when calendar view is active (neither journal nor events sub-tab is open)
+		short bJournalToggled = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled"
+		short bEventsToggled = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled"
+		short iMenuOpen = bJournalToggled + (bEventsToggled * 2)
+
+		if iMenuOpen == 0
+			Call PulseSelectedDateTileUDF
+		endif
+	endif
+
+end

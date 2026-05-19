@@ -1,0 +1,30 @@
+; The story begins here.
+
+ref ShowBirthdayPromptUDF = CompileScript "PipLog\Interface\Birthday\ShowBirthdayPrompt.gek"
+ref MenuModeLoopUDF = CompileScript "PipLog\Interface\MenuModeLoop.gek"
+ref MarkCalendarModifiedUDF = CompileScript "PipLog\Interface\Calendar\MarkCalendarModified.gek"
+ref OnTileSelectUDF = CompileScript "PipLog\Interface\Calendar\OnTileSelect.gek"
+ref OnMenuClickUDF = CompileScript "PipLog\Interface\OnMenuClick.gek"
+ref OnCalendarHoverUDF = CompileScript "PipLog\Interface\Calendar\OnCalendarHover.gek"
+ref OnMenuCloseUDF = CompileScript "PipLog\Interface\OnMenuClose.gek"
+ref AddComputedEventsUDF = CompileScript "PipLog\Calendar\AddComputedEvents.gek"
+ref AppendJournalEntryUDF = CompileScript "PipLog\Journal\AppendJournalEntry.gek"
+
+SetGameMainLoopCallback ShowBirthdayPromptUDF 1 1 2
+SetGameMainLoopCallback MenuModeLoopUDF 1 1 2
+
+SetEventHandlerAlt "SD_MarkCalendarModified" MarkCalendarModifiedUDF
+
+SetOnMenuClickEventHandler OnTileSelectUDF 1 "MapMenu#509"
+SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#510"
+SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#511"
+SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#512"
+SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#513"
+SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#514"
+
+SetOnMouseoverChangeEventHandler OnCalendarHoverUDF 1 1023
+SetOnMenuCloseEventHandler OnMenuCloseUDF 1 1023
+
+SetEventHandlerAlt "SD_AddJournalEntry" AppendJournalEntryUDF
+
+Call AddComputedEventsUDF GameYear

@@ -1,0 +1,24 @@
+begin function { short iMenuID }
+
+	; Resets all calendar session state when the Pip-Boy is closed.
+	; View month is reset to current so the calendar reopens on today's month.
+
+	if iMenuID != 1023
+		return
+	endif
+
+	; Main
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_bDidGenerateCalendar" == 1
+		Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
+		Player.AuxiliaryVariableSetFloat "*PLC_bPulseAscending" 0
+		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarYear" 0
+		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarMonth" 0
+	endif
+
+	; Reset selection state (menu is closed; aux vars cleared for next open)
+	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" -1
+	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" -1
+	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" -1
+
+end
