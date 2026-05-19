@@ -16,7 +16,6 @@ begin function { short iDay, short iMonth, short iYear }
 	; UDFs (Local)
 
 	ref CollectForPatternUDF = (begin function { string_var sPattern, array_var aById, array_var aByDate, array_var aAllEvents }
-
 		if Ar_Size aByDate == -1
 			return
 		endif
@@ -32,7 +31,7 @@ begin function { short iDay, short iMonth, short iYear }
 
 		array_var aIds = (Call DecodeEventIdsFromStringUDF aByDate[sPattern])
 
-		ForEach (string_var sId) <- aIds
+		foreach (string_var sId) <- aIds
 			if Ar_HasKey aById, sId
 				array_var aEvent = (Call DecodeEventFromStringUDF aById[sId])
 
@@ -48,7 +47,6 @@ begin function { short iDay, short iMonth, short iYear }
 		loop
 
 		let aIds := Ar_Null
-
 	end)
 
 	; State
@@ -67,7 +65,7 @@ begin function { short iDay, short iMonth, short iYear }
 	array_var aAllEvents = Ar_Construct "array"
 	array_var aPatterns = Ar_List sDateSpecific, sDateYearly, sDateMonthly
 
-	ForEach (string_var sPattern) <- aPatterns
+	foreach (string_var sPattern) <- aPatterns
 		Call CollectForPatternUDF sPattern aGlobalEventsById aGlobalEventsByDate aAllEvents
 		Call CollectForPatternUDF sPattern aPlayerEventsById aPlayerEventsByDate aAllEvents
 	loop

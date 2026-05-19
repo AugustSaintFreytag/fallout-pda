@@ -31,7 +31,7 @@ begin function { short iStatCode, short iModVal }
 
 	string_var sEncoded = ""
 
-	ForEach array_var aEntry <- aStats
+	foreach array_var aEntry <- aStats
 		string_var sCode = aEntry["key"]
 		short iVal = aEntry["value"]
 

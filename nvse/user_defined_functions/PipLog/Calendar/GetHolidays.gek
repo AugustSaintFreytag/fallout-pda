@@ -15,7 +15,7 @@ begin function {}
 	array_var aHolidays = Ar_Construct "array"
 
 	if Ar_Size aJSON == -1
-		;PrintC "GetHolidays: failed to load data\config\PipLog\events\holidays.json"
+		Print "Could not load holidays from file 'data\config\PipLog\events\holidays.json'."
 		SetFunctionValue aHolidays
 		return
 	endif
