@@ -55,10 +55,22 @@ let iCount += 1           ; increment
 let iCount *= 1           ; multiply
 ```
 
-The `eval` keyword is common when a compound boolean expression is used as a condition:
+The `eval` keyword should be used whenever an evaluation requires implicit coercion, reads values from arrays, or performs anything more complex than a direct value comparison.
+
+```gek
+if eval bFlagsByType["master"]
+    ; ...
+elseif eval bFlagsByType["alternative"]
+    ; ...
+endif
+```
+
+It is also advised when a compound boolean expression is used as a condition:
 
 ```gek
 if eval (iIndex == Ar_BadNumericIndex) || (Ar_HasKey aValues, iIndex == 0)
+    ; ...
+endif
 ```
 
 ### Arrays
@@ -438,7 +450,7 @@ Use descriptive variable names, refrain from using abbreviations. A variable nam
 
 Exclusively use tabs. Do not use spaces to indent for horizontal alignment, e.g. consecutive lines of variable declarations.
 
-There should be empty lines between major blocks of logic for legibility. There should always be an empty line before and after conditionals and similar blocks, including return statements. At the same time, orphan lines within a block should also be avoided, i.e. no empty line between two singular statements in a block.
+There should be empty lines between major blocks of logic for legibility. There should always be an empty line before and after conditionals and similar blocks, including return statements. At the same time, orphan lines within a block should also be avoided, i.e. no empty line between two singular statements in a block. There should be no empty line orphans, i.e. right after an opening `if` or right before a closing `endif`. There should always be an empty line inside the outermost `begin function` block in UDFs.
 
 ### Naming Conventions
 
