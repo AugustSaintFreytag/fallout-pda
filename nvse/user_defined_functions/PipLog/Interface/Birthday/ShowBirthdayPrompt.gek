@@ -1,0 +1,54 @@
+begin function {}
+
+	; Shows a text input prompt for the player's birthday.
+	; Runs as a menumode callback — no-ops unless the map menu is open
+	; and no birthday has been stored yet.
+	
+	; Guards against re-showing within the same session via a transient flag.
+	; Currently still uses the internal storage ISO format.
+
+	if eval !(IsMenuOpen 1024)
+		return
+	endif
+
+	if eval Player.AuxiliaryVariableGetFloat "PLC_bDidSetBirthday" == 1
+		return
+	endif
+
+	if eval Player.AuxiliaryVariableGetFloat "*PLC_bDidShowBirthdayPrompt" == 1
+		return
+	endif
+
+	; UDFs
+
+	ref OnBirthdayInputConfirmUDF = CompileScript "PipLog\Interface\Birthday\OnBirthdayInputConfirm.gek"
+	ref GetDisplayDateStringUDF = CompileScript "PipLog\DateTime\GetDisplayDateString.gek"
+
+	; State
+
+	short iDefaultYear = GameYear - 18
+	short iDefaultMonth = GameMonth
+	short iDefaultDay = GameDay
+
+	if IsModLoaded "Fallout3.esm"
+		let iDefaultYear := 2258
+		let iDefaultMonth := 6
+		let iDefaultDay := 13
+	endif
+
+	string_var sDefault = (Call GetDisplayDateStringUDF iDefaultYear iDefaultMonth iDefaultDay)
+
+	; Main
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bDidShowBirthdayPrompt" 1
+
+	ShowTextInputMenu OnBirthdayInputConfirmUDF 400 150 "Enter your character's birthday (YYYY.MM.DD):"
+	
+	SetTextInputString $sDefault
+	SetTextInputExtendedProps 0 0 10 10 3
+
+	; Clean-Up
+
+	Sv_Destruct sDefault
+
+end

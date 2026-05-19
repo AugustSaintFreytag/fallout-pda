@@ -1,0 +1,43 @@
+begin function { string_var sInput }
+
+	; Callback for the birthday text input prompt.
+	; Parses a YYYY.MM.DD string, validates, clamps day to a valid range,
+	; saves to persistent aux vars, and registers the birthday as a recurring event.
+
+	; UDFs
+
+	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
+	ref AddComputedEventsUDF = CompileScript "PipLog\Calendar\AddComputedEvents.gek"
+
+	; Main
+
+	array_var aParts = Sv_Split "." sInput
+
+	if Ar_Size aParts != 3
+		let aParts := Ar_Null
+		return
+	endif
+
+	short iYear = #aParts[0]
+	short iMonth = #aParts[1]
+	short iDay = #aParts[2]
+
+	let aParts := Ar_Null
+
+	if eval (iDay < 1) || (iMonth < 1) || (iMonth > 12) || (iYear < 1) || (iYear > GameYear)
+		return
+	endif
+
+	short iMonthZeroIndexed = iMonth - 1
+	short iDaysInMonth = (Call GetDaysInMonthUDF iYear iMonthZeroIndexed)
+
+	if iDay > iDaysInMonth
+		let iDay := iDaysInMonth
+	endif
+
+	Player.AuxiliaryVariableSetFloat "PLC_iBirthdayDay" iDay
+	Player.AuxiliaryVariableSetFloat "PLC_iBirthdayMonth" iMonthZeroIndexed
+	Player.AuxiliaryVariableSetFloat "PLC_iBirthdayYear" iYear
+	Player.AuxiliaryVariableSetFloat "PLC_bDidSetBirthday" 1
+
+end
