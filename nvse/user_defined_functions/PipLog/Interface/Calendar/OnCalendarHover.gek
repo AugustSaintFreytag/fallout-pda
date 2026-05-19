@@ -1,0 +1,32 @@
+begin function { short iMenuID }
+
+	; Updates the data panel to show a summary for the tile being hovered.
+	; Skipped when a tile is already selected — the selection takes precedence.
+
+	; UDFs
+
+	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
+
+	; Main
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iSelectedDay" >= 1
+		return
+	endif
+
+	string_var sComponent = GetActiveUIComponentFullName
+
+	if Sv_Count "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/" sComponent == 0
+		Sv_Destruct sComponent
+		return
+	endif
+
+	Sv_Replace "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/|" sComponent
+	Sv_Replace "/CM_Box_Main|" sComponent
+
+	Call UpdateSelectedDaySummaryUDF sComponent
+
+	; Clean-Up
+
+	Sv_Destruct sComponent
+
+end

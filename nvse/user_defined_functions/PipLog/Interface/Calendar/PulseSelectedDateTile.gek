@@ -1,0 +1,53 @@
+begin function {}
+
+	; Animates today's tile alpha between 150 and 255 each menumode frame.
+	; Only runs when the current in-game month is being viewed.
+	; Called from MenuModeLoop when *PLC_bDidGenerateCalendar == 1.
+
+	; UDFs
+
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+
+	; State
+
+	short iCalendarYear = Player.AuxiliaryVariableGetFloat "*PLC_iCalendarYear"
+	short iCalendarMonth = Player.AuxiliaryVariableGetFloat "*PLC_iCalendarMonth"
+
+	; Main
+
+	if eval iCalendarYear != GameYear || iCalendarMonth != GameMonth
+		return
+	endif
+
+	short bPulseAscending = Player.AuxiliaryVariableGetFloat "*PLC_bPulseAscending"
+
+	string_var sTileName = (Call GetStorageDateStringUDF GameYear GameMonth GameDay)
+	string_var sAlphaPath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_alpha1" sTileName
+
+	float fAlpha = GetUIFloatAlt $sAlphaPath
+
+	if bPulseAscending == 0
+
+		if fAlpha > 150
+			let fAlpha -= 5
+			SetUIFloatAlt $sAlphaPath fAlpha
+		else
+			Player.AuxiliaryVariableSetFloat "*PLC_bPulseAscending" 1
+		endif
+
+	else
+
+		if fAlpha < 255
+			let fAlpha += 5
+			SetUIFloatAlt $sAlphaPath fAlpha
+		else
+			Player.AuxiliaryVariableSetFloat "*PLC_bPulseAscending" 0
+		endif
+
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sTileName, sAlphaPath
+
+end

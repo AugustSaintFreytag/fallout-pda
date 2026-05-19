@@ -1,0 +1,32 @@
+begin function { string_var sDate }
+
+	; Compiles and writes the calendar notes and scroll bar for the selected day tile.
+	; sDate is in YYYY-MM-DD format (1-indexed month, zero-padded).
+
+	; UDFs
+
+	ref GetCalendarSummaryStringUDF = CompileScript "PipLog\Main\GetCalendarSummaryString.gek"
+
+	; Main
+
+	string_var sNotesStr = (Call GetCalendarSummaryStringUDF sDate)
+
+	short iTotalLines = Sv_Count "%r" sNotesStr
+	short iTotalLinesFromChars = Sv_Length sNotesStr / 32
+	float fScrollDelta = 1.01 * (iTotalLinesFromChars + iTotalLines) + 8
+
+	if fScrollDelta < 10
+		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\visible" 0
+		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\_ScrollDelta" 0
+	else
+		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\visible" 1
+		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\_ScrollDelta" fScrollDelta
+	endif
+
+	SetUIStringAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_DataText\string" $sNotesStr
+
+	; Clean-Up
+
+	Sv_Destruct sNotesStr
+
+end

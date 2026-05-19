@@ -1,0 +1,37 @@
+begin function {}
+
+	; Clears the visual selection on the currently selected calendar tile, if any,
+	; resets the data panel to the hover hint, and disables the Wait and Track buttons.
+	; Safe to call when no tile is selected or when the grid has been unloaded.
+
+	; UDFs
+
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+
+	; State
+
+	short iSelectedDay = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedDay"
+	short iSelectedMonth = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedMonth"
+	short iSelectedYear = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedYear"
+
+	; Main
+
+	if iSelectedDay >= 1
+
+		string_var sTileName = (Call GetStorageDateStringUDF iSelectedYear iSelectedMonth iSelectedDay)
+		string_var sTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sTileName
+		SetUIFloatAlt $sTilePath 0
+
+		Sv_Destruct sTileName, sTilePath
+
+	endif
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_WaitButton/target" 0
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/target" 0
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_DataText/string" "Hover over a date for more information."
+
+	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" -1
+	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" -1
+	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" -1
+
+end
