@@ -1,0 +1,4 @@
+piplog\calendar.xml::MapMenu
+true
+piplog\birthdaymenu.xml::MessageMenu
+true

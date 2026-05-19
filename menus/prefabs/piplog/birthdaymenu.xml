@@ -1,0 +1,585 @@
+<!-- Birthday Menu by StealthDick -->
+
+<!-- Main container for the Birthday Menu -->
+<rect name="SD_BD_BirthdayMenu">
+    <!-- Center the menu on the screen -->
+    <x>
+        <copy src="screen" trait="width"/>
+        <sub src="me" trait="width"/>
+        <div>2</div>
+    </x>
+    <y>
+        <copy src="screen" trait="height"/>
+        <sub src="me" trait="height"/>
+        <div>2</div>
+    </y>
+    <!-- Set the dimensions of the menu -->
+    <width>400</width>
+    <height>624</height>
+    <locus>1</locus>
+    <visible>0</visible>
+
+    <!-- Background and decorative elements -->
+    <rect name="SD_BD_BackgroundBox">
+        <!-- Shared values for background elements -->
+        <_alpha>230</_alpha>
+        <_menuWidth><copy src="parent" trait="width"/></_menuWidth>
+        <_menuHeight>
+            <copy src="parent" trait="height"/>
+        </_menuHeight>
+        <depth>1</depth>
+
+        <!-- Background Image -->
+        <image name="SD_BD_Background">
+            <include src="VUI+\background.xml"/>
+            <_VUI+MenuX>0</_VUI+MenuX>
+            <_VUI+MenuY>0</_VUI+MenuY>
+            <_VUI+MenuWidth> <copy src="parent" trait="_menuWidth" /> </_VUI+MenuWidth>
+            <_VUI+MenuHeight> <copy src="parent" trait="_menuHeight" /> </_VUI+MenuHeight>
+            <alpha><copy src="parent" trait="_alpha"/></alpha>
+        </image>
+
+        <!-- Left Vertical Line (Top) -->
+        <image name="SD_BD_TopLeftVertLine">
+            <include src="vertical_fade_line.xml"/>
+            <x>0</x>
+            <y>0</y>
+        </image>
+
+        <!-- Left Horizontal Line (Top) -->
+        <image name="SD_BD_TopLeftHorLine">
+            <include src="line.xml"/>
+            <x>0</x>
+            <y>0</y>
+            <!-- Length of the line -->
+            <_length>
+                <copy src="grandparent" trait="width"/>
+                <mul>0.05</mul>
+            </_length>
+        </image>
+
+        <!-- Menu Header Text -->
+        <text name="SD_BD_MenuHeader">
+            <!-- Positioning the header next to the left horizontal line with padding -->
+            <x>
+                <copy src="sibling(SD_BD_TopLeftHorLine)" trait="_length"/>
+                <add>10</add> <!-- Padding between line and header -->
+            </x>
+            <y>
+                <sub>
+                    <copy src="me" trait="height"/>
+                    <div>3</div>
+                </sub>
+            </y>
+            <string>Set Birthday</string>
+            <depth>2</depth>
+        </text>
+
+        <!-- Right Horizontal Line (Top) -->
+        <image name="SD_BD_TopRightHorLine">
+            <include src="line.xml"/>
+            <!-- Positioning next to the header with padding -->
+            <x>
+                <copy src="sibling(SD_BD_MenuHeader)" trait="x"/>
+                <add src="sibling(SD_BD_MenuHeader)" trait="width"/>
+                <add>10</add> <!-- Padding between header and line -->
+            </x>
+            <!-- Calculate length based on the remaining space -->
+            <_length>
+                <copy src="grandparent" trait="width"/>
+                <sub src="me" trait="x"/>
+            </_length>
+        </image>
+
+        <!-- Right Vertical Line (Top) -->
+        <image name="SD_BD_TopRightVertLine">
+            <include src="vertical_fade_line.xml"/>
+            <x><copy src="grandparent" trait="width"/></x>
+        </image>
+
+        <!-- Left Vertical Line (Bottom) -->
+        <image name="SD_BD_BottomLeftVertLine">
+            <include src="vertical_fade_line.xml"/>
+            <y>
+                <copy src="parent" trait="_menuHeight" />
+                <sub src="me" trait="height"/>
+            </y>
+            <_bottom_to_top>1</_bottom_to_top>
+        </image>
+
+        <!-- Horizontal Line (Bottom) -->
+        <image name="SD_BD_BottomHorLine">
+            <include src="line.xml"/>
+            <y><copy src="parent" trait="_menuHeight" /></y>
+            <_length>
+                <copy src="grandparent" trait="width"/>
+                <add>2</add>
+            </_length>
+        </image>
+
+        <!-- Right Vertical Line (Bottom) -->
+        <image name="SD_BD_BottomRightVertLine">
+            <include src="vertical_fade_line.xml"/>
+            <x><copy src="grandparent" trait="width"/></x>
+            <y><copy src="sibling(SD_BD_BottomLeftVertLine)" trait="y"/></y>
+            <_bottom_to_top>1</_bottom_to_top>
+        </image>
+
+        <!-- Menu Description Text -->
+        <text name="SD_BD_BottomDesc">
+            <depth>2</depth>
+            <x>
+                <copy src="grandparent" trait="width"/>
+                <div>2</div>
+            </x>
+            <y>
+                <copy src="parent" trait="_menuHeight" />
+                <mul>0.97</mul>
+            </y>
+            <width>
+                <copy src="grandparent" trait="width"/>
+                <sub>24</sub>
+            </width>
+            <height>
+                <copy src="parent" trait="height"/>
+                <mul>0.20</mul>
+            </height>
+            <wrapwidth><copy src="me" trait="width"/></wrapwidth>
+            <justify>&center;</justify>
+            <font>2</font>
+            <string>This can only be done once.</string>
+            <zoom>40</zoom>
+        </text>
+
+        <text name="SD_BD_TopDesc">
+            <depth>2</depth>
+            <x><copy src="grandparent" trait="width"/><div>2</div></x>
+            <y><copy src="parent" trait="_menuHeight" /><mul>0.05</mul></y>
+            <width><copy src="grandparent" trait="width"/><sub>24</sub></width>
+            <height><copy src="parent" trait="height"/><mul>0.20</mul></height>
+            <wrapwidth><copy src="me" trait="width"/></wrapwidth>
+            <justify>&center;</justify>
+            <font>2</font>
+            <string>Set your birthday. Hold Left-Shift and click to quickly increase the Day and Year values.</string>
+            <zoom>75</zoom>
+        </text>
+    </rect>
+
+    <!-- Main Content Area -->
+    <rect name="SD_BD_MainContent">
+        <depth>3</depth>
+        <x>24</x>
+        <y>
+            <copy src="SD_BD_TopDesc" trait="y"/>
+            <add src="SD_BD_TopDesc" trait="height"/>
+            <add>
+                <copy src="parent" trait="height"/>
+                <mul>0.05</mul>
+            </add>
+        </y>
+        <width>
+            <copy src="parent" trait="width"/>
+            <sub>
+                <copy src="me" trait="x"/>
+                <mul>2</mul>
+            </sub>
+        </width>
+        <height>
+            <copy src="sibling(SD_BD_BottomButtons)" trait="y"/>
+            <sub src="me" trait="y"/>
+            <sub>4</sub>
+        </height>
+        <locus>1</locus>
+
+        <!-- Shared values for headings and boxes -->
+        <_fontSize>2</_fontSize>
+        <_justify>&center;</_justify>
+        <_textOffset>
+            <copy src="SD_BD_MonthHeading" trait="height"/>
+            <add>15</add>
+        </_textOffset>
+
+<!-- Headings for each interactable section -->
+<!-- Month Heading -->
+<text name="SD_BD_MonthHeading">
+    <x>
+        <copy src="parent" trait="width"/>
+        <div>2</div>
+    </x>
+    <y>0</y>
+    <string>Month</string>
+    <justify>&center;</justify>
+</text>
+
+<!-- Day Heading -->
+<text name="SD_BD_DayHeading">
+    <x>
+        <copy src="parent" trait="width"/>
+        <div>2</div>
+    </x>
+    <y>
+        <copy src="parent" trait="height"/>
+        <mul>0.25</mul>
+    </y>
+    <string>Day</string>
+    <justify>&center;</justify>
+</text>
+
+<!-- Year Heading -->
+<text name="SD_BD_YearHeading">
+    <x>
+        <copy src="parent" trait="width"/>
+        <div>2</div>
+    </x>
+    <y>
+        <copy src="parent" trait="height"/>
+        <mul>0.5</mul>
+    </y>
+    <string>Year</string>
+    <justify>&center;</justify>
+</text>
+
+<!-- Age Heading -->
+<text name="SD_BD_AgeHeading">
+    <x>
+        <copy src="parent" trait="width"/>
+        <div>2</div>
+    </x>
+    <y>
+        <copy src="parent" trait="height"/>
+        <mul>0.75</mul>
+    </y>
+    <string>Your Age</string>
+    <justify>&center;</justify>
+</text>
+
+<!-- Strings inside the headings -->
+<!-- Month String -->
+<text name="SD_BD_MonthString">
+    <x>
+        <copy src="sibling(SD_BD_MonthHeading)" trait="x"/>
+    </x>
+    <y>
+        <copy src="sibling(SD_BD_MonthHeading)" trait="y"/>
+        <add src="parent" trait="_textOffset"/>
+    </y>
+    <justify>&center;</justify>
+    <font><copy src="parent" trait="_fontSize"/></font>
+    <string>
+        <copy src="me" trait="_Value"/>
+        <copy src="me" trait="_month_"/>
+    </string>
+</text>
+
+<!-- Day String -->
+<text name="SD_BD_DayString">
+    <x><copy src="sibling(SD_BD_MonthString)" trait="x"/></x>
+    <y>
+        <copy src="sibling(SD_BD_DayHeading)" trait="y"/>
+        <add src="parent" trait="_textOffset"/>
+    </y>
+    <justify>&center;</justify>
+    <font><copy src="parent" trait="_fontSize"/></font>
+    <_Value></_Value>
+    <string><copy src="me" trait="_Value"/></string>
+</text>
+
+<!-- Year String -->
+<text name="SD_BD_YearString">
+    <x><copy src="sibling(SD_BD_MonthString)" trait="x"/></x>
+    <y>
+        <copy src="sibling(SD_BD_YearHeading)" trait="y"/>
+        <add src="parent" trait="_textOffset"/>
+    </y>
+    <justify>&center;</justify>
+    <font><copy src="parent" trait="_fontSize"/></font>
+    <_Value></_Value>
+    <string><copy src="me" trait="_Value"/></string>
+</text>
+
+<!-- Age String -->
+<text name="SD_BD_AgeString">
+    <x><copy src="sibling(SD_BD_MonthString)" trait="x"/></x>
+    <y>
+        <copy src="sibling(SD_BD_AgeHeading)" trait="y"/>
+        <add src="parent" trait="_textOffset"/>
+    </y>
+    <justify>&center;</justify>
+    <font><copy src="parent" trait="_fontSize"/></font>
+    <_Value></_Value>
+    <string><copy src="me" trait="_Value"/></string>
+    <systemcolor>
+        <copy src="io" trait="systemcolor"/>
+        <copy>
+            <copy>&hudalt;</copy>
+            <onlyif>
+                <copy src="me" trait="_Value"/>
+                <lt>0</lt>
+            </onlyif>
+        </copy>
+    </systemcolor>
+</text>
+
+
+        <!-- Shared values for arrows -->
+        <_arrowWidth>19</_arrowWidth>
+        <_arrowClickSound>UIMenuFocus</_arrowClickSound>
+        <_arrowMouseOverSound>UIMenuFocus</_arrowMouseOverSound>
+        <_box_visible>0</_box_visible>
+        <_x_inc>50</_x_inc>
+
+        <!-- Left Arrows -->
+        <!-- Month Left Arrow -->
+        <hotrect name="SD_BD_MonthLeftArrow">
+            <x>
+                <copy src="parent" trait="width"/>
+                <div>2</div>
+                <sub src="me" trait="width"/>
+                <sub src="parent" trait="_x_inc"/>
+            </x>
+            <y>
+                <copy src="sibling(SD_BD_MonthString)" trait="y"/>
+                <sub>
+                    <copy src="sibling(SD_BD_MonthString)" trait="height"/>
+                    <div>2</div>
+                </sub>
+            </y>
+            <width><copy src="parent" trait="_arrowWidth"/></width>
+            <height>
+                <copy src="sibling(SD_BD_MonthString)" trait="height"/>
+                <mul>1.5</mul>
+            </height>
+            <target>1</target>
+            <locus>1</locus>
+            <clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+            <mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+            <image name="SD_BD_MonthLeftArrow_t">
+                <filename>Interface\Main\main_arrow_left.dds</filename>
+                <width><copy src="parent" trait="width"/></width>
+                <height><copy src="parent" trait="height"/></height>
+                <zoom>&scale;</zoom>
+                <brightness>
+                    <copy>210</copy>
+                    <add>
+                        <copy src="globals" trait="_VUI+Highlighting"/>
+                        <mul>2</mul>
+                        <onlyif src="parent" trait="mouseover"/>
+                    </add>
+                </brightness>
+            </image>
+        </hotrect>
+
+        <!-- Day Left Arrow -->
+        <hotrect name="SD_BD_DayLeftArrow">
+            <x>
+                <copy src="parent" trait="width"/>
+                <div>2</div>
+                <sub src="me" trait="width"/>
+                <sub src="parent" trait="_x_inc"/>
+            </x>
+            <y>
+                <copy src="sibling(SD_BD_DayString)" trait="y"/>
+                <sub>
+                    <copy src="sibling(SD_BD_DayString)" trait="height"/>
+                    <div>2</div>
+                </sub>
+            </y>
+            <width><copy src="parent" trait="_arrowWidth"/></width>
+            <height>
+                <copy src="sibling(SD_BD_DayString)" trait="height"/>
+                <mul>1.5</mul>
+            </height>
+            <target>1</target>
+            <locus>1</locus>
+            <clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+            <mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+            <image name="SD_BD_DayLeftArrow_t">
+                <filename>Interface\Main\main_arrow_left.dds</filename>
+                <width><copy src="parent" trait="width"/></width>
+                <height><copy src="parent" trait="height"/></height>
+                <zoom>&scale;</zoom>
+                <brightness>
+                    <copy>210</copy>
+                    <add>
+                        <copy src="globals" trait="_VUI+Highlighting"/>
+                        <mul>2</mul>
+                        <onlyif src="parent" trait="mouseover"/>
+                    </add>
+                </brightness>
+            </image>
+        </hotrect>
+
+        <!-- Year Left Arrow -->
+        <hotrect name="SD_BD_YearLeftArrow">
+            <x>
+                <copy src="parent" trait="width"/>
+                <div>2</div>
+                <sub src="me" trait="width"/>
+                <sub src="parent" trait="_x_inc"/>
+            </x>
+            <y>
+                <copy src="sibling(SD_BD_YearString)" trait="y"/>
+                <sub>
+                    <copy src="sibling(SD_BD_YearString)" trait="height"/>
+                    <div>2</div>
+                </sub>
+            </y>
+            <width><copy src="parent" trait="_arrowWidth"/></width>
+            <height>
+                <copy src="sibling(SD_BD_YearString)" trait="height"/>
+                <mul>1.5</mul>
+            </height>
+            <target>1</target>
+            <locus>1</locus>
+            <clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+            <mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+            <image name="SD_BD_YearLeftArrow_t">
+                <filename>Interface\Main\main_arrow_left.dds</filename>
+                <width><copy src="parent" trait="width"/></width>
+                <height><copy src="parent" trait="height"/></height>
+                <zoom>&scale;</zoom>
+                <brightness>
+                    <copy>210</copy>
+                    <add>
+                        <copy src="globals" trait="_VUI+Highlighting"/>
+                        <mul>2</mul>
+                        <onlyif src="parent" trait="mouseover"/>
+                    </add>
+                </brightness>
+            </image>
+        </hotrect>
+
+        <!-- Right Arrows -->
+        <!-- Month Right Arrow -->
+        <hotrect name="SD_BD_MonthRightArrow">
+            <x>
+                <copy src="parent" trait="width"/>
+                <div>2</div>
+                <add src="parent" trait="_x_inc"/>
+            </x>
+            <y><copy src="sibling(SD_BD_MonthLeftArrow)" trait="y"/></y>
+            <width><copy src="parent" trait="_arrowWidth"/></width>
+            <height><copy src="sibling(SD_BD_MonthLeftArrow)" trait="height"/></height>
+            <target>1</target>
+            <locus>1</locus>
+            <clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+            <mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+            <image name="SD_BD_MonthRightArrow_t">
+                <filename>Interface\Main\main_arrow_right.dds</filename>
+                <width><copy src="parent" trait="width"/></width>
+                <height><copy src="parent" trait="height"/></height>
+                <zoom>&scale;</zoom>
+                <brightness>
+                    <copy>210</copy>
+                    <add>
+                        <copy src="globals" trait="_VUI+Highlighting"/>
+                        <mul>2</mul>
+                        <onlyif src="parent" trait="mouseover"/>
+                    </add>
+                </brightness>
+            </image>
+        </hotrect>
+
+        <!-- Day Right Arrow -->
+        <hotrect name="SD_BD_DayRightArrow">
+            <x>
+                <copy src="parent" trait="width"/>
+                <div>2</div>
+                <add src="parent" trait="_x_inc"/>
+            </x>
+            <y><copy src="sibling(SD_BD_DayLeftArrow)" trait="y"/></y>
+            <width><copy src="parent" trait="_arrowWidth"/></width>
+            <height><copy src="sibling(SD_BD_DayLeftArrow)" trait="height"/></height>
+            <target>1</target>
+            <locus>1</locus>
+            <clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+            <mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+            <image name="SD_BD_DayRightArrow_t">
+                <filename>Interface\Main\main_arrow_right.dds</filename>
+                <width><copy src="parent" trait="width"/></width>
+                <height><copy src="parent" trait="height"/></height>
+                <zoom>&scale;</zoom>
+                <brightness>
+                    <copy>210</copy>
+                    <add>
+                        <copy src="globals" trait="_VUI+Highlighting"/>
+                        <mul>2</mul>
+                        <onlyif src="parent" trait="mouseover"/>
+                    </add>
+                </brightness>
+            </image>
+        </hotrect>
+
+        <!-- Year Right Arrow -->
+        <hotrect name="SD_BD_YearRightArrow">
+            <x>
+                <copy src="parent" trait="width"/>
+                <div>2</div>
+                <add src="parent" trait="_x_inc"/>
+            </x>
+            <y><copy src="sibling(SD_BD_YearLeftArrow)" trait="y"/></y>
+            <width><copy src="parent" trait="_arrowWidth"/></width>
+            <height><copy src="sibling(SD_BD_YearLeftArrow)" trait="height"/></height>
+            <target>1</target>
+            <locus>1</locus>
+            <clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+            <mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+            <image name="SD_BD_YearRightArrow_t">
+                <filename>Interface\Main\main_arrow_right.dds</filename>
+                <width><copy src="parent" trait="width"/></width>
+                <height><copy src="parent" trait="height"/></height>
+                <zoom>&scale;</zoom>
+                <brightness>
+                    <copy>210</copy>
+                    <add>
+                        <copy src="globals" trait="_VUI+Highlighting"/>
+                        <mul>2</mul>
+                        <onlyif src="parent" trait="mouseover"/>
+                    </add>
+                </brightness>
+            </image>
+        </hotrect>
+
+
+    </rect>
+
+    <!-- Bottom Buttons Section -->
+    <rect name="SD_BD_BottomButtons">
+        <!-- Positioning the buttons -->
+        <x>
+            <copy src="me" trait="width"/>
+            <div>2</div>
+        </x>
+        <y>
+            <copy src="parent" trait="height"/>
+            <mul>0.85</mul>
+        </y>
+        <width><copy src="parent" trait="width"/></width>
+        <height>
+            <copy src="parent" trait="height"/>
+            <sub src="me" trait="y"/>
+        </height>
+        <locus>&true;</locus>
+        <depth>3</depth>
+
+        <!-- Shared values for buttons -->
+        <_verticalPadding>15</_verticalPadding>
+        <_horizontalPadding>15</_horizontalPadding>
+        <_fontSize>1</_fontSize>
+        <_justify>&center;</_justify>
+
+        <!-- Confirm Button -->
+        <hotrect name="SD_BD_ConfirmButton">
+            <visible>1</visible>
+            <include src="text_box.xml"/>
+            <string>Confirm</string>
+            <font><copy src="parent" trait="_fontSize"/></font>
+            <justify>&center;</justify>
+            <_verbuf><copy src="parent" trait="_verticalPadding"/></_verbuf>
+            <_horbuf><copy src="parent" trait="_horizontalPadding"/></_horbuf>
+        </hotrect>
+    </rect>
+
+    <!-- Shared values for the entire menu -->
+    <_sidePadding>16</_sidePadding>
+</rect>

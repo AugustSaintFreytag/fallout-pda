@@ -1,0 +1,1813 @@
+<!-- ===== MAIN POSITIONING RECT ===== -->
+<rect name="CM_MainRect">
+	<x><copy src="MM_MainRect" trait="x"/></x>
+	<y><copy src="MM_MainRect" trait="y"/></y>
+	<width><copy src="MM_MainRect" trait="width"/></width>
+	<height><copy src="MM_MainRect" trait="height"/></height>
+	<depth><copy src="MM_MainRect" trait="depth"/></depth>
+	<locus> &true; </locus>
+
+	<!--
+	This XML (and mod) evolved under duress,
+	lack of sleep,
+	poor emotional well-being,
+	an anorexic's appetite,
+	over 100 disposable vapes, 2 cigarettes,
+	and enough coffee to flood a mansion.
+	...overall bad habits.
+
+	None of the values are defined at the top of the script — I didn’t know how useful it would have been when I started.
+	Every altered string, modified integer, etc. is fully pathed in scripts — no shortcuts.
+
+	Some values are absolute, some are relative. If I hadn’t taken a class on HTML, everything here would be absolute.
+	Consistency wasn’t part of the process — just survival.
+
+	Refactored versions might exist in the future if something breaks for the general pop.
+	VUI+ was my favored UI mod at the time, meaning this will work great with vanilla UI as well.
+	As for Darnified, I have no interest in adding support for a mod I have to download from some
+	dusty Bethesda forum circa 2011.
+
+	For now, enjoy the duct tape.
+	— StealthDick, 5/20/2025 (Happy Birthday to me)
+	-->
+
+	<!--== HEADLINE RECT ==-->
+	<rect name="CM_HeadlineRect">
+		<width><copy src="MM_HeadlineRect" trait="width"/></width>
+		<height><copy src="MM_HeadlineRect" trait="height"/></height>
+		<visible>
+			<copy src="CM_Button1" trait="_toggled"/>
+			<and src="CM_Button1" trait="visible"/>
+		</visible>
+
+		<!-- Upper-left corner -->
+		<image name="CM_Headline_v1">
+			<include src="vertical_fade_line.xml"/>
+		</image>
+		
+		<image name="CM_Headline_h1">
+			<include src="line.xml"/>
+			<_length><copy src="MM_Headline_h1" trait="_length"/></_length>
+		</image>
+
+		<!-- Menu title -->
+		<text name="CM_Headline_Title">
+			<font><copy src="MM_Headline_Title" trait="font"/></font>
+			
+			<x><copy src="MM_Headline_Title" trait="x"/></x>
+			<y><copy src="MM_Headline_Title" trait="y"/></y>
+			<string> &-sData; </string>
+		</text>
+		
+		<image name="CM_Headline_h2">
+			<include src="line.xml"/>
+			<x><copy src="MM_Headline_h2" trait="x"/></x>
+			<_length><copy src="MM_Headline_h2" trait="_length"/></_length>
+		</image>
+
+		<!-- Player's current location -->
+		<text name="CM_Headline_LocationInfo">
+			<font><copy src="MM_Headline_LocationInfo" trait="font"/></font>
+			<justify> &right; </justify>
+			<_title_1>Calendar</_title_1>
+			<_title_2>Journal</_title_2>
+			<_title_3>Yearly Events</_title_3>
+			<_title_4>Monthly Events</_title_4>
+			<_title_5>Weekly Events</_title_5>
+			<_title_6>One-Time Events</_title_6>
+			<_Title>
+				<copy>1</copy>
+				<add src="CM_Button2" trait="_toggled"/>
+				<add>
+					<copy>2</copy>
+					<sub src="CM_Button2" trait="_toggled"/>
+					<onlyif src="CM_Button3" trait="_toggled"/>
+				</add>
+				<add>
+					<copy src="CM_Button2" trait="user0"/>
+					<onlyif src="CM_Button3" trait="_toggled"/>
+				</add>
+				<copy src="me()" trait="_Title_"/>
+			</_Title>
+			
+			<x><copy src="MM_Headline_LocationInfo" trait="x"/></x>
+			<y><copy src="MM_Headline_LocationInfo" trait="y"/></y>
+			<string><copy src="me()" trait="_Title"/></string>
+		</text>
+		
+		<image name="CM_Headline_v2">
+			<include src="vertical_fade_line.xml"/>
+			<x><copy src="MM_Headline_v2" trait="x"/></x>
+		</image>
+		
+		<image name="CM_Headline_h3">
+			<include src="line.xml"/>
+			<x><copy src="MM_Headline_h3" trait="x"/></x>
+			<_length><copy src="MM_Headline_h3" trait="_length"/></_length>
+		</image>
+		
+		<!-- The current time -->
+		<text name="CM_Headline_TimeDateInfo">
+			<font><copy src="MM_Headline_TimeDateInfo" trait="font"/></font>
+			<justify> &right; </justify>
+			
+			<x><copy src="MM_Headline_TimeDateInfo" trait="x"/></x>
+			<y><copy src="MM_Headline_TimeDateInfo" trait="y"/></y>
+			<string><copy src="MM_Headline_TimeDateInfo" trait="string"/></string>		<!-- Set in code -->
+		</text>
+		
+		<image name="CM_Headline_v3">
+			<include src="vertical_fade_line.xml"/>
+			<x><copy src="MM_Headline_v3" trait="x"/></x>
+		</image>
+		
+	</rect>
+	<!--== BUTTON RECT ==-->
+	<rect name="CM_ButtonRect">
+		<visible>1</visible>
+		<x><copy src="MM_ButtonRect" trait="x"/></x>
+		<y><copy src="MM_ButtonRect" trait="y"/></y>
+		<y>60</y>
+		<height> 120 </height>
+		<locus> &true; </locus>
+
+		<hotrect name="CM_Button3">	<!--Event Button-->
+			<id>512</id>
+			<include src="text_box.xml"/>
+			<_horbuf> 20 </_horbuf>
+			<_verbuf> 15 </_verbuf>
+			<justify> &right; </justify>
+			<_line_alpha>
+				<copy> 127 </copy>
+				<add>
+					<copy> 128 </copy>
+					<onlyif src="me()" trait="target"/>
+				</add>
+			</_line_alpha>
+
+			<visible>
+				<copy src="sibling(CM_Button1)" trait="_toggled"/>
+				<and src="sibling(CM_Button1)" trait="visible"/>
+			</visible>
+
+			<string><copy src="me()" trait="_Title"/></string>
+
+			<target>
+				<copy>1</copy>
+				<onlyifnot src="CM_CustomEventRect" trait="visible"/>
+			</target>
+
+			<_Title>
+				<copy src="me()" trait="_toggled"/>
+				<add>1</add>
+				<copy src="me()" trait="_Title_"/>
+			</_Title>
+
+			<_Title_1>Events</_Title_1>
+			<_Title_2>Back</_Title_2>
+
+			<mouseoversound>UIMenuFocus</mouseoversound>
+			<clicksound>UIPipBoySelect</clicksound>
+
+			<_PCButtonText> Q) </_PCButtonText>
+			<_toggled>0</_toggled>
+		</hotrect>
+
+		<hotrect name="CM_Button2">	<!--Calendar Button-->
+			<id>511</id>
+			<include src="text_box.xml"/>
+			<_y>
+				<copy src="sibling(CM_Button3)" trait="_y"/>
+				<add>
+					<copy src="sibling(CM_Button1)" trait="height"/>
+					<onlyif src="sibling(CM_Button1)" trait="visible"/>
+				</add>				
+			</_y>
+			<_horbuf> 20 </_horbuf>
+			<_verbuf> 15 </_verbuf>
+			<justify> &right; </justify>
+			<_line_alpha>
+				<copy> 127 </copy>
+				<add>
+					<copy> 128 </copy>
+					<onlyif src="me()" trait="target"/>
+				</add>
+			</_line_alpha>
+
+			<justify> &right; </justify>
+
+			<visible>
+				<copy src="sibling(CM_Button1)" trait="_toggled"/>
+				<and src="sibling(CM_Button1)" trait="visible"/>
+			</visible>
+
+			<!-- If inside the Event tab, add user0 to the Headline_location title to update which type of event we are looking at-->
+			<user0>0</user0>
+
+			<_Title_1>Journal</_Title_1>
+			<_Title_2>Calendar</_Title_2>
+			<_Title_3>Next Event Type</_Title_3>
+
+			<_Title>
+				<!--Determine if we should display 'Journal' or 'Calendar' based on the state of CM_Button2.
+					This block defaults to 'Journal' (Title 1) and switches to 'Calendar' (Title 2) 
+					if CM_Button2 is toggled, provided the event menu (CM_Button3) is NOT toggled.-->
+				<copy>
+					<copy>1</copy>
+					<onlyif>
+						<copy src="me()" trait="_toggled"/>
+						<eq>1</eq>
+						<and>
+							<copy src="sibling(CM_Button3)" trait="_toggled"/>
+							<eq>0</eq>
+						</and>
+					</onlyif>
+				</copy>
+
+				<!--Add 2 to switch to 'Next Event Type' (Title 3) if the event menu (CM_Button3) is toggled.
+					This ensures that the button shows 'Next Event Type' when the event menu is active.-->
+				<add>
+					<copy>2</copy>
+					<onlyif>
+						<copy src="sibling(CM_Button3)" trait="_toggled"/>
+						<eq>1</eq>
+					</onlyif>
+				</add>
+
+				<!--Final adjustment: add 1 to the result to ensure correct title indexing.
+					Since _Title starts at 0, adding 1 aligns it with _Title_1, _Title_2, or _Title_3.-->
+				<add>1</add>
+				<copy src="me()" trait="_Title_"/>
+			</_Title>
+
+
+			<string><copy src="me()" trait="_Title"/></string>
+
+			<target>
+				<copy>1</copy>
+				<onlyifnot src="CM_CustomEventRect" trait="visible"/>
+			</target>
+
+			<mouseoversound>UIMenuFocus</mouseoversound>
+			<clicksound>UIPipBoySelect</clicksound>
+
+			<_PCButtonText> R) </_PCButtonText>
+			<_toggled>0</_toggled>
+		</hotrect>
+
+		<hotrect name="CM_Button1">	<!--Calendar Button-->
+			<id>510</id>
+			<include src="text_box.xml"/>
+			<_y>
+				<copy src="sibling(CM_Button2)" trait="_y"/>
+				<add>
+					<copy src="sibling(CM_Button2)" trait="height"/>
+					<onlyif src="sibling(CM_Button2)" trait="visible"/>
+				</add>
+				<add>
+					<copy src="MM_ButtonY" trait="height"/>
+					<onlyifnot src="sibling(CM_Button2)" trait="visible"/>
+				</add>			
+			</_y>
+
+			<_horbuf> 20 </_horbuf>
+			<_verbuf> 15 </_verbuf>
+			<justify> &right; </justify>
+			<_line_alpha>
+				<copy> 127 </copy>
+				<add>
+					<copy> 128 </copy>
+					<onlyif src="me()" trait="target"/>
+				</add>
+			</_line_alpha>
+
+			<justify> &right; </justify>
+
+			<visible>
+				<copy src="MM_Tabline" trait="_CurrentTab"/>
+				<eq> 3 </eq>
+			</visible>
+
+			<string><copy src="me()" trait="_Title"/></string>
+
+			<target>
+				<copy>1</copy>
+				<onlyifnot src="CM_CustomEventRect" trait="visible"/>
+			</target>
+
+			<_Title>
+				<copy src="me()" trait="_toggled"/>
+				<add>1</add>
+				<copy src="me()" trait="_Title_"/>
+			</_Title>
+
+			<mouseoversound>UIMenuFocus</mouseoversound>
+			<clicksound>UIPipBoySelect</clicksound>
+
+			<_Title_1>Log</_Title_1>
+			<_Title_2>Notes</_Title_2>
+
+			<_PCButtonText> C) </_PCButtonText>
+			<_toggled>0</_toggled>
+		</hotrect>
+
+	</rect>
+
+	<!--== CALENDAR RECT ==-->
+	<!--For the information displayed in the calendar section-->
+	<rect name="CM_CalendarRect">
+		<x>-10</x>
+		<y>115</y>
+		<locus>1</locus>
+		<visible>
+			<copy src="sibling(CM_HeadlineRect)" trait="visible"/>
+			<and>
+				<copy src="CM_Button2" trait="_toggled"/>
+				<eq>0</eq>
+			</and>
+			<and>
+				<copy src="CM_Button3" trait="_toggled"/>
+				<eq>0</eq>
+			</and>
+		</visible>
+
+		<text name="CM_MonthTitle">
+			<x>230</x>
+			<width>
+				<copy src="sibling(CM_IncreaseArrow)" trait="x"/>
+			</width>
+			<_month_0>January</_month_0>
+			<_month_1>February</_month_1>
+			<_month_2>March</_month_2>
+			<_month_3>April</_month_3>
+			<_month_4>May</_month_4>
+			<_month_5>June</_month_5>
+			<_month_6>July</_month_6>
+			<_month_7>August</_month_7>
+			<_month_8>September</_month_8>
+			<_month_9>October</_month_9>
+			<_month_10>November</_month_10>
+			<_month_11>December</_month_11>
+
+			<depth> 5 </depth>
+			<string></string>
+			<justify>&center;</justify>
+			<font>6</font>
+		</text>
+
+		<rect name="CM_Weekdays">
+			<depth>5</depth>
+			<width>400</width>
+			<height>
+				<copy src="child(CM_Day0)" trait="height"/>
+			</height>
+			<y>
+				<copy src="sibling(CM_MonthTitle)" trait="y"/>
+				<add src="sibling(CM_MonthTitle)" trait="height"/>
+				<add>15</add>
+			</y>
+			<x>52</x>
+			<_dimensions>53</_dimensions>
+			<_font>3</_font>
+			<locus>&true;</locus>
+
+			<text name="CM_Day0">
+				<width><copy src="parent" trait="_dimensions"/></width>
+				<height><copy src="parent" trait="_dimensions"/></height>
+				<string>SUN</string>
+				<font><copy src="parent" trait="_font"/></font>
+			</text>
+
+			<text name="CM_Day1">
+				<x>
+					<copy src="sibling(CM_Day0)" trait="x"/>
+					<add src="parent" trait="_dimensions"/>
+				</x>
+				<width><copy src="parent" trait="_dimensions"/></width>
+				<height><copy src="parent" trait="_dimensions"/></height>
+				<string>MON</string>
+				<font><copy src="parent" trait="_font"/></font>
+			</text>
+
+			<text name="CM_Day2">
+				<x>
+					<copy src="sibling(CM_Day1)" trait="x"/>
+					<add src="parent" trait="_dimensions"/>
+				</x>
+				<width><copy src="parent" trait="_dimensions"/></width>
+				<height><copy src="parent" trait="_dimensions"/></height>
+				<string>TUE</string>
+				<font><copy src="parent" trait="_font"/></font>
+			</text>
+
+			<text name="CM_Day3">
+				<x>
+					<copy src="sibling(CM_Day2)" trait="x"/>
+					<add src="parent" trait="_dimensions"/>
+				</x>
+				<width><copy src="parent" trait="_dimensions"/></width>
+				<height><copy src="parent" trait="_dimensions"/></height>
+				<string>WED</string>
+				<font><copy src="parent" trait="_font"/></font>
+			</text>
+
+			<text name="CM_Day4">
+				<x>
+					<copy src="sibling(CM_Day3)" trait="x"/>
+					<add src="parent" trait="_dimensions"/>
+				</x>
+				<width><copy src="parent" trait="_dimensions"/></width>
+				<height><copy src="parent" trait="_dimensions"/></height>
+				<string>THU</string>
+				<font><copy src="parent" trait="_font"/></font>
+			</text>
+
+			<text name="CM_Day5">
+				<x>
+					<copy src="sibling(CM_Day4)" trait="x"/>
+					<add src="parent" trait="_dimensions"/>
+				</x>
+				<width><copy src="parent" trait="_dimensions"/></width>
+				<height><copy src="parent" trait="_dimensions"/></height>
+				<string>FRI</string>
+				<font><copy src="parent" trait="_font"/></font>
+			</text>
+
+			<text name="CM_Day6">
+				<x>
+					<copy src="sibling(CM_Day5)" trait="x"/>
+					<add src="parent" trait="_dimensions"/>
+				</x>
+				<width><copy src="parent" trait="_dimensions"/></width>
+				<height><copy src="parent" trait="_dimensions"/></height>
+				<string>SAT</string>
+				<font><copy src="parent" trait="_font"/></font>
+			</text>
+		</rect>
+
+		<hotrect name="CM_DecreaseArrow">
+			<id>514</id>
+			<x>60</x>
+			<y>
+				<copy src="sibling(CM_MonthTitle)" trait="y"/>
+				<sub>8</sub>
+			</y>
+			<width> 17.5 </width>
+			<height> 50 </height>
+			<target> &true; </target>
+			<mouseoversound>UIMenuFocus</mouseoversound>
+			<clicksound>UIMenuPrevNext</clicksound>
+
+			<image name="CM_DecreaseArrowIcon">
+				<filename> Interface\Main\main_arrow_left.dds </filename>
+				<x><copy src="parent" trait="x"/></x>
+				<y><copy src="parent" trait="y"/></y>
+				<width><copy src="parent" trait="width"/></width>
+				<height><copy src="parent" trait="height"/></height>
+				<zoom> &scale; </zoom>
+			</image>
+		</hotrect>
+		
+		<hotrect name="CM_IncreaseArrow">
+			<id>513</id>
+			<x>390</x>
+			<y>
+				<copy src="sibling(CM_DecreaseArrow)" trait="y"/>
+			</y>
+			<width> 17.5 </width>
+			<height> 50 </height>
+			<target> &true; </target>
+			<mouseoversound>UIMenuFocus</mouseoversound>
+			<clicksound>UIMenuPrevNext</clicksound>
+
+			<image name="CM_IncreaseArrowIcon">
+				<filename> Interface\Main\main_arrow_right.dds </filename>
+				<x><copy src="parent" trait="x"/></x>
+				<y><copy src="parent" trait="y"/></y>
+				<width><copy src="parent" trait="width"/></width>
+				<height><copy src="parent" trait="height"/></height>
+				<zoom> &scale; </zoom>
+			</image>
+		</hotrect>
+
+
+	</rect>
+
+	<rect name="CM_EventRect">
+		<_editing>0</_editing>
+		<visible>
+			<copy src="sibling(CM_HeadlineRect)" trait="visible"/>
+			<and>
+				<copy src="CM_Button3" trait="_toggled"/>
+				<eq>1</eq>
+			</and>
+		</visible>
+
+		<rect name="CM_EventSide">
+			<locus>1</locus>
+			<visible>1</visible><!-- Set in code-->
+			<x>525</x>
+			<y>355</y>
+			<width>
+				<copy src="CM_Headline_v3" trait="x"/>
+				<sub src="me" trait="x"/>					
+			</width>
+			<height>106</height>
+			<_tileselected>0</_tileselected>
+
+			<image name="CM_EventLineH1">
+				<visible><copy src="parent" trait="_tileselected"/></visible>
+				<include src="line.xml"/>
+				<_length><copy src="parent" trait="width"/></_length>
+			</image>
+
+			<image name="CM_EventLineV1">
+				<visible><copy src="parent" trait="_tileselected"/></visible>
+				<include src="vertical_fade_line.xml"/>
+				<x><copy src="parent" trait="width"/></x>
+			</image>
+
+			<!--Variables for Events-->
+			<_font>2</_font>
+			<_zoom>90</_zoom>
+
+			<text name="CM_Event_Side_1R">
+				<visible><copy src="parent" trait="_tileselected"/></visible>				
+				<string></string><!-- Set in code-->
+				<justify>&left;</justify>
+				<y>25</y>
+				<x>5</x>
+				<width>
+					<copy src="parent" trait="width"/>
+				</width>
+				<font><copy src="parent" trait="_font"/></font>
+				<zoom><copy src="parent" trait="_zoom"/></zoom>
+			</text>
+
+			<text name="CM_Event_Side_2R">
+				<visible><copy src="parent" trait="_tileselected"/></visible>
+				<string></string><!-- Set in code-->
+				<justify>&left;</justify>
+				<y>
+					<copy src="sibling(CM_Event_Side_1R)" trait="y"/>
+					<add src="sibling(CM_Event_Side_1R)" trait="height"/>
+					<add>15</add>
+				</y>
+				<x><copy src="sibling(CM_Event_Side_1R)" trait="x"/></x>
+				<width>
+					<copy src="parent" trait="width"/>
+				</width>
+				<font><copy src="parent" trait="_font"/></font>
+				<zoom><copy src="parent" trait="_zoom"/></zoom>
+			</text>
+
+			<hotrect name="CM_Event_Delete">
+				<id>525</id>
+				<visible><copy src="parent" trait="_tileselected"/></visible>
+				<width>24</width>
+				<height>
+					<copy src="me" trait="width"/>
+				</height> 
+				<x>
+					<copy src="parent" trait="width"/>
+					<sub src="me" trait="width"/>
+					<sub>21</sub>
+				</x>
+				<y>
+					<!-- <copy src="parent" trait="height"/>
+					<sub src="me" trait="height"/> -->
+					<add>19</add>
+				</y>
+				<target>1</target>
+				<locus>1</locus>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clickSound>UIMenuCancel</clickSound>
+				<image name="EntryDelete_ico">
+					<depth>
+						<copy src="parent" trait="depth"/>
+						<sub>1</sub>
+					</depth>
+					<_filename_1>Interface\piplog\calendar_x.dds</_filename_1>
+					<_filename_2>Interface\piplog\calendar_x_filled.dds</_filename_2>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<clips> &true; </clips>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_filename_"/>
+					</filename>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
+		</rect>
+
+		<!--Larger section for holding all of the written journal entries-->
+		<hotrect name="CM_EventTextRect">
+			<locus>1</locus>
+			<wheelable>&true;</wheelable>
+			<clipwindow> &true; </clipwindow>
+			<target> <copy src="me()" trait="visible"/> </target>
+			<visible>
+				<copy>1</copy>
+				<onlyifnot src="parent" trait="_editing"/>
+			</visible>
+
+			<x>0</x>
+			<y>50</y>
+			<width>697</width>
+			<height>515</height>
+			<_templateheight></_templateheight>
+
+			<!--Scroll bar for the Journal, might need some refinement-->
+			<hotrect name="CM_EventScrollbar">
+				<include src="scrollbar_vert.xml"/>
+				<y>26</y>				<!--The placement of the top arrow-->
+				<height>468.5</height>	<!--The placement of the bottom arrow-->
+				<_x>-15</_x>
+				<_wheelmoved> <copy src="parent()" trait="wheelmoved"/> </_wheelmoved>
+				<_number_of_visible_items>
+					<copy src="parent" trait="height"/>
+					<div src="me" trait="_scrolldelta" />
+				</_number_of_visible_items>
+				<_number_of_items>
+					<copy src="parent" trait="_templateheight"/>
+					<div src="me" trait="_scrolldelta" />
+				</_number_of_items>
+				
+				<_ScrollDelta> 16 </_ScrollDelta>
+			</hotrect>
+
+			<!-- Event Parent w/ Event children tiles stored here
+			Event parent and children tiles are stored at the bottom of this document-->
+
+		</hotrect>
+	</rect>
+
+	<!-- Container for the Journal tab -->
+	<rect name="CM_JournalRect">
+		<_editing>0</_editing>
+		<visible>
+			<copy src="sibling(CM_HeadlineRect)" trait="visible"/>
+			<and>
+				<copy src="CM_Button2" trait="_toggled"/>
+				<eq>1</eq>
+			</and>
+			<and>
+				<copy src="CM_Button3" trait="_toggled"/>
+				<eq>0</eq>
+			</and>
+		</visible>
+
+		<!--Tiny section to the right for adding new journal entries-->
+		<rect name="CM_JournalSide">
+			<locus>1</locus>
+			<x>697</x>
+			<y>450</y>
+			<width>
+				<copy src="CM_Headline_v3" trait="x"/>
+				<sub src="me" trait="x"/>					
+			</width>
+			<height>106</height>
+
+			<image name="CM_JournalLineH">
+				<include src="line.xml"/>
+				<_length><copy src="parent" trait="width"/></_length>
+			</image>
+
+			<image name="CM_JournalLineV">
+				<include src="vertical_fade_line.xml"/>
+				<x><copy src="parent" trait="width"/></x>
+			</image>
+
+			<hotrect name="CM_JournalWrite">
+				<id>515</id>
+				<include src="text_box.xml"/>
+				<y>10</y>
+				<string>Write Entry</string>
+				<target>1</target>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clickSound>UIMenuOK</clickSound>
+				<font>2</font>
+			</hotrect>
+
+			<hotrect name="CM_JournalSort">
+				<id>516</id>
+				<include src="text_box.xml"/>
+				<y>60</y>
+				<_title_1>Sort Asc.</_title_1>
+				<_title_2>Sort Dsc.</_title_2>
+				<_Title>
+					<copy src="me()" trait="_value"/>
+					<add>1</add>
+					<copy src="me()" trait="_title_"/>
+				</_Title>
+				<_value>0</_value>
+				<_string></_string>
+				<string>
+					<copy src="me" trait="_Title"/>
+				</string>
+				<target>1</target>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clickSound>UIMenuPrevNext</clickSound>
+				<font>2</font>
+			</hotrect>
+		</rect>
+
+		<!--Larger section for holding all of the written journal entries-->
+		<hotrect name="CM_JournalTextRect">
+			<id>517</id>
+			<locus>1</locus>
+			<wheelable>&true;</wheelable>
+			<clipwindow> &true; </clipwindow>
+			<target> <copy src="me()" trait="visible"/> </target>
+			<visible>
+				<copy>1</copy>
+				<onlyifnot src="parent" trait="_editing"/>
+			</visible>
+
+			<x>0</x>
+			<y>100</y>
+			<width>697</width>
+			<height>470</height>
+			<_templateheight></_templateheight>
+
+			<!--Scroll bar for the Journal, might need some refinement-->
+			<hotrect name="CM_JournalScrollbar">
+				<include src="scrollbar_vert.xml"/>
+				<y>-25</y>				<!--The placement of the top arrow-->
+				<height>475</height>	<!--The placement of the bottom arrow-->
+				<_x>-15</_x>
+				<_wheelmoved> <copy src="parent()" trait="wheelmoved"/> </_wheelmoved>
+				<_number_of_visible_items>
+					<copy src="parent" trait="height"/>
+					<div src="me" trait="_scrolldelta" />
+				</_number_of_visible_items>
+				<_number_of_items>
+					<copy src="parent" trait="_templateheight"/>
+					<div src="me" trait="_scrolldelta" />
+				</_number_of_items>
+				
+				<_ScrollDelta> 16 </_ScrollDelta>
+			</hotrect>
+
+			<!--Rect for holding entries would go in here,
+			Each journal entry is stored in that rect.-->
+
+		</hotrect>
+	</rect>
+
+	<rect name="CM_DataRect">
+		<x><copy src="MM_DataRect" trait="x"/></x>
+		<y>275</y>
+		<width><copy src="MM_DataRect" trait="width"/></width>
+		<visible><copy src="sibling(CM_CalendarRect)" trait="visible"/></visible>
+		<locus>&true;</locus>
+		
+	
+		<hotrect name="CM_DataTextRect">
+			<wheelable> &true; </wheelable>
+			<clipwindow> &true; </clipwindow>
+	
+			<visible>
+				<copy>1</copy>
+				<onlyifnot src="CM_CustomEventRect" trait="visible"/>
+			</visible>
+			<target><copy src="me()" trait="visible"/></target>
+			<locus>&true;</locus>
+			
+			<width><copy src="MM_DataTextRect" trait="width"/></width>
+			<height>295</height>
+					
+			<hotrect name="CM_TextScrollbar">
+				<include src="scrollbar_vert.xml"/>
+	
+				<y>50</y>				<!--The placement of the top arrow-->
+				<height>219</height>	<!--The placement of the bottom arrow-->
+				<_x> <copy src="parent()" trait="width"/> </_x>
+				<_wheelmoved> <copy src="parent()" trait="wheelmoved"/> </_wheelmoved>
+				<_number_of_visible_items> 1 </_number_of_visible_items>
+				
+				<_ScrollDelta> </_ScrollDelta> <!--Set in code-->
+			</hotrect>
+				
+			<text name="CM_DataText">
+				<justify>&left;</justify>
+			
+				<y>
+					<copy src="sibling(CM_TextScrollbar)" trait="_current_value"/>
+					<mul src="sibling(CM_TextScrollbar)" trait="_ScrollDelta"/>
+					<mul>-1</mul>
+					<add>2</add>
+				</y>
+				<wrapwidth> <copy src="parent()" trait="width"/> </wrapwidth>
+				<clips>&true;</clips>
+				<font>1</font>
+				<zoom>95</zoom>					
+				
+				<string>Hover over a date for more information.</string>		<!-- Set in code -->
+			</text>
+		</hotrect>
+
+		<!--== TOOLBAR ABOVE DATA TEXT ==-->
+		<rect name="CM_ToolsRect">
+
+			<y>-65</y>
+			<x>-3</x>
+			<width><copy src="parent" trait="width"/></width>
+			<locus>1</locus>
+		
+			<!-- Shared Values -->
+			<_xverbuf>5</_xverbuf>
+			<_xhorbuf>13</_xhorbuf>
+			<_font>2</_font>
+			<_justify>&right;</_justify>
+			<_box_visible>0</_box_visible>
+			<_padding>10</_padding>
+		
+			<hotrect name="CM_CustomButton">
+				<id>517</id>
+				<depth>14</depth>
+				<include src="text_box.xml"/>
+				<_verbuf><copy src="parent" trait="_xverbuf"/></_verbuf>
+				<_horbuf><copy src="parent" trait="_xhorbuf"/></_horbuf>
+				<font><copy src="parent" trait="_font"/></font>
+				<justify><copy src="parent" trait="_justify"/></justify>
+				<_box_visible><copy src="parent" trait="_box_visible"/></_box_visible>
+				<string>Create Event</string>
+				<target>
+					<copy>1</copy>
+					<onlyifnot src="CM_CustomEventRect" trait="visible"/>
+				</target>
+				<_toggled></_toggled>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clicksound>UIMenuFocus</clicksound>
+				<x>
+					<copy src="parent" trait="width"/>
+					<sub>
+						<copy src="me()" trait="width"/>
+					</sub>
+				</x>
+		
+		
+				<image name="HorLine">
+					<include src="line.xml"/>
+					<_length><copy src="parent" trait="width"/></_length>
+				</image>
+		
+				<image name="VerLine">
+					<include src="vertical_fade_line.xml"/>
+					<x><copy src="sibling(HorLine)" trait="_length"/></x>
+					<height><copy src="parent" trait="height"/></height>
+				</image>
+			</hotrect>
+		
+			<hotrect name="CM_WaitButton">
+				<depth>14</depth>
+				
+				<include src="text_box.xml"/>
+				<id>526</id>
+				<_verbuf><copy src="parent" trait="_xverbuf"/></_verbuf>
+				<_horbuf><copy src="parent" trait="_xhorbuf"/></_horbuf>
+				<font><copy src="parent" trait="_font"/></font>
+				<justify><copy src="parent" trait="_justify"/></justify>
+				<_box_visible><copy src="parent" trait="_box_visible"/></_box_visible>
+				<string>Wait Until</string>
+				<target>0</target>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clicksound>UIMenuFocus</clicksound>
+				<x>
+					<copy src="CM_CustomButton" trait="x"/>
+					<sub>
+						<copy src="me()" trait="width"/>
+					</sub>
+					<sub>
+						<copy src="parent" trait="_padding"/>
+					</sub>
+				</x>
+
+				<image name="HorLine">
+					<include src="line.xml"/>
+					<_length><copy src="parent" trait="width"/></_length>
+				</image>
+
+				<image name="VerLine">
+					<include src="vertical_fade_line.xml"/>
+					<x><copy src="sibling(HorLine)" trait="_length"/></x>
+					<height><copy src="parent" trait="height"/></height>
+				</image>
+			</hotrect>
+
+			<!-- Set Alarm Button -->
+			<hotrect name="CM_TrackButton">
+				<depth>14</depth>
+				<include src="text_box.xml"/>
+				<id>527</id>
+
+				<_verbuf><copy src="parent" trait="_xverbuf"/></_verbuf>
+				<_horbuf>-2</_horbuf>
+				<font><copy src="parent" trait="_font"/></font>
+				<justify>1</justify>
+				<_box_visible><copy src="parent" trait="_box_visible"/></_box_visible>
+				<_Title_1>Remind: No</_Title_1>
+				<_Title_2>Remind: Yes</_Title_2>
+				<_Title>
+					<copy src="me()" trait="_value"/>
+					<add>1</add>
+					<copy src="me()" trait="_title_"/>
+				</_Title>
+				<_value>0</_value>
+				<_string></_string>
+				<string>
+					<copy src="me" trait="_Title"/>
+				</string>
+				<target>0</target>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+
+				<_Sound_1>UIMenuOK</_Sound_1>
+				<_Sound_2>UIMenuCancel</_Sound_2>
+
+				<_Sound>
+					<copy src="me()" trait="_value"/>
+					<add>1</add>
+					<copy src="me()" trait="_Sound_"/>
+				</_Sound>
+
+				<clicksound>
+					<copy src="me" trait="_Sound"/>
+				</clicksound>
+				<x>
+					<copy src="CM_WaitButton" trait="x"/>
+					<sub>
+						<copy src="me()" trait="width"/>
+					</sub>
+					<sub>
+						<copy src="parent" trait="_padding"/>
+					</sub>
+				</x>
+				
+				<width>142</width>
+				<!--<width><copy src="me()" trait="width"/></width>-->
+
+				<image name="HorLine">
+					<include src="line.xml"/>
+					<_length><copy src="parent" trait="width"/></_length>
+				</image>
+
+				<image name="VerLine">
+					<include src="vertical_fade_line.xml"/>
+					<x><copy src="sibling(HorLine)" trait="_length"/></x>
+					<height><copy src="parent" trait="height"/></height>
+				</image>
+			</hotrect>
+		
+			<!-- Horizontal Line -->
+			<image name="CM_HorLine">
+				<include src="line.xml"/>
+				<x>0</x>
+				<y><copy src="CM_VerLine" trait="y"/></y>
+				<_length><copy src="sibling(CM_VerLine)" trait="x"/></_length>
+			</image>
+		
+			<!-- Vertical Line -->
+			<image name="CM_VerLine">
+				<include src="vertical_fade_line.xml"/>
+				<y>37</y>
+				<x>463</x>
+			</image>
+		
+		</rect>
+
+		<!--==CUSTOM EVENT RECT ==-->
+		<rect name="CM_CustomEventRect">
+			<visible>
+				<copy src="CM_CustomButton" trait="_toggled"/>
+				<eq>1</eq>
+				<and src="CM_CustomButton" trait="visible"/>
+			</visible>	
+			<locus>1</locus>
+			<width><copy src="parent" trait="width"/></width>
+			<height>320</height>
+
+			<_arrowWidth>41</_arrowWidth>
+			<_arrowHeight>41</_arrowHeight>
+			<_arrowClickSound>UIMenuPrevNext</_arrowClickSound>
+			<_arrowMouseOverSound>UIMenuFocus</_arrowMouseOverSound>
+			<_box_visible>0</_box_visible>
+			<_x_inc>60</_x_inc>
+
+			<text name="CM_Event_Header">
+				<x>
+					<copy src="parent" trait="width"/>
+					<div>2</div>
+				</x>
+				<y>0</y>
+				<justify>&center;</justify>
+				<font>1</font>
+				<string>New Event</string>
+				<zoom>85</zoom>
+			</text>
+
+			<hotrect name="CM_Event_TextBox">
+				<id>518</id>
+				<include src="text_box.xml"/>
+				<_box_visible>0</_box_visible>
+				<x>0</x>
+				<y>30</y>
+				<width><copy src="parent" trait="width"/></width>
+				<height>
+					<copy src="sibling(CM_Event_Header)" trait="height"/>
+				</height>
+				<string>Input Event's Name</string>
+				<_verbuf>0</_verbuf>
+				<_horbuf>4</_horbuf>
+				<font>2</font>
+				<justify>&center;</justify>
+				<target>1</target>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clickSound>UIMenuOK</clickSound>
+			</hotrect>
+
+			<text name="CM_Month_Header">
+				<y>
+					<copy src="parent" trait="height"/>
+					<mul>0.25</mul>
+				</y>
+				<justify>&left;</justify>
+				<font>2</font>
+				<string>Month</string>
+				<zoom>85</zoom>
+			</text>
+
+			<text name="CM_Month_Text">
+				<x>375</x>
+				<y>
+					<copy src="sibling(CM_Month_Header)" trait="y"/>
+				</y>
+				<justify>&center;</justify>
+				<font>2</font>
+				<string></string>
+				<zoom>85</zoom>
+				<target>1</target>
+			</text>
+
+			<hotrect name="CM_MonthLeftArrow">
+				<id>528</id>
+				<x>280</x>
+				<y>
+					<copy src="sibling(CM_Month_Text)" trait="y"/>
+					<sub>6</sub>
+				</y>
+				<width><copy src="parent" trait="_arrowWidth"/></width>
+				<height><copy src="parent" trait="_arrowHeight"/></height>
+				<target>1</target>
+				<locus>1</locus>
+				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+				<image name="CM_MonthLeftArrow_t">
+					<_texture_1>interface\shared\arrow\adjust_decrease.dds</_texture_1>
+					<_texture_2>interface\shared\arrow\adjust_decrease_over.dds</_texture_2>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_texture_"/>
+					</filename>
+					<y>-8</y>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
+			<hotrect name="CM_MonthRightArrow">
+				<id>529</id>
+				<x>
+					<copy src="parent" trait="width"/>
+					<sub src="me" trait="width"/>
+				</x>
+				<y><copy src="sibling(CM_MonthLeftArrow)" trait="y"/>
+				<width><copy src="parent" trait="_arrowWidth"/></width>
+				<height><copy src="parent" trait="_arrowHeight"/></height>
+				<target>1</target>
+				<locus>1</locus>
+				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+				<image name="CM_MonthRightArrow_t">
+					<_texture_1>interface\shared\arrow\adjust_increase.dds</_texture_1>
+					<_texture_2>interface\shared\arrow\adjust_increase_over.dds</_texture_2>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_texture_"/>
+					</filename>
+					<y>-8</y>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
+			<text name="CM_Day_Header">
+				<y>
+					<copy src="parent" trait="height"/>
+					<mul>0.35</mul>
+				</y>
+				<justify>&left;</justify>
+				<font>2</font>
+				<string>Day</string>
+				<zoom>85</zoom>
+			</text>
+
+			<text name="CM_Day_Text">
+				<x>
+					<copy src="CM_Month_Text" trait="x"/>
+				</x>
+				<y>
+					<copy src="sibling(CM_Day_Header)" trait="y"/>
+				</y>
+				<justify>&center;</justify>
+				<font>2</font>
+				<_Value></_Value>
+				<string><copy src="me" trait="_Value"/></string>
+				<zoom>85</zoom>
+				<target>1</target>
+			</text>
+
+			<hotrect name="CM_DayLeftArrow">
+				<id>530</id>
+				<x><copy src="sibling(CM_MonthLeftArrow)" trait="x"/></x>
+				<y>
+					<copy src="sibling(CM_Day_Text)" trait="y"/>
+					<sub>6</sub>
+				</y>
+				<width><copy src="parent" trait="_arrowWidth"/></width>
+				<height><copy src="parent" trait="_arrowHeight"/></height>
+				<target>1</target>
+				<locus>1</locus>
+				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+				<image name="CM_DayLeftArrow_t">
+					<_texture_1>interface\shared\arrow\adjust_decrease.dds</_texture_1>
+					<_texture_2>interface\shared\arrow\adjust_decrease_over.dds</_texture_2>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_texture_"/>
+					</filename>
+					<y>-8</y>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+			<hotrect name="CM_DayRightArrow">
+				<id>531</id>
+				<x><copy src="sibling(CM_MonthRightArrow)" trait="x"/></x>
+				<y><copy src="sibling(CM_DayLeftArrow)" trait="y"/>
+				<width><copy src="parent" trait="_arrowWidth"/></width>
+				<height><copy src="parent" trait="_arrowHeight"/></height>
+				<target>1</target>
+				<locus>1</locus>
+				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+				<image name="CM_DayRightArrow_t">
+					<_texture_1>interface\shared\arrow\adjust_increase.dds</_texture_1>
+					<_texture_2>interface\shared\arrow\adjust_increase_over.dds</_texture_2>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_texture_"/>
+					</filename>
+					<y>-8</y>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>        
+			<text name="CM_Year_Header">
+				<y>
+					<copy src="parent" trait="height"/>
+					<mul>0.45</mul>
+				</y>
+				<justify>&left;</justify>
+				<font>2</font>
+				<string>Year</string>
+				<zoom>85</zoom>
+			</text>
+			<text name="CM_Year_Text">
+				<x>
+					<copy src="CM_Month_Text" trait="x"/>
+				</x>
+				<y>
+					<copy src="sibling(CM_Year_Header)" trait="y"/>
+				</y>
+				<justify>&center;</justify>
+				<font>2</font>
+				<_Value></_Value>
+				<string><copy src="me" trait="_Value"/></string>
+				<zoom>85</zoom>
+				<target>1</target>           
+			</text>
+
+			<hotrect name="CM_YearLeftArrow">
+				<id>532</id>
+				<x><copy src="sibling(CM_MonthLeftArrow)" trait="x"/></x>
+				<y>
+					<copy src="sibling(CM_Year_Text)" trait="y"/>
+					<sub>6</sub>
+				</y>
+				<width><copy src="parent" trait="_arrowWidth"/></width>
+				<height><copy src="parent" trait="_arrowHeight"/></height>
+				<target>1</target>
+				<locus>1</locus>
+				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+				<image name="CM_YearLeftArrow_t">
+					<_texture_1>interface\shared\arrow\adjust_decrease.dds</_texture_1>
+					<_texture_2>interface\shared\arrow\adjust_decrease_over.dds</_texture_2>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_texture_"/>
+					</filename>
+					<y>-8</y>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
+			<hotrect name="CM_YearRightArrow">
+				<id>533</id>
+				<x><copy src="sibling(CM_MonthRightArrow)" trait="x"/></x>
+				<y><copy src="sibling(CM_YearLeftArrow)" trait="y"/>
+				<width><copy src="parent" trait="_arrowWidth"/></width>
+				<height><copy src="parent" trait="_arrowHeight"/></height>
+				<target>1</target>
+				<locus>1</locus>
+				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+				<image name="CM_YearRightArrow_t">
+					<_texture_1>interface\shared\arrow\adjust_increase.dds</_texture_1>
+					<_texture_2>interface\shared\arrow\adjust_increase_over.dds</_texture_2>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_texture_"/>
+					</filename>
+					<y>-8</y>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
+			<text name="CM_Repeatable_Header">
+				<y>
+					<copy src="parent" trait="height"/>
+					<mul>0.55</mul>
+				</y>
+				<justify>&left;</justify>
+				<font>2</font>
+				<string>Repeatable</string>
+				<zoom>85</zoom>
+			</text>
+
+			<text name="CM_RepeatText">
+				<_Title_1>One-Time</_Title_1>
+				<_Title_2>Weekly</_Title_2>
+				<_Title_3>Monthly</_Title_3>
+				<_Title_4>Yearly</_Title_4>
+				<_Value></_Value>
+				<string>
+					<copy>1</copy>
+					<add src="me" trait="_Value"/>
+					<copy src="me" trait="_Title_"/>
+				</string>
+				<x>
+					<copy src="CM_Month_Text" trait="x"/>
+				</x>
+				<y>
+					<copy src="sibling(CM_Repeatable_Header)" trait="y"/>
+				</y>
+				<font>2</font>
+				<zoom>85</zoom>
+				<justify>&center;</justify>
+				<target>1</target>
+			</text>
+
+			<hotrect name="CM_RepeatLeftArrow">
+				<id>534</id>
+				<x><copy src="sibling(CM_MonthLeftArrow)" trait="x"/></x>
+				<y>
+					<copy src="sibling(CM_RepeatText)" trait="y"/>
+					<sub>6</sub>
+				</y>
+				<width><copy src="parent" trait="_arrowWidth"/></width>
+				<height>
+					<copy src="sibling(CM_RepeatText)" trait="height"/>
+					<mul>1.5</mul>
+				</height>
+				<target>1</target>
+				<locus>1</locus>
+				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+				<image name="CM_RepeatLeftArrow_t">
+					<_texture_1>interface\shared\arrow\adjust_decrease.dds</_texture_1>
+					<_texture_2>interface\shared\arrow\adjust_decrease_over.dds</_texture_2>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_texture_"/>
+					</filename>
+					<y>-8</y>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
+			<hotrect name="CM_RepeatRightArrow">
+				<id>535</id>
+				<x><copy src="sibling(CM_MonthRightArrow)" trait="x"/></x>
+				<y><copy src="sibling(CM_RepeatLeftArrow)" trait="y"/>
+				<width><copy src="parent" trait="_arrowWidth"/></width>
+				<height><copy src="sibling(CM_RepeatLeftArrow)" trait="height"/></height>
+				<target>1</target>
+				<locus>1</locus>
+				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
+				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
+				<image name="CM_RepeatRightArrow_t">
+					<_texture_1>interface\shared\arrow\adjust_increase.dds</_texture_1>
+					<_texture_2>interface\shared\arrow\adjust_increase_over.dds</_texture_2>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_texture_"/>
+					</filename>
+					<y>-8</y>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
+			<rect name="CM_BottomButton">
+				<depth>3</depth>
+				<y>
+					<copy src="parent" trait="height"/>
+					<mul>0.7</mul>
+				</y>
+				<width>
+					<copy src="parent" trait="width"/>
+				</width>
+				<height>
+					<copy src="parent" trait="height"/>
+					<sub src="me" trait="y"/>
+				</height>
+				<locus>&true;</locus>
+				<!-- Shared Values -->
+				<_xverbuf>15</_xverbuf>
+				<_xhorbuf>15</_xhorbuf>
+				<_font>1</_font>
+				<_justify>&center;</_justify>
+		
+				<hotrect name="CM_Confirm">
+					<id>536</id>
+					<include src="text_box.xml"/>
+					<x>
+						<copy src="parent" trait="width"/>
+						<mul>0.5</mul>
+						<sub>20
+								<copy src="me" trait="width"/>
+								<add>20</add>
+						</sub>
+					</x>
+					<_badstr>Input Event's Name</_badstr>
+					<string>Confirm</string>
+					<font><copy src="parent" trait="_font"/></font>
+					<justify><copy src="parent" trait="_justify"/></justify>
+					<_verbuf><copy src="parent" trait="_xverbuf"/></_verbuf>
+					<_horbuf><copy src="parent" trait="_xhorbuf"/></_horbuf>
+					<mouseoversound>UIMenuFocus</mouseoversound>
+					<clickSound>UIMenuOK</clickSound>
+				</hotrect>
+
+				<hotrect name="CM_Cancel">
+					<id>537</id>
+					<include src="text_box.xml"/>
+					<x>
+						<copy src="parent" trait="width"/>
+						<mul>0.5</mul>
+						<add> 20</add>
+					</x>
+					<string>Cancel</string>
+					<font><copy src="parent" trait="_font"/></font>
+					<justify><copy src="parent" trait="_justify"/></justify>
+					<_verbuf><copy src="parent" trait="_xverbuf"/></_verbuf>
+					<_horbuf><copy src="parent" trait="_xhorbuf"/></_horbuf>
+					<mouseoversound>UIMenuFocus</mouseoversound>
+					<clickSound>UIMenuCancel</clickSound>
+				</hotrect>
+
+			</rect>
+	
+		</rect>
+		
+	</rect>
+</rect>
+
+<!--Template that stores calendar grids-->
+<template name="CM_GridParent_Template">
+	<rect name="CM_CalendarGrids">
+		<locus> &true; </locus>
+		<width>400</width>
+		<height>325</height>
+		<y>
+			<copy src="CM_Weekdays" trait="y"/>
+			<add src="CM_Weekdays" trait="height"/>
+		</y>
+		<depth> 4 </depth>
+	</rect>
+</template>
+
+<!-- Template that builds the Calendar -->
+<template name="CM_Box_Template">
+	<rect name="CM_Box_Rect">
+		<!-- Local variables for the children to copy -->
+		<depth> 5 </depth>
+		<width> 52 </width>
+		<height> 52 </height>
+		<x> 0 </x>
+		<y> 0 </y>
+
+		<_string1></_string1> <!-- Set in code | Handles the date text -->
+
+		<_clips>1</clips>
+
+		<_alpha1><_alpha1> <!-- Set in code | Handles the alpha of the date text -->
+		<_alpha2><_alpha2> <!-- Set in code | Handles the alpha of the box -->
+		<locus>1</locus>
+		<_line_alpha>255</_line_alpha>
+		<_selected></_selected> <!-- Set in code-->
+		<_day_state></_day_state>
+
+		<!-- The boxes that make up the calendar -->
+		<hotrect name="CM_Box_Main">
+			<id>509</id>
+			<depth>6</depth>
+			<include src="text_box.xml"/>
+			<width><copy src="parent" trait="width"/></width>
+			<height><copy src="parent" trait="height"/></height>
+			<string><copy src="parent" trait="_string1"/></string>
+			<justify>&left;</justify>
+			<_line_alpha><copy src="parent" trait="_alpha1"/></alpha>
+			<target>&true;</target>
+			<mouseoversound>UIMenuFocus</mouseoversound>
+			<clickSound>UIMenuOK</clickSound>			
+		</hotrect>
+
+		<!-- The box's alpha -->
+		<image name="CM_Box_Selected">
+			<depth>7</depth>
+			<include src="box.xml"/>
+			<filename> Interface\Shared\solid.dds</filename>
+			<width><copy src="parent" trait="width"/></width>
+			<height><copy src="parent" trait="height"/></height>
+			<visible><copy src="parent()" trait="_selected"/></visible>
+			<alpha>150</alpha>
+			<_line_alpha> <copy src="parent()" trait="_line_alpha"/> </_line_alpha>
+		</image>
+
+		<image name="CM_Box_Hours">
+			<depth>8</depth>
+			
+			<filename> Interface\Shared\solid.dds</filename>
+			<width>
+				<copy src="parent" trait="_day_state"/>
+				<div>24</div>
+				<mul><copy src="parent" trait="width"/></mul>
+			</width>
+			<height> 4 </height>
+			<y>
+				<copy src="parent" trait="height"/>
+				<sub><copy src="me()" trait="height"/></sub>
+			</y>
+			<visible>
+				<copy src="parent" trait="_day_state"/>
+				<gt>0</gt>
+			</visible>
+			<alpha>150</alpha>
+		</image>
+
+
+	</rect>
+</template>
+
+<template name="CM_JournalEntryRect_Template">
+	<!--Specifies the bounds of and holds the entry tiles-->
+	<rect name="CM_JournalEntryRect">
+		<id>519</id>
+		<locus>&true;</locus>
+		<visible>0</visible>
+		<y>
+			<copy src="sibling(CM_JournalScrollbar)" trait="_current_value"/>
+			<mul src="sibling(CM_JournalScrollbar)" trait="_ScrollDelta"/>
+			<mul> -1 </mul>
+			<add>10</add>
+		</y>
+		<x>25</x>
+	</rect>
+
+</template>
+
+<!-- Template that builds the Journal entries -->
+<template name="CM_Journal_Template">
+	<rect name="CM_Entry">
+		<rect name="CM_JournalEntry">
+			<width>697</width>
+			<_entry></_entry>
+			<_location></_location>
+			<_time></_time>
+			<height>
+				<copy>60</copy>
+				<add src="child(CM_JournalText)" trait="height"/>
+			</height>
+
+			<text name="timestamp">
+				<y><copy src="parent" trait="y"/></y>
+				<x>-6</x>
+				<clips>&true;</clips>
+				<font>1</font>
+				<string><copy src="parent" trait="_time"/></string>
+			</text>
+
+			<image name="verline">
+				<include src="line.xml"/>
+				<clips> &true; </clips>
+				<_length>
+					<copy src="sibling(timestamp)" trait="height"/>
+				</_length>
+				<y>
+					<copy src="sibling(horline)" trait="y"/>
+					<sub src="sibling(timestamp)" trait="height"/>
+				</y>
+				<x>
+					<copy src="sibling(timestamp)" trait="width"/>
+					<add>16</add>
+				</x>
+				<_horizontal>&false;</_horizontal>
+
+			</image>
+
+			<hotrect name="EntryEdit">
+				<id>520</id>
+				<width>
+					<copy src="sibling(EntryDelete)" trait="width"/>
+				</width> 
+				<height>
+					<copy src="me" trait="width"/>
+				</height> 
+				<y><copy src="sibling(EntryDelete)" trait="y"/></y>
+				<x>
+					<copy src="sibling(EntryDelete)" trait="x"/>
+					<sub>
+						<copy src="me" trait="width"/>
+						<mul>1.15</mul>
+						<add>10</add>
+					</sub>
+				</x>
+				<target>1</target>
+				<locus>1</locus>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clicksound>UIMenuFocus</clicksound>
+				<image name="EntryEdit_ico">
+					<depth>
+						<copy src="parent" trait="depth"/>
+						<sub>1</sub>
+					</depth>
+					<_filename_1>Interface\piplog\calendar_pencil.dds</_filename_1>
+					<_filename_2>Interface\piplog\calendar_pencil_filled.dds</_filename_2>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<clips> &true; </clips>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_filename_"/>
+					</filename>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
+			<hotrect name="EntryDelete">
+				<id>521</id>
+				<width>24</width>
+				<height>
+					<copy src="me" trait="width"/>
+				</height> 
+				<x>
+					<copy src="parent" trait="width"/>
+					<sub>
+						<copy src="me" trait="width"/>
+						<mul>2.5</mul>
+					</sub>
+				</x>
+				<y>
+					<copy src="sibling(CM_JournalText)" trait="y"/>
+					<sub>6</sub>
+				</y>
+				<target>1</target>
+				<locus>1</locus>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clickSound>UIMenuCancel</clickSound>
+				<image name="EntryDelete_ico">
+					<depth>
+						<copy src="parent" trait="depth"/>
+						<sub>1</sub>
+					</depth>
+					<_filename_1>Interface\piplog\calendar_x.dds</_filename_1>
+					<_filename_2>Interface\piplog\calendar_x_filled.dds</_filename_2>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<clips> &true; </clips>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_filename_"/>
+					</filename>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
+			<text name="location">
+				<y><copy src="parent" trait="y"/></y>
+				<x>
+					<copy src="sibling(verline)" trait="x"/>
+					<add>18</add>
+				</x>
+				<clips>&true;</clips>
+				<font>1</font>
+				<string><copy src="parent" trait="_location"/></string>
+			</text>
+
+			<image name="horline">
+				<include src="line.xml"/>
+				<clips> &true; </clips>
+				<y>
+					<copy src="parent" trait="y"/>
+					<add src="sibling(timestamp)" trait="height"/>
+					<sub>6</sub>
+				</y>
+				<x>
+					<copy src="sibling(timestamp)" trait="x"/>
+				</x>
+				<_length>
+					<copy src="parent" trait="width"/>
+					<sub src="me" trait="x"/>
+				</_length>
+			</image>
+
+			<text name="CM_JournalText">
+				<y>
+					<copy src="parent" trait="y"/>
+					<add>50</add>
+				</y>
+				<x>-4</x>
+				<width>
+					<copy src="parent" trait="width"/>
+					<sub>50</sub>
+				</width>
+				<wrapwidth>
+					<copy src="parent" trait="width"/>
+					<sub>100</sub>
+				</wrapwidth>
+				<clips> &true; </clips>
+				<font> 2 </font>
+				<justify> &left; </justify>				
+				<string><copy src="parent" trait="_entry"/></string>
+				<target>1</target>
+			</text>
+
+
+		</rect>
+	</rect>
+</template>
+
+<!-- Template that contains the event tiles (below)-->
+<template name="CM_EventParentRect_Template">
+	<rect name="CM_EventParentRect">
+		<locus>&true;</locus>
+		<visible>0</visible> <!-- Set in Code-->
+		<x>20</x>
+		<y>
+			<copy src="sibling(CM_EventScrollbar)" trait="_current_value"/>
+			<mul src="sibling(CM_EventScrollbar)" trait="_ScrollDelta"/>
+			<mul> -1 </mul>
+		</y>
+		<width>475</width>
+		<_horbuf> 72 </_horbuf>
+		<_verbuf> 13 </_verbuf>
+		<justify>1</justify>
+	</rect>
+
+</template>
+
+<!-- Template that builds the Event tiles-->
+<template name="CM_Event_Template">
+	<hotrect name="CM_Event">
+		<include src="text_box.xml"/>
+		<locus>&true;</locus>
+		<id>522</id>
+		
+		<!-- Tile positioning (set in GECK)-->
+		<y></y>
+		<x></x>
+		<width><copy src="parent" trait="width"/></width>
+
+		<!-- Tile string (set in GECK)-->
+		<string></string><!--The title of the holiday-->
+		<_value1>0</_value1>
+		<_value2>0</_value2>
+		<_value3>0</_value3>
+
+		<!-- Tile Display-->
+		<_horbuf><copy src="parent" trait="_horbuf"/></_horbuf>
+		<_verbuf><copy src="parent" trait="_verbuf"/></_verbuf>
+		<clips>1</clips>
+		<depth>24</depth>
+
+		<!-- Tile Interaction-->
+		<target>1</target>
+		<mouseoversound>UIMenuFocus</mouseoversound>
+		<clicksound>UIMenuPrevNext</clicksound>
+		<_selected>0</_selected><!-- Set in code-->
+
+		<!-- Tile Selection -->
+		<image name="CM_EventSelected">
+			<id>523</id>
+			<visible>
+				<copy src="parent" trait="_selected"/>
+			</visible>
+			<alpha>
+				<copy>255</copy>
+				<mul src="me" trait="visible"/>
+			</alpha>
+			<brightness><copy src="parent" trait="brightness"/></brightness>
+			<depth>
+				<copy src="parent" trait="depth"/>
+				<add>1</add>
+			</depth>
+
+			<filename> square_filled.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+
+			<width>24</width>
+			<height>24</height>
+			<x>10</x>
+			<y>
+				<copy src="parent" trait="height"/>
+				<add src="parent" trait="_verbuf"/>
+				<sub src="me" trait="height"/>
+				<div>2</div>
+			</y>
+
+
+		</image>
+
+	</hotrect>
+</template>
