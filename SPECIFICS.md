@@ -1,3 +1,25 @@
+## View Model
+
+`iViewMode`						; 0 = None/vanilla views, 1=calendar view, 2 = events view, 3 = journal view
+
+View mode is set from mode buttons (e.g. the Log, Notes, Events, Journal buttons). The selected view mode determines which buttons to display or hide or what labels to set them to, as well as what sub-parts of the UI control loop to run.
+
+`iCalendarYear`					; Year the calendar is set to view
+`iCalendarMonth`				; Month the calendar is set to view
+
+`sHoveredCalendarDate`			; Date string of the hovered calendar tile (precedence over selected, unset when not hovering)
+`sSelectedCalendarDate`			; Date string of the clicked calendar tile (auto-set to today's date string)
+
+`sCalendarDateSummary`			; Text to be displayed in `CM_DataTextRect/CM_DataText/string`, set to placeholder tutorial text when no date is hovered, otherwise generated day summary
+
+The calendar summary string is generated when a calendar tile is clicked and will automatically be picked up by the next UI control loop. It must not be regenerated every frame in a menu mode loop.
+
+Some additional flags can gate against constant redrawing in the UI control loop.
+
+`bIsCalendarViewModified`		; Dirty flag for calendar tiles
+`bIsCalendarSummaryModified`	; Dirty flag for selected date summary text
+`bIsCalendarSelectionModified`	; Dirty flag for an individual tile's visual selection
+
 ## Events
 
 Assuming an event is a structure:
