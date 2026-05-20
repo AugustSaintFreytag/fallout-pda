@@ -49,11 +49,15 @@ There are two assignment forms:
 | `let name := value` | Reassignment of an existing variable     |
 
 ```gek
-short iCount = 0          ; declare
-let iCount := iCount + 1  ; mutate
-let iCount += 1           ; increment
-let iCount *= 1           ; multiply
+short iCount = 0            ; declare
+let iCount := iCount + 1    ; mutate
+let iCount += 1             ; increment
+let iCount *= 1             ; multiply
+let aList[0] := value       ; list array assign
+let aMap["key"] := value    ; map array assign
 ```
+
+#### Eval
 
 The `eval` keyword should be used whenever an evaluation requires implicit coercion, reads values from arrays, or performs anything more complex than a direct value comparison.
 
@@ -68,10 +72,12 @@ endif
 It is also advised when a compound boolean expression is used as a condition:
 
 ```gek
-if eval (iIndex == Ar_BadNumericIndex) || (Ar_HasKey aValues, iIndex == 0)
+if eval (iIndex == Ar_BadNumericIndex) || (Ar_HasKey aValues, iIndex) == 0
     ; ...
 endif
 ```
+
+Inline function calls and their parameters should always be wrapped in parentheses.
 
 ### Arrays
 
@@ -105,6 +111,8 @@ endif
 ```
 
 #### Foreach Loop
+
+A foreach loop will *always* produce an `array_var aEntry`, a string map with keys "key" and "value".
 
 ```gek
 array_var aEntry
@@ -161,6 +169,16 @@ Prefix a `string_var` with `$` to interpolate it in a command that expects a pla
 
 ```gek
 MessageBoxEx ($sMessage) sItemName
+```
+
+#### String Comparison
+
+String comparison *must* be performed with `eval`.
+
+```gek
+if eval sLeft == sRight
+    ; ...
+endif
 ```
 
 #### Format Specifiers in `PrintC` / `MessageBoxEx`
