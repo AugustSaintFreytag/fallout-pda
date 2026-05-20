@@ -11,18 +11,18 @@ begin function { string_var sInput }
 
 	; Main
 
-	array_var aParts = Sv_Split "." sInput
+	array_var aComponents = Sv_Split sInput, "."
 
-	if eval (Ar_Size aParts) != 3
-		let aParts := Ar_Null
+	if eval (Ar_Size aComponents) != 3
+		let aComponents := Ar_Null
 		return
 	endif
 
-	short iYear = #aParts[0]
-	short iMonth = #aParts[1]
-	short iDay = #aParts[2]
+	short iYear = #aComponents[0]
+	short iMonth = #aComponents[1]
+	short iDay = #aComponents[2]
 
-	let aParts := Ar_Null
+	let aComponents := Ar_Null
 
 	if eval (iDay < 1) || (iMonth < 1) || (iMonth > 12) || (iYear < 1) || (iYear > GameYear)
 		return

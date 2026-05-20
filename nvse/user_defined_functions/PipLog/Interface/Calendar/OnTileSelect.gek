@@ -45,13 +45,22 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 		SetUIFloatAlt ($sNewTilePath) 1
 		Sv_Destruct sNewTilePath
 
-		array_var aParts = (Call GetDateComponentsFromStringUDF sComponent)
-		
-		short iNewYear = aParts[0]
-		short iNewMonth = aParts[1]
-		short iNewDay = aParts[2]
+		array_var aComponents = (Call GetDateComponentsFromStringUDF sComponent)
 
-		let aParts := Ar_Null
+		if eval aComponents == Ar_Null
+			PrintC "Could not select tile, date string '%z' is invalid." (sComponent)
+			
+			let aComponents := Ar_Null
+			Sv_Destruct sComponent, sCurrent
+
+			return
+		endif
+		
+		short iNewYear = aComponents[0]
+		short iNewMonth = aComponents[1]
+		short iNewDay = aComponents[2]
+
+		let aComponents := Ar_Null
 
 		Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" iNewDay
 		Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" iNewMonth
