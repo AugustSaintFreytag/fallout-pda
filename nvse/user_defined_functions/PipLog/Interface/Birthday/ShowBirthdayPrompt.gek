@@ -15,7 +15,7 @@ begin function {}
 
 	; Main
 
-	if eval !(MenuMode 1024)
+	if eval !(MenuMode 1023)
 		return
 	endif
 
