@@ -1,0 +1,90 @@
+begin function { short iMenuID, short iTileID, string_var sTileParam }
+
+	; Opens the Sleep/Wait menu preconfigured to wait until the selected future date.
+
+	Sv_Destruct sTileParam
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		return
+	endif
+
+	if eval (GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab") != 3
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 1
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateFuture" == 0
+		return
+	endif
+
+	if Player.IsInCombat
+		MessageExAlt 2 "$0|You cannot wait while in combat."
+		return
+	endif
+
+	if eval (Ar_Size Player.GetCombatTargets) > 0
+		MessageExAlt 2 "$0|You cannot wait while hostile actors are nearby."
+		return
+	endif
+
+	if Player.HasHealthDamageEffect
+		MessageExAlt 2 "$0|You cannot wait while taking health damage."
+		return
+	endif
+
+	if Player.GetRadiationLevel > 0
+		MessageExAlt 2 "$0|You cannot wait while taking radiation."
+		return
+	endif
+
+	if Player.IsTrespassing
+		MessageExAlt 2 "$0|You cannot wait while trespassing."
+		return
+	endif
+
+	if eval (GetCellFlag (Player.GetParentCell) 5 == 0) && Player.IsInInterior
+		MessageExAlt 2 "$0|You cannot wait here."
+		return
+	endif
+
+	if Player.GetWaterImmersionPerc >= 0.875
+		MessageExAlt 2 "$0|You cannot wait underwater."
+		return
+	endif
+
+	if Player.IsInAir
+		MessageExAlt 2 "$0|You cannot wait while not on the ground."
+		return
+	endif
+
+	; UDFs
+
+	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
+	ref ApplyWaitUntilMenuUDF = CompileScript "PipLog\Interface\Wait\ApplyWaitUntilMenu.gek"
+
+	; State
+
+	short iSelectedDay = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedDay"
+	short iSelectedMonth = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedMonth"
+	short iSelectedYear = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedYear"
+
+	; Main
+
+	short iDaysUntil = (Call GetDaysBetweenUDF iSelectedDay iSelectedMonth iSelectedYear GameDay GameMonth GameYear 0)
+	short iHoursUntil = (iDaysUntil * 24)
+
+	if iHoursUntil <= 0
+		return
+	endif
+
+	TapControl 14
+	
+	CallWhen ({} => ShowSleepWaitMenu 0 1) ({} => GetPipboyMode == 0)
+	CallWhen ApplyWaitUntilMenuUDF ({} => GetActiveMenuMode == 1012) 1 iHoursUntil
+
+end

@@ -1,0 +1,22 @@
+begin function { short iWaitUntilHours }
+
+	; Applies the requested wait duration after SleepWaitMenu opens.
+
+	if eval !(MenuMode 1012)
+		return
+	endif
+
+	if iWaitUntilHours <= 0
+		return
+	endif
+
+	; Main
+
+	SetUIFloatAlt "SleepWaitMenu/NOGLOW_BRANCH/SWM_MainRect/SWM_Scrollbar/_current_value" iWaitUntilHours
+
+	if iWaitUntilHours > 24
+		short iWaitUntilDays = (iWaitUntilHours / 24)
+		SetUIString "SleepWaitMenu/NOGLOW_BRANCH/SWM_MainRect/SWM_HoursChosen/string" ($iWaitUntilDays + " days")
+	endif
+
+end
