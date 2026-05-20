@@ -1,8 +1,7 @@
 begin function { short iMenuID, short iTileID, string_var sTileParam }
 
-	; Handles clicks on the Log toggle (510), Calendar/Journal toggle (511),
-	; Events toggle (512), and month navigation arrows (513/514).
-	; Buttons 515+ are deferred to later phases.
+	; Handles main Pip-Log buttons and calendar month arrows by mutating the view model.
+	; UIControlLoop.gek owns applying those values to menu tiles.
 
 	Sv_Destruct sTileParam
 
@@ -25,47 +24,78 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 	; UDFs
 
 	ref OnTileDeselectUDF = CompileScript "PipLog\Interface\Calendar\OnTileDeselect.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 
 	; Main
 
 	short bButton1Target = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/target" == 1
 	short bButton2Target = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/target" == 1
 	short bButton3Target = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/target" == 1
+	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
 
 	if eval (iTileID >= 510) && (iTileID <= 512)
 		if eval (iTileID == 510) && (bButton1Target)
-			short bToggled = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled"
-			short bNowToggled = 1 - bToggled
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled" bNowToggled
+			if iViewMode == 0
+				let iViewMode := 1
+				Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
 
-			if bNowToggled == 1
-				SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/visible" 0
-				SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonA/target" 0
-				SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonX/target" 0
-				SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonY/target" 0
+				if eval (Player.AuxiliaryVariableGetFloat "*PLC_iCalendarYear") == 0
+					Player.AuxiliaryVariableSetFloat "*PLC_iCalendarYear" GameYear
+					Player.AuxiliaryVariableSetFloat "*PLC_iCalendarMonth" GameMonth
+				endif
+
+				string_var sSelectedDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
+
+				if eval (Sv_Length sSelectedDate) == 0
+					string_var sToday = (Call GetStorageDateStringUDF GameYear GameMonth GameDay)
+					
+					Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedCalendarDate"
+					
+					Player.AuxiliaryVariableSetString "*PLC_sSelectedCalendarDate" ($sToday)
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 0
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" 0
+					
+					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" GameDay
+					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" GameMonth
+					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" GameYear
+					
+					Sv_Destruct sToday
+				endif
+
+				Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedCalendarDate"
+				Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
+				Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
+
+				Sv_Destruct sSelectedDate
 			else
-				SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/visible" 1
-				SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonA/target" 1
-				SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonX/target" 1
-				SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonY/target" 1
+				let iViewMode := 0
+				Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
+
+				Call OnTileDeselectUDF
 			endif
 
-			Call OnTileDeselectUDF
 			StopSound UIMenuCancel
 			PlaySound UIPipBoySelect 1
-		elseif eval (GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled") == 1
-			if eval (iTileID == 511 && bButton2Target)
-				if eval (GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled") == 0
-					short bToggled2 = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled"
-					SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" (1 - bToggled2)
+		elseif iViewMode > 0
+			if eval (iTileID == 511) && (bButton2Target)
+				if iViewMode == 3
+					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
+				elseif iViewMode == 2
+					; Event category cycling deferred to a later phase.
+				else
+					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 3
 				endif
-				
-				; Event category cycling (when button3 toggled) deferred to later phase
+
 				StopSound UIMenuCancel
 				PlaySound UIPipBoySelect 1
 			elseif eval (iTileID == 512) && (bButton3Target)
-				short bToggled3 = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled"
-				SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" (1 - bToggled3)
+				if iViewMode == 2
+					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
+				else
+					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 2
+				endif
+
 				StopSound UIMenuCancel
 				PlaySound UIPipBoySelect 1
 			endif
@@ -97,6 +127,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 
 		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarMonth" iCalendarMonth
 		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarYear" iCalendarYear
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
 		Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
 
 		Call OnTileDeselectUDF

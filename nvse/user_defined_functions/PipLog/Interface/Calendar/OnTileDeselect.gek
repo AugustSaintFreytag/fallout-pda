@@ -1,12 +1,12 @@
 begin function {}
 
-	; Clears the visual selection on the currently selected calendar tile, if any,
-	; resets the data panel to the hover hint, and disables the Wait and Track buttons.
-	; Safe to call when no tile is selected or when the grid has been unloaded.
+	; Clears the selected calendar date in the view model.
+	; The UI control loop owns the visual tile, tools, and summary text updates.
 
 	; UDFs
 
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
 	; State
 
@@ -16,20 +16,31 @@ begin function {}
 
 	; Main
 
-	if iSelectedDay >= 1
-		string_var sTileName = (Call GetStorageDateStringUDF iSelectedYear iSelectedMonth iSelectedDay)
-		string_var sTilePath = (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sTileName)
-		SetUIFloatAlt ($sTilePath) 0
+	string_var sSelectedDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
 
-		Sv_Destruct sTileName, sTilePath
+	if eval (Sv_Length sSelectedDate) == 0
+		if iSelectedDay >= 1
+			let sSelectedDate := (Call GetStorageDateStringUDF iSelectedYear iSelectedMonth iSelectedDay)
+		endif
 	endif
 
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_WaitButton/target" 0
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/target" 0
-	SetUIStringAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_DataText/string" "Hover over a date for more information."
+	Player.AuxiliaryVariableErase "*PLC_sSelectedCalendarDate"
+	
+	Player.AuxiliaryVariableSetString "*PLC_sPreviousSelectedCalendarDate" ($sSelectedDate)
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" 0
 
 	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" -1
 	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" -1
 	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" -1
+
+	string_var sHoveredDate = Player.AuxiliaryVariableGetString "*PLC_sHoveredCalendarDate"
+
+	Call UpdateSelectedDaySummaryUDF sHoveredDate
+
+	; Clean-Up
+
+	Sv_Destruct sSelectedDate, sHoveredDate
 
 end

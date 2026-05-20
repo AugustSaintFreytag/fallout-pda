@@ -1,10 +1,11 @@
 begin function {}
 
 	; Resets the calendar grid generation flag, triggering a fresh rebuild on the next
-	; MenuModeLoop frame. Registered as the handler for the calendar reset event.
+	; UIControlLoop frame. Registered as the handler for the calendar reset event.
 
 	; Main
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
 
 end

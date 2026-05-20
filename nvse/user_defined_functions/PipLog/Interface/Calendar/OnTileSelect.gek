@@ -1,83 +1,63 @@
 begin function { short iMenuID, short iTileID, string_var sTileParam }
 
-	; Handles a click on a calendar grid tile. Selects the tile, updates the data panel,
-	; and enables future-date tools. Clicking the already-selected tile deselects it.
+	; Handles a click on a calendar grid tile by updating the calendar view model.
+	; The UI control loop owns visual selection, tools, and summary text writes.
 
 	Sv_Destruct sTileParam
 
 	; UDFs
 
 	ref OnTileDeselectUDF = CompileScript "PipLog\Interface\Calendar\OnTileDeselect.gek"
-	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetDateComponentsFromStringUDF = CompileScript "PipLog\DateTime\GetDateComponentsFromString.gek"
 	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
 	; State
 
-	short iSelectedDay = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedDay"
-	short iSelectedMonth = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedMonth"
-	short iSelectedYear = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedYear"
+	string_var sCurrentSelectedDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
 
 	; Main
 
-	PrintC "Selecting calendar tile %g in menu %g, param '%z'." iTileID iMenuID sTileParam
-
 	string_var sComponent = GetActiveUIComponentFullName
 
-	Sv_Replace "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/|", sComponent
-	Sv_Replace "/CM_Box_Main|", sComponent
+	Sv_Replace "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/|" sComponent
+	Sv_Replace "/CM_Box_Main|" sComponent
 
-	string_var sCurrent = ""
-
-	if iSelectedDay >= 1
-		let sCurrent := (Call GetStorageDateStringUDF iSelectedYear iSelectedMonth iSelectedDay)
-	endif
-
-	if eval (sComponent != sCurrent)
-		if iSelectedDay >= 1
-			string_var sOldTilePath = (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sCurrent)
-			SetUIFloatAlt ($sOldTilePath) 0
-			Sv_Destruct sOldTilePath
-		endif
-
-		string_var sNewTilePath = (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sComponent)
-		
-		SetUIFloatAlt ($sNewTilePath) 1
-		Sv_Destruct sNewTilePath
-
+	if eval (sComponent != sCurrentSelectedDate)
 		array_var aComponents = (Call GetDateComponentsFromStringUDF sComponent)
 
 		if eval aComponents == Ar_Null
 			PrintC "Could not select tile, date string '%z' is invalid." (sComponent)
-			
+
 			let aComponents := Ar_Null
-			Sv_Destruct sComponent, sCurrent
+			Sv_Destruct sComponent, sCurrentSelectedDate
 
 			return
 		endif
-		
+
 		short iNewYear = aComponents[0]
 		short iNewMonth = aComponents[1]
 		short iNewDay = aComponents[2]
 
 		let aComponents := Ar_Null
 
+		Player.AuxiliaryVariableSetString "*PLC_sPreviousSelectedCalendarDate" ($sCurrentSelectedDate)
+		Player.AuxiliaryVariableSetString "*PLC_sSelectedCalendarDate" ($sComponent)
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
+
 		Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" iNewDay
 		Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" iNewMonth
 		Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" iNewYear
 
 		if eval (iNewYear > GameYear) || ((iNewYear == GameYear) && (iNewMonth > GameMonth)) || ((iNewYear == GameYear) && (iNewMonth == GameMonth) && (iNewDay > GameDay))
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_WaitButton/target" 1
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/target" 1
-
 			array_var aPlayerReminders = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerReminders"
 			short bIsTracked = (Ar_Size aPlayerReminders) != -1 && (Ar_HasKey aPlayerReminders, sComponent)
 
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/_Value" bIsTracked
+			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 1
+			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" bIsTracked
 			let aPlayerReminders := Ar_Null
 		else
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_WaitButton/target" 0
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/target" 0
+			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 0
+			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" 0
 		endif
 
 		Call UpdateSelectedDaySummaryUDF sComponent
@@ -87,6 +67,6 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 
 	; Clean-Up
 
-	Sv_Destruct sComponent, sCurrent
+	Sv_Destruct sComponent, sCurrentSelectedDate
 
 end

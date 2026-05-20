@@ -8,7 +8,6 @@ begin function {}
 
 	; UDFs
 
-	ref OnTileDeselectUDF = CompileScript "PipLog\Interface\Calendar\OnTileDeselect.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetDayOfWeekUDF = CompileScript "PipLog\DateTime\GetDayOfWeek.gek"
 	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
@@ -19,8 +18,6 @@ begin function {}
 	short iCalendarMonth = Player.AuxiliaryVariableGetFloat "*PLC_iCalendarMonth"
 
 	; Main
-
-	Call OnTileDeselectUDF
 
 	UnloadUIComponent "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids"
 	AddTileFromTemplate "MapMenu/CM_MainRect/CM_CalendarRect|CM_GridParent_Template|CM_CalendarGrids"
@@ -121,6 +118,10 @@ begin function {}
 
 		let iTilesInCurrentRow += 1
 
+		if iBuiltTileCount == 0
+			PrintC "PipLog: first tile name=%z, x_readback=%g" sTileDate (GetUIFloat (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/x" sTileDate))
+		endif
+
 		let sTilePropertyPath := Sv_Construct "%z/_string1" sTileBasePath
 		SetUIStringAlt ($sTilePropertyPath) ($iTileDay)
 
@@ -168,6 +169,8 @@ begin function {}
 	loop
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
 
 	; Clean-Up
 

@@ -2,7 +2,7 @@ begin function {}
 
 	; Animates today's tile alpha between 150 and 255 each menumode frame.
 	; Only runs when the current in-game month is being viewed.
-	; Called from MenuModeLoop when *PLC_bDidGenerateCalendar == 1.
+	; Called from UIControlLoop when *PLC_bDidGenerateCalendar == 1.
 
 	; UDFs
 

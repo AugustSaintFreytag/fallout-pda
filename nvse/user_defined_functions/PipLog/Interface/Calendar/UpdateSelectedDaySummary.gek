@@ -1,6 +1,7 @@
 begin function { string_var sDate }
 
-	; Compiles and writes the calendar notes and scroll bar for the selected day tile.
+	; Compiles the calendar notes for a day tile and stores them in the view model.
+	; The UI control loop owns writing this value into the actual menu tile.
 	; sDate is in YYYY-MM-DD format (1-indexed month, zero-padded).
 
 	; UDFs
@@ -9,21 +10,16 @@ begin function { string_var sDate }
 
 	; Main
 
-	string_var sSummary = (Call GetCalendarSummaryStringUDF sDate)
+	string_var sSummary = ""
 
-	short iNumLines = (Sv_Count, "%r" sSummary)
-	short iNumLinesFromChars = ((Sv_Length sSummary) / 32)
-	float fScrollDelta = ((iNumLinesFromChars + iNumLines) + 8)
-
-	if fScrollDelta < 10
-		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\visible" 0
-		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\_ScrollDelta" 0
+	if eval (Sv_Length sDate) > 0
+		let sSummary := (Call GetCalendarSummaryStringUDF sDate)
 	else
-		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\visible" 1
-		SetUIFloatAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_TextScrollbar\_ScrollDelta" fScrollDelta
+		let sSummary := "No date selected."
 	endif
 
-	SetUIStringAlt "MapMenu\CM_MainRect\CM_DataRect\CM_DataTextRect\CM_DataText\string" ($sSummary)
+	Player.AuxiliaryVariableSetString "*PLC_sCalendarDateSummary" ($sSummary)
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 
 	; Clean-Up
 
