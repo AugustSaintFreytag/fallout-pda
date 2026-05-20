@@ -39,11 +39,12 @@ begin function { short iDay, short iMonth, short iYear, string_var sEventName, s
 
 	; Main
 
-	string_var sEvent = (Call CreateEventUDF sDate sEventName)
-	Call AddEventUDF sEvent 1
+	array_var aEvent = (Call CreateEventUDF sDate sEventName)
+	Call AddEventUDF aEvent 1
 
 	; Clean-Up
 
-	Sv_Destruct sDate, sEvent
+	Sv_Destruct sDate
+	let aEvent := Ar_Null
 
 end

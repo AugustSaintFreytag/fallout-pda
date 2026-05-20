@@ -1,0 +1,54 @@
+begin function { short iMenuID, short iTileID, string_var sTileParam }
+
+	; Toggles a one-shot reminder for the selected future calendar date.
+	; The UI control loop owns applying the updated state to CM_TrackButton.
+
+	Sv_Destruct sTileParam
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		return
+	endif
+
+	if eval (GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab") != 3
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 1
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateFuture" == 0
+		return
+	endif
+
+	; UDFs
+
+	ref GetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\GetPlayerDateReminder.gek"
+	ref SetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\SetPlayerDateReminder.gek"
+
+	; State
+
+	string_var sSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
+
+	if eval (Sv_Length sSelectedCalendarDate) == 0
+		Sv_Destruct sSelectedCalendarDate
+		return
+	endif
+
+	; Main
+
+	short bHasPlayerDateReminder = (Call GetPlayerDateReminderUDF sSelectedCalendarDate)
+	short bIsSelectedCalendarDateTracked = (1 - bHasPlayerDateReminder)
+
+	Call SetPlayerDateReminderUDF sSelectedCalendarDate bIsSelectedCalendarDateTracked
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" bIsSelectedCalendarDateTracked
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
+
+	; Clean-Up
+
+	Sv_Destruct sSelectedCalendarDate
+
+end

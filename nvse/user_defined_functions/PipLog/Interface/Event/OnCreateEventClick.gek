@@ -1,0 +1,41 @@
+begin function { short iMenuID, short iTileID, string_var sTileParam }
+
+	; Opens a text input prompt for creating a one-time event on the selected date.
+	; The confirm callback reads *PLC_sSelectedCalendarDate from the view model.
+
+	Sv_Destruct sTileParam
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		return
+	endif
+
+	if eval (GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab") != 3
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 1
+		return
+	endif
+
+	string_var sSelectedDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
+
+	if eval (Sv_Length sSelectedDate) == 0
+		Sv_Destruct sSelectedDate
+		return
+	endif
+
+	; UDFs
+
+	ref OnCreateEventConfirmUDF = CompileScript "PipLog\Interface\Event\OnCreateEventConfirm.gek"
+
+	; Main
+
+	ShowTextInputMenu OnCreateEventConfirmUDF 500 160 "Event Name:"
+
+	; Clean-Up
+
+	Sv_Destruct sSelectedDate
+
+end

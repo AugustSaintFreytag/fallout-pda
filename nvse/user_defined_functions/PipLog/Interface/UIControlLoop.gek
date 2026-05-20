@@ -86,6 +86,12 @@ begin function {}
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
 	endif
 
+	if eval (iViewMode == 1) && ((Sv_Length sSelectedCalendarDate) > 0)
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 1
+	else
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
+	endif
+
 	; Calendar View (Tiles)
 
 	if iViewMode == 1

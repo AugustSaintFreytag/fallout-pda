@@ -1,0 +1,47 @@
+begin function { string_var sEventTitle }
+
+	; Creates a one-time player event for the selected calendar date.
+	; Empty titles or missing selected dates are ignored.
+
+	; Guards
+
+	if eval (Sv_Length sEventTitle) == 0
+		return
+	endif
+
+	string_var sSelectedDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
+
+	if eval (Sv_Length sSelectedDate) == 0
+		Sv_Destruct sSelectedDate
+		return
+	endif
+
+	; UDFs
+
+	ref GetDateComponentsFromStringUDF = CompileScript "PipLog\DateTime\GetDateComponentsFromString.gek"
+	ref AddPlayerEventUDF = CompileScript "PipLog\Event\AddPlayerEvent.gek"
+	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
+
+	; Main
+
+	array_var aDate = (Call GetDateComponentsFromStringUDF sSelectedDate)
+
+	if eval aDate == Ar_Null
+		Sv_Destruct sSelectedDate
+		return
+	endif
+
+	short iYear = aDate[0]
+	short iMonth = aDate[1]
+	short iDay = aDate[2]
+
+	let aDate := Ar_Null
+
+	Call AddPlayerEventUDF iDay iMonth iYear sEventTitle 1
+	Call UpdateSelectedDaySummaryUDF sSelectedDate
+
+	; Clean-Up
+
+	Sv_Destruct sSelectedDate
+
+end

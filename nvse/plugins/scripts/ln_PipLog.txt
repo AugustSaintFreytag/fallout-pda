@@ -7,6 +7,9 @@ ref OnTileSelectUDF = CompileScript "PipLog\Interface\Calendar\OnTileSelect.gek"
 ref OnMenuClickUDF = CompileScript "PipLog\Interface\OnMenuClick.gek"
 ref OnCalendarHoverUDF = CompileScript "PipLog\Interface\Calendar\OnCalendarHover.gek"
 ref OnMenuCloseUDF = CompileScript "PipLog\Interface\OnMenuClose.gek"
+ref OnCreateEventClickUDF = CompileScript "PipLog\Interface\Event\OnCreateEventClick.gek"
+ref OnToggleReminderClickUDF = CompileScript "PipLog\Interface\Reminder\OnToggleReminderClick.gek"
+ref TickPlayerRemindersUDF = CompileScript "PipLog\Reminder\TickPlayerReminders.gek"
 ref AddComputedEventsUDF = CompileScript "PipLog\Calendar\AddComputedEvents.gek"
 ref AppendJournalEntryUDF = CompileScript "PipLog\Journal\AppendJournalEntry.gek"
 
@@ -26,6 +29,8 @@ SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#511"
 SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#512"
 SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#513"
 SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#514"
+SetOnMenuClickEventHandler OnCreateEventClickUDF 1 "MapMenu#517"
+SetOnMenuClickEventHandler OnToggleReminderClickUDF 1 "MapMenu#527"
 
 SetOnMouseoverChangeEventHandler OnCalendarHoverUDF 1 1023
 SetOnMenuCloseEventHandler OnMenuCloseUDF 1 1023

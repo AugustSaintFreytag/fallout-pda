@@ -10,6 +10,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 	ref OnTileDeselectUDF = CompileScript "PipLog\Interface\Calendar\OnTileDeselect.gek"
 	ref GetDateComponentsFromStringUDF = CompileScript "PipLog\DateTime\GetDateComponentsFromString.gek"
 	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
+	ref GetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\GetPlayerDateReminder.gek"
 
 	; State
 
@@ -49,12 +50,10 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 		Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" iNewYear
 
 		if eval (iNewYear > GameYear) || ((iNewYear == GameYear) && (iNewMonth > GameMonth)) || ((iNewYear == GameYear) && (iNewMonth == GameMonth) && (iNewDay > GameDay))
-			array_var aPlayerReminders = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerReminders"
-			short bIsTracked = (Ar_Size aPlayerReminders) != -1 && (Ar_HasKey aPlayerReminders, sComponent)
+			short bIsTracked = (Call GetPlayerDateReminderUDF sComponent)
 
 			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 1
 			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" bIsTracked
-			let aPlayerReminders := Ar_Null
 		else
 			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 0
 			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" 0
