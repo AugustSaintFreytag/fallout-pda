@@ -14,29 +14,29 @@ We can use `Sv_Join` and `Sv_Split` to establish basic encoding. This makes our 
 ```gek
 array_var aEvent = Ar_Construct "stringmap"
 
-let aEvent["id"] = GetRandomId
-let aEvent["date"] = "2077-12-01"
-let aEvent["name"] = "Festival of Suns"
+let aEvent["id"] := GetRandomId
+let aEvent["date"] := "2077-12-01"
+let aEvent["name"] := "Festival of Suns"
 ```
 
 ```gek
 ref EncodeEventToString = (begin function { array_var aEvent } 
 	array_var aComponents = (Ar_List aEvent["id"], aEvent["name"], aEvent["date"])
-	string_var sEncodedEvent = (Sv_Join aComponents "@@@")
+	string_var sEncodedEvent = (Sv_Join aComponents, "@@@")
 
 	SetFunctionValue sEncodedEvent
 	let aComponents := Ar_Null
 end)
 
 ref DecodeEventFromString = (begin function { string_var sData } 
-	array_var aComponents = (Sv_Split sData "@@@")
+	array_var aComponents = (Sv_Split sData, "@@@")
 	array_var aEvent = Ar_Construct "stringmap"
 
 	; TODO: Safeguard with `Ar_Size` check and `(TypeOf aComponents[0]) == "String"`, etc.
 
-	let aEvent["id"] = aComponents[0]
-	let aEvent["date"] = aComponents[1]
-	let aEvent["name"] = aComponents[2]
+	let aEvent["id"] := aComponents[0]
+	let aEvent["date"] := aComponents[1]
+	let aEvent["name"] := aComponents[2]
 
 	SetFunctionValue aEvent
 	let aComponents := Ar_Null
