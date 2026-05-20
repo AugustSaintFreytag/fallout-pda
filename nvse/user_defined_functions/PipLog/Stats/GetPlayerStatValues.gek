@@ -25,18 +25,18 @@ begin function { short iDay, short iMonth, short iYear }
 	endif
 
 	string_var sEncoded = aAllStats[sDate]
-	array_var aPairs = Sv_Split "," sEncoded
+	array_var aPairs = Sv_Split sEncoded, ","
 
 	foreach array_var aElement <- aPairs
 		string_var sPair = aElement["value"]
-		array_var aParts = Sv_Split ":", sPair
+		array_var aComponents = Sv_Split sPair, ":"
 		
-		if eval (Ar_Size aParts) == 2
-			short iCount = aParts[1]
-			let aResult[aParts[0]] := iCount
+		if eval (Ar_Size aComponents) == 2
+			short iCount = aComponents[1]
+			let aResult[aComponents[0]] := iCount
 		endif
 		
-		let aParts := Ar_Null
+		let aComponents := Ar_Null
 	loop
 
 	SetFunctionValue aResult

@@ -24,7 +24,7 @@ begin function { string_var sIdList, string_var sId }
 
 	Ar_Append aIds, sId
 
-	string_var sNewIdList = Sv_Join aIds ","
+	string_var sNewIdList = (Sv_Join aIds, ",")
 
 	SetFunctionValue sNewIdList
 

@@ -7,7 +7,7 @@ begin function { array_var aJournalEntry }
 	; Main
 
 	array_var aComponents = Ar_List aJournalEntry["id"], aJournalEntry["flags"], aJournalEntry["datetime"], aJournalEntry["location"], aJournalEntry["text"]
-	string_var sEncodedEntry = Sv_Join aComponents "@@@"
+	string_var sEncodedEntry = Sv_Join aComponents, "@@@"
 
 	SetFunctionValue sEncodedEntry
 

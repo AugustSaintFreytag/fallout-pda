@@ -7,7 +7,7 @@ begin function { string_var sData }
 
 	; Main
 
-	array_var aComponents = Sv_Split sData "@@@"
+	array_var aComponents = Sv_Split sData, "@@@"
 
 	if eval (Ar_Size aComponents) != 3
 		PrintC "Could not decode event from string '%z', invalid format." sData

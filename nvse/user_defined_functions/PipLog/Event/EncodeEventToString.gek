@@ -7,7 +7,7 @@ begin function { array_var aEvent }
 	; Main
 
 	array_var aComponents = Ar_List aEvent["id"], aEvent["date"], aEvent["name"]
-	string_var sEncodedEvent = Sv_Join aComponents "@@@"
+	string_var sEncodedEvent = Sv_Join aComponents, "@@@"
 
 	SetFunctionValue sEncodedEvent
 

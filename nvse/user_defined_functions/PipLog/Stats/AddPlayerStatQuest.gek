@@ -31,9 +31,9 @@ begin function { ref rQuest }
 
 	if eval (Ar_HasKey aQuestStats, sDate)
 		string_var sExisting = aQuestStats[sDate]
-		array_var aParts = Sv_Split "," sExisting
+		array_var aComponents = Sv_Split sExisting, ","
 
-		short bAlreadyRecorded = eval (Ar_Find sQuestId, aParts) != Ar_BadNumericIndex
+		short bAlreadyRecorded = eval (Ar_Find sQuestId, aComponents) != Ar_BadNumericIndex
 
 		if eval !bAlreadyRecorded
 			let aQuestStats[sDate] := Sv_Construct "%z,%z" sExisting sQuestId
@@ -41,7 +41,7 @@ begin function { ref rQuest }
 		endif
 
 		Sv_Destruct sExisting
-		let aParts := Ar_Null
+		let aComponents := Ar_Null
 	else
 		let aQuestStats[sDate] := sQuestId
 		Player.AuxStringMapArraySetFromArray "PLC_aPlayerQuestStats" aQuestStats

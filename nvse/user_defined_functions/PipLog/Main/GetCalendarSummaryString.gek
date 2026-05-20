@@ -18,6 +18,11 @@ begin function { string_var sDate }
 
 	array_var aDate = (Call GetDateComponentsFromStringUDF sDate)
 
+	if eval aDate == Ar_Null
+		PrintC "Could not formulate calendar summary string for invalid date '%z'." sDate
+		return
+	endif
+
 	short iYear = aDate[0]
 	short iMonth = aDate[1]
 	short iDay = aDate[2]
@@ -66,7 +71,7 @@ begin function { string_var sDate }
 
 		if eval (Ar_HasKey aQuestStats, sDate)
 			string_var sQuestList = aQuestStats[sDate]
-			array_var aQuestIds = Sv_Split "," sQuestList
+			array_var aQuestIds = Sv_Split sQuestList, ","
 
 			foreach (array_var aElement) <- aQuestIds
 				string_var sQuestId = aElement["value"]
