@@ -6,17 +6,27 @@ begin function { string_var sDate }
 
 	; Main
 
-	array_var aParts = Sv_Split "-" sDate
+	array_var aComponents = Sv_Split sDate, "-"
+
+	if eval (Ar_Size aComponents) != 3
+		PrintC "Could not split date string '%z' into three parts (got %g), invalid format." (Ar_Size aComponents) (sDate)
+
+		SetFunctionValue Ar_Null
+		let aComponents := Ar_Null
+		return
+	endif
+
 	array_var aResult = Ar_Construct "array"
 
-	Ar_Append aResult, #aParts[0]
-	Ar_Append aResult, (#aParts[1] - 1)
-	Ar_Append aResult, #aParts[2]
+	Ar_Append aResult, (#aComponents[0])
+	Ar_Append aResult, (#aComponents[1] - 1)
+	Ar_Append aResult, (#aComponents[2])
 
 	SetFunctionValue aResult
 
 	; Clean-Up
 
-	let aParts := Ar_Null
+	let aComponents := Ar_Null
+	let aResult := Ar_Null
 
 end
