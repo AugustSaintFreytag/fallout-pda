@@ -14,6 +14,7 @@ ref AppendJournalEntryUDF = CompileScript "PipLog\Journal\AppendJournalEntry.gek
 
 ;SetGameMainLoopCallback ShowBirthdayPromptUDF 1 1 2
 SetGameMainLoopCallback UIControlLoopUDF 1 1 2
+SetGameMainLoopCallback TickPlayerRemindersUDF 1 100 1
 
 ; Event Handlers
 
