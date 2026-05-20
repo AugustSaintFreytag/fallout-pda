@@ -1,0 +1,25 @@
+begin function {}
+
+	; Checks whether today's date has a pending player reminder.
+	; Runs from ln_PipLog every 100 game-mode frames.
+
+	; UDFs
+
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref GetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\GetPlayerDateReminder.gek"
+	ref SetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\SetPlayerDateReminder.gek"
+
+	string_var sCurrentDate = (Call GetStorageDateStringUDF GameYear GameMonth GameDay)
+
+	; Main
+
+	if eval (Call GetPlayerDateReminderUDF sCurrentDate)
+		Call SetPlayerDateReminderUDF sCurrentDate 0
+		MessageEx "You have a reminder for today."
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sCurrentDate
+
+end

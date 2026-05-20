@@ -1,0 +1,23 @@
+begin function { string_var sDate }
+
+	; Returns 1 when the player has a reminder set for sDate, otherwise 0.
+
+	; State
+
+	array_var aPlayerReminders = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerReminders"
+
+	; Main
+
+	short bHasPlayerDateReminder = 0
+
+	if eval (Ar_Size aPlayerReminders) != -1
+		let bHasPlayerDateReminder := (Ar_HasKey aPlayerReminders, sDate)
+	endif
+
+	SetFunctionValue bHasPlayerDateReminder
+
+	; Clean-Up
+
+	let aPlayerReminders := Ar_Null
+
+end

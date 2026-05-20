@@ -1,0 +1,30 @@
+begin function { string_var sDate, short iState }
+
+	; Sets or clears the player's one-shot reminder for sDate.
+	; iState: 1 = set, 0 = clear.
+
+	; State
+
+	array_var aPlayerReminders = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerReminders"
+
+	if eval (Ar_Size aPlayerReminders) == -1
+		let aPlayerReminders := Ar_Construct "stringmap"
+	endif
+
+	; Main
+
+	if iState
+		let aPlayerReminders[sDate] := "1"
+	else
+		if eval (Ar_HasKey aPlayerReminders, sDate)
+			Ar_Erase aPlayerReminders, sDate
+		endif
+	endif
+
+	Player.AuxStringMapArraySetFromArray "PLC_aPlayerReminders" aPlayerReminders
+
+	; Clean-Up
+
+	let aPlayerReminders := Ar_Null
+
+end
