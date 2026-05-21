@@ -1,0 +1,51 @@
+begin function { string_var sEventId, string_var sEventName }
+
+	; Updates the name of an existing player event without changing its id or date.
+
+	; UDFs
+
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+	ref EncodeEventToStringUDF = CompileScript "PipLog\Event\EncodeEventToString.gek"
+
+	; State
+
+	array_var aEventsById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
+
+	; Main
+
+	if eval (Ar_Size aEventsById) == -1
+		let aEventsById := Ar_Null
+		return
+	endif
+
+	short bHasEvent = Ar_HasKey aEventsById, sEventId
+
+	if eval !bHasEvent
+		let aEventsById := Ar_Null
+		return
+	endif
+
+	string_var sEncodedEvent = aEventsById[sEventId]
+	array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+	if eval aEvent == Ar_Null
+		Sv_Destruct sEncodedEvent
+		let aEventsById := Ar_Null
+		let aEvent := Ar_Null
+		return
+	endif
+
+	let aEvent["name"] := sEventName
+
+	string_var sUpdatedEvent = (Call EncodeEventToStringUDF aEvent)
+	let aEventsById[sEventId] := sUpdatedEvent
+
+	Player.AuxStringMapArraySetFromArray "PLC_aPlayerEventsById" aEventsById
+
+	; Clean-Up
+
+	Sv_Destruct sEncodedEvent, sUpdatedEvent
+	let aEventsById := Ar_Null
+	let aEvent := Ar_Null
+
+end
