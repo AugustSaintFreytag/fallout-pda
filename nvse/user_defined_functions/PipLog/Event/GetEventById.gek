@@ -1,0 +1,51 @@
+begin function { string_var sEventId, short bIsPlayerEvent }
+
+	; Returns the decoded event with sEventId from player or global event storage.
+	; Pass bIsPlayerEvent = 1 for player events, 0 for global events.
+	; Returns Ar_Null if the event does not exist.
+
+	; UDFs
+
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+
+	; State
+
+	string_var sKeyById = "*PLC_aGlobalEventsById"
+
+	if eval bIsPlayerEvent
+		let sKeyById := "PLC_aPlayerEventsById"
+	endif
+
+	; Main
+
+	array_var aEventsById = Player.AuxStringMapArrayGetAsArray ($sKeyById)
+
+	if eval (Ar_Size aEventsById) == -1
+		SetFunctionValue Ar_Null
+
+		Sv_Destruct sKeyById
+		let aEventsById := Ar_Null
+		return
+	endif
+
+	short bHasEvent = Ar_HasKey aEventsById, sEventId
+
+	if eval !bHasEvent
+		SetFunctionValue Ar_Null
+		
+		Sv_Destruct sKeyById
+		let aEventsById := Ar_Null
+		return
+	endif
+
+	string_var sEncodedEvent = aEventsById[sEventId]
+	array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+	SetFunctionValue aEvent
+
+	; Clean-Up
+
+	Sv_Destruct sKeyById, sEncodedEvent
+	let aEventsById := Ar_Null
+
+end
