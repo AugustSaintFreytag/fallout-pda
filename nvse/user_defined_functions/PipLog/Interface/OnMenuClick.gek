@@ -25,6 +25,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 
 	ref OnTileDeselectUDF = CompileScript "PipLog\Interface\Calendar\OnTileDeselect.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
 	; Main
 
@@ -59,12 +60,13 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" GameDay
 					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" GameMonth
 					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" GameYear
+
+					Call UpdateSelectedDaySummaryUDF sToday
 					
 					Sv_Destruct sToday
 				endif
 
 				Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedCalendarDate"
-				Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 				Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
 
 				Sv_Destruct sSelectedDate
@@ -82,7 +84,21 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 				if iViewMode == 3
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
 				elseif iViewMode == 2
-					; Event category cycling deferred to a later phase.
+					short iEventFilterMode = Player.AuxiliaryVariableGetFloat "*PLC_iEventFilterMode"
+
+					let iEventFilterMode += 1
+
+					if iEventFilterMode > 2
+						let iEventFilterMode := 0
+					endif
+
+					Player.AuxiliaryVariableSetFloat "*PLC_iEventFilterMode" iEventFilterMode
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+					Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
+					Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
+					Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedEventTileName"
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
 				else
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 3
 				endif
@@ -94,6 +110,12 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
 				else
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 2
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+					Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
+					Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
+					Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedEventTileName"
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
 				endif
 
 				StopSound UIMenuCancel

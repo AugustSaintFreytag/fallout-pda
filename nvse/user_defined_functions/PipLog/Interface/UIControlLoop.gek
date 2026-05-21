@@ -13,6 +13,9 @@ begin function {}
 
 	ref GenerateCalendarTilesUDF = CompileScript "PipLog\Interface\Calendar\GenerateCalendarTiles.gek"
 	ref PulseSelectedDateTileUDF = CompileScript "PipLog\Interface\Calendar\PulseSelectedDateTile.gek"
+	ref GenerateEventListUDF = CompileScript "PipLog\Interface\Event\GenerateEventList.gek"
+	ref GetEventByIdUDF = CompileScript "PipLog\Event\GetEventById.gek"
+	ref GetEventDateLabelUDF = CompileScript "PipLog\Interface\Event\GetEventDateLabel.gek"
 
 	; Core State
 
@@ -29,9 +32,17 @@ begin function {}
 	short bIsSelectedCalendarDateFuture = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateFuture"
 	short bIsSelectedCalendarDateTracked = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateTracked"
 
+	short iEventFilterMode = Player.AuxiliaryVariableGetFloat "*PLC_iEventFilterMode"
+	short bIsEventListModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsEventListModified"
+	short bIsEventSelectionModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsEventSelectionModified"
+	short bIsSelectedEventPlayer = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedEventPlayer"
+
 	string_var sCalendarDateSummary = Player.AuxiliaryVariableGetString "*PLC_sCalendarDateSummary"
 	string_var sPreviousSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sPreviousSelectedCalendarDate"
 	string_var sSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
+	string_var sPreviousSelectedEventTileName = Player.AuxiliaryVariableGetString "*PLC_sPreviousSelectedEventTileName"
+	string_var sSelectedEventTileName = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventTileName"
+	string_var sSelectedEventId = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventId"
 
 	if eval (iSelectedTab != 3)
 		let iViewMode := 0
@@ -41,6 +52,11 @@ begin function {}
 	if eval (iViewMode < 0) || (iViewMode > 3)
 		let iViewMode := 0
 		Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
+	endif
+
+	if eval (iEventFilterMode < 0) || (iEventFilterMode > 2)
+		let iEventFilterMode := 0
+		Player.AuxiliaryVariableSetFloat "*PLC_iEventFilterMode" 0
 	endif
 
 	; General Visibility
@@ -82,6 +98,14 @@ begin function {}
 
 	if iViewMode == 2
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 1
+
+		if iEventFilterMode == 0
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 3
+		elseif iEventFilterMode == 1
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 1
+		else
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 0
+		endif
 	else
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
 	endif
@@ -163,8 +187,62 @@ begin function {}
 		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 0
 	endif
 
+	; Events View (List)
+
+	if iViewMode == 2
+		if bIsEventListModified
+			PrintC "Generating event list. View mode: %g, list modified: %g" iViewMode bIsEventListModified
+			Call GenerateEventListUDF
+		endif
+	endif
+
+	; Events View (Selection)
+
+	if eval (iViewMode == 2) && (bIsEventSelectionModified)
+		PrintC "Updating event selection. View mode: %g, selection modified: %g" iViewMode bIsEventSelectionModified
+
+		if eval (Sv_Length sPreviousSelectedEventTileName) > 0
+			string_var sOldEventTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/%z/_selected" sPreviousSelectedEventTileName
+			SetUIFloatAlt ($sOldEventTilePath) 0
+			Sv_Destruct sOldEventTilePath
+		endif
+
+		if eval (Sv_Length sSelectedEventId) > 0
+			if eval (Sv_Length sSelectedEventTileName) > 0
+				string_var sNewEventTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/%z/_selected" sSelectedEventTileName
+				SetUIFloatAlt ($sNewEventTilePath) 1
+				Sv_Destruct sNewEventTilePath
+			endif
+
+			array_var aSelectedEvent = (Call GetEventByIdUDF sSelectedEventId bIsSelectedEventPlayer)
+
+			if eval aSelectedEvent == Ar_Null
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 0
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" 0
+			else
+				string_var sSelectedEventName = aSelectedEvent["name"]
+				string_var sSelectedEventDate = aSelectedEvent["date"]
+				string_var sSelectedEventDateLabel = (Call GetEventDateLabelUDF sSelectedEventDate)
+
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 1
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" bIsSelectedEventPlayer
+				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_1R/string" ($sSelectedEventName)
+				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_2R/string" ($sSelectedEventDateLabel)
+
+				Sv_Destruct sSelectedEventName, sSelectedEventDate, sSelectedEventDateLabel
+			endif
+
+			let aSelectedEvent := Ar_Null
+		else
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 0
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" 0
+		endif
+
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 0
+	endif
+
 	; Clean-Up
 
-	Sv_Destruct sCalendarDateSummary, sPreviousSelectedCalendarDate, sSelectedCalendarDate
+	Sv_Destruct sCalendarDateSummary, sPreviousSelectedCalendarDate, sSelectedCalendarDate, sPreviousSelectedEventTileName, sSelectedEventTileName, sSelectedEventId
 
 end

@@ -1,0 +1,58 @@
+begin function { short iMenuID, short iTileID, string_var sTileParam }
+
+	; Removes the currently selected player event.
+
+	Sv_Destruct sTileParam
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 2
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedEventPlayer" == 0
+		return
+	endif
+
+	; UDFs
+
+	ref RemoveEventUDF = CompileScript "PipLog\Event\RemoveEvent.gek"
+	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
+
+	; State
+
+	string_var sSelectedEventId = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventId"
+	string_var sSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
+
+	; Main
+
+	if eval (Sv_Length sSelectedEventId) == 0
+		Sv_Destruct sSelectedEventId, sSelectedCalendarDate
+		return
+	endif
+
+	Call RemoveEventUDF sSelectedEventId 1
+
+	Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
+	Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
+	Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedEventTileName"
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
+
+	if eval (Sv_Length sSelectedCalendarDate) > 0
+		Call UpdateSelectedDaySummaryUDF sSelectedCalendarDate
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sSelectedEventId, sSelectedCalendarDate
+
+end

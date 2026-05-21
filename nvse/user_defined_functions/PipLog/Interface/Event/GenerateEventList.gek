@@ -1,0 +1,43 @@
+begin function {}
+
+	; Rebuilds the event list for the active event filter mode.
+	; Filter modes: 0 = one-time, 1 = monthly, 2 = yearly.
+
+	; UDFs
+
+	ref AppendEventListSourceUDF = CompileScript "PipLog\Interface\Event\AppendEventListSource.gek"
+
+	; State
+
+	short iEventFilterMode = Player.AuxiliaryVariableGetFloat "*PLC_iEventFilterMode"
+	array_var aGlobalEventsById = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsById"
+	array_var aGlobalEventIdsByDate = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsByDate"
+	array_var aPlayerEventsById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
+	array_var aPlayerEventIdsByDate = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsByDate"
+
+	; Main
+
+	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
+	AddTileFromTemplate "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect|CM_EventParentRect_Template|CM_EventParentRect"
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_current_value" 0
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/_templateheight" 0
+
+	short iTileIndex = 0
+
+	let iTileIndex := (Call AppendEventListSourceUDF aGlobalEventsById aGlobalEventIdsByDate iEventFilterMode iTileIndex 0)
+	let iTileIndex := (Call AppendEventListSourceUDF aPlayerEventsById aPlayerEventIdsByDate iEventFilterMode iTileIndex 1)
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/_templateheight" (iTileIndex * 42)
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/visible" 1
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 0
+
+	; Clean-Up
+
+	let aGlobalEventsById := Ar_Null
+	let aGlobalEventIdsByDate := Ar_Null
+	let aPlayerEventsById := Ar_Null
+	let aPlayerEventIdsByDate := Ar_Null
+
+end

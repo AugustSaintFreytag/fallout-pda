@@ -1,0 +1,64 @@
+begin function { short iMenuID, short iTileID, string_var sTileParam }
+
+	; Handles event-list tile clicks by updating selected event view-model state.
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		Sv_Destruct sTileParam
+		return
+	endif
+
+	if eval (GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab") != 3
+		Sv_Destruct sTileParam
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 2
+		Sv_Destruct sTileParam
+		return
+	endif
+
+	; State
+
+	string_var sTileName = Sv_Construct "%z" sTileParam
+	Sv_Destruct sTileParam
+
+	Sv_Replace "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/|" sTileName
+	Sv_Replace "/CM_EventSelected|" sTileName
+
+	string_var sEventIdPath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/%z/_event_id" sTileName
+	string_var sEventSourcePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/%z/_event_source" sTileName
+	string_var sEventId = GetUIString ($sEventIdPath)
+
+	short bIsPlayerEvent = GetUIFloat ($sEventSourcePath)
+	
+	string_var sCurrentEventId = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventId"
+	string_var sCurrentTileName = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventTileName"
+
+	; Main
+
+	if eval (Sv_Length sEventId) == 0
+		Sv_Destruct sTileName, sEventIdPath, sEventSourcePath, sEventId, sCurrentEventId, sCurrentTileName
+		return
+	endif
+
+	Player.AuxiliaryVariableSetString "*PLC_sPreviousSelectedEventTileName" ($sCurrentTileName)
+
+	if eval (sEventId == sCurrentEventId) && ((Sv_Length sEventId) > 0)
+		Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
+		Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
+	else
+		Player.AuxiliaryVariableSetString "*PLC_sSelectedEventId" ($sEventId)
+		Player.AuxiliaryVariableSetString "*PLC_sSelectedEventTileName" ($sTileName)
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" bIsPlayerEvent
+	endif
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+
+	; Clean-Up
+
+	Sv_Destruct sTileName, sEventIdPath, sEventSourcePath, sEventId, sCurrentEventId, sCurrentTileName
+
+end

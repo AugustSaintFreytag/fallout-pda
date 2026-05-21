@@ -1,0 +1,37 @@
+begin function { string_var sDate }
+
+	; Converts an event storage date into user-facing text.
+	; YYYY-MM-DD -> DD.MM.YYYY, *-MM-DD -> DD.MM, *-*-DD -> every month on day DD.
+
+	; Main
+
+	array_var aComponents = Sv_Split sDate, "-"
+
+	if eval (Ar_Size aComponents) != 3
+		string_var sFallback = Sv_Construct "%z" sDate
+		SetFunctionValue sFallback
+		let aComponents := Ar_Null
+		return
+	endif
+
+	string_var sYear = aComponents[0]
+	string_var sMonth = aComponents[1]
+	string_var sDay = aComponents[2]
+	string_var sLabel = ""
+
+	if eval (sYear == "*") && (sMonth == "*")
+		let sLabel := Sv_Construct "Every month on day %g" (#sDay)
+	elseif eval sYear == "*"
+		let sLabel := Sv_Construct "%z.%z" sDay sMonth
+	else
+		let sLabel := Sv_Construct "%z.%z.%z" sDay sMonth sYear
+	endif
+
+	SetFunctionValue sLabel
+
+	; Clean-Up
+
+	Sv_Destruct sYear, sMonth, sDay
+	let aComponents := Ar_Null
+
+end

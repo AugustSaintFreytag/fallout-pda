@@ -1,0 +1,109 @@
+begin function { array_var aEventsById, array_var aEventIdsByDate, short iEventFilterMode, short iStartTileIndex, short bIsPlayerEvent }
+
+	; Appends event-list rows from one event storage source.
+	; Returns the next tile index after all appended rows.
+
+	; UDFs
+
+	ref DecodeEventIdsFromStringUDF = CompileScript "PipLog\Event\DecodeEventIdsFromString.gek"
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+
+	; State
+
+	short iTileIndex = iStartTileIndex
+
+	; Main
+
+	if eval ((Ar_Size aEventsById) == -1) || ((Ar_Size aEventIdsByDate) == -1)
+		SetFunctionValue iTileIndex
+		return
+	endif
+
+	foreach (array_var aDateEntry) <- aEventIdsByDate
+		string_var sDate = aDateEntry["key"]
+		string_var sEncodedIds = aDateEntry["value"]
+		array_var aDateComponents = Sv_Split sDate, "-"
+		short bMatchesFilter = 0
+
+		if eval (Ar_Size aDateComponents) == 3
+			string_var sYear = aDateComponents[0]
+			string_var sMonth = aDateComponents[1]
+
+			if iEventFilterMode == 0
+				if eval sYear != "*"
+					let bMatchesFilter := 1
+				endif
+			elseif iEventFilterMode == 1
+				if eval (sYear == "*") && (sMonth == "*")
+					let bMatchesFilter := 1
+				endif
+			elseif iEventFilterMode == 2
+				if eval (sYear == "*") && (sMonth != "*")
+					let bMatchesFilter := 1
+				endif
+			endif
+
+			Sv_Destruct sYear, sMonth
+		endif
+
+		if eval bMatchesFilter
+			array_var aEventIds = (Call DecodeEventIdsFromStringUDF sEncodedIds)
+
+			foreach (array_var aEventIdEntry) <- aEventIds
+				string_var sEventId = aEventIdEntry["value"]
+
+				if eval !(Ar_HasKey aEventsById, sEventId)
+					Sv_Destruct sEventId
+					continue
+				endif
+
+				string_var sEncodedEvent = aEventsById[sEventId]
+				array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+				if eval aEvent == Ar_Null
+					Sv_Destruct sEventId, sEncodedEvent
+					let aEvent := Ar_Null
+					continue
+				endif
+
+				string_var sEventName = aEvent["name"]
+				string_var sTileInsertCommand = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect|CM_Event_Template|CM_Event%g" iTileIndex
+				string_var sTileBasePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/CM_Event%g" iTileIndex
+				string_var sTilePropertyPath = ""
+
+				AddTileFromTemplate ($sTileInsertCommand)
+
+				let sTilePropertyPath := Sv_Construct "%z/string" sTileBasePath
+				SetUIStringAlt ($sTilePropertyPath) ($sEventName)
+
+				let sTilePropertyPath := Sv_Construct "%z/_event_id" sTileBasePath
+				SetUIStringAlt ($sTilePropertyPath) ($sEventId)
+
+				let sTilePropertyPath := Sv_Construct "%z/_event_date" sTileBasePath
+				SetUIStringAlt ($sTilePropertyPath) ($sDate)
+
+				let sTilePropertyPath := Sv_Construct "%z/_event_source" sTileBasePath
+				SetUIFloatAlt ($sTilePropertyPath) bIsPlayerEvent
+
+				let sTilePropertyPath := Sv_Construct "%z/y" sTileBasePath
+				SetUIFloatAlt ($sTilePropertyPath) (iTileIndex * 42)
+
+				let sTilePropertyPath := Sv_Construct "%z/_selected" sTileBasePath
+				SetUIFloatAlt ($sTilePropertyPath) 0
+
+				let iTileIndex += 1
+
+				Sv_Destruct sEventId, sEncodedEvent, sEventName, sTileInsertCommand, sTileBasePath, sTilePropertyPath
+				let aEvent := Ar_Null
+			loop
+
+			let aEventIds := Ar_Null
+		endif
+
+		Sv_Destruct sDate, sEncodedIds
+		let aDateComponents := Ar_Null
+	loop
+
+	SetFunctionValue iTileIndex
+
+end
