@@ -12,6 +12,7 @@ ref OnToggleReminderClickUDF = CompileScript "PipLog\Interface\Reminder\OnToggle
 ref OnWaitUntilClickUDF = CompileScript "PipLog\Interface\Wait\OnWaitUntilClick.gek"
 ref TickPlayerRemindersUDF = CompileScript "PipLog\Reminder\TickPlayerReminders.gek"
 ref AddComputedEventsUDF = CompileScript "PipLog\Calendar\AddComputedEvents.gek"
+ref AddHolidayEventsUDF = CompileScript "PipLog\Calendar\AddHolidayEvents.gek"
 ref AppendJournalEntryUDF = CompileScript "PipLog\Journal\AppendJournalEntry.gek"
 
 ; Loops
@@ -42,3 +43,4 @@ SetOnMenuCloseEventHandler OnMenuCloseUDF 1 1023
 ; Set-Up
 
 Call AddComputedEventsUDF GameYear
+Call AddHolidayEventsUDF
