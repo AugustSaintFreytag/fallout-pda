@@ -24,18 +24,19 @@ begin function {}
 
 	short iIndex = 0
 
-	while iIndex < iNumEntries
-		array_var aEntry = aFileContents[iIndex]
+	foreach array_var aElement <- aFileContents
+		array_var aEntry = aElement["value"]
 		string_var sDate = aEntry["date"]
 		string_var sName = aEntry["name"]
 		array_var aEvent = (Call CreateEventUDF sDate sName)
 
 		Ar_Append aHolidays, aEvent
 
+		let aElement := Ar_Null
 		let aEvent := Ar_Null
 		let aEntry := Ar_Null
+		
 		Sv_Destruct sDate, sName
-		let iIndex += 1
 	loop
 
 	SetFunctionValue aHolidays
