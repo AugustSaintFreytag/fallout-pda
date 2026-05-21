@@ -23,8 +23,6 @@ SetGameMainLoopCallback TickPlayerRemindersUDF 1 100 1
 
 ; Event Handlers
 
-SetEventHandlerAlt "SD_MarkCalendarModified" MarkCalendarModifiedUDF
-
 SetOnMenuClickEventHandler OnTileSelectUDF 1 "MapMenu#509"
 SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#510"
 SetOnMenuClickEventHandler OnMenuClickUDF 1 "MapMenu#511"
@@ -38,7 +36,8 @@ SetOnMenuClickEventHandler OnToggleReminderClickUDF 1 "MapMenu#527"
 SetOnMouseoverChangeEventHandler OnCalendarHoverUDF 1 1023
 SetOnMenuCloseEventHandler OnMenuCloseUDF 1 1023
 
-; SetEventHandlerAlt "SD_AddJournalEntry" AppendJournalEntryUDF
+; TODO: Re-introduce event handlers for API access.
+; API: AddJournalEntry, AddDateReminder, AddEvent
 
 ; Set-Up
 
