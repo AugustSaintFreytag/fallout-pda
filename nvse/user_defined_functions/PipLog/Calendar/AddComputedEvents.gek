@@ -10,37 +10,41 @@ begin function { short iYear }
 
 	; UDFs
 
+	ref GetRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetRecurringDateString.gek"
 	ref GetEasterDateUDF = CompileScript "PipLog\Calendar\GetEasterDate.gek"
 	ref GetThanksgivingDateUDF = CompileScript "PipLog\Calendar\GetThanksgivingDate.gek"
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
-	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
-	ref GetRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetRecurringDateString.gek"
+	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
 
-	; Main — Easter
+	; Main
+
+	array_var aEvents = Ar_Construct "array"
+
+	; Easter Event
 
 	string_var sEasterDate = (Call GetEasterDateUDF iYear)
 
 	if eval sEasterDate != ""
 		array_var aEasterEvent = (Call CreateEventUDF sEasterDate "Easter")
-		Call AddEventUDF aEasterEvent 0
+		Ar_Append aEvents, aEasterEvent
 		let aEasterEvent := Ar_Null
 	endif
 
 	Sv_Destruct sEasterDate
 
-	; Main — Thanksgiving
+	; Thanksgiving Event
 
 	string_var sThanksgivingDate = (Call GetThanksgivingDateUDF iYear)
 
 	if eval sThanksgivingDate != ""
 		array_var aThanksgivingEvent = (Call CreateEventUDF sThanksgivingDate "Thanksgiving")
-		Call AddEventUDF aThanksgivingEvent 0
+		Ar_Append aEvents, aThanksgivingEvent
 		let aThanksgivingEvent := Ar_Null
 	endif
 
 	Sv_Destruct sThanksgivingDate
 
-	; Main — Birthday
+	; Birthday Event
 
 	short bDidSetBirthday = Player.AuxiliaryVariableGetFloat "PLC_bDidSetBirthday"
 
@@ -51,10 +55,20 @@ begin function { short iYear }
 		string_var sBirthdayDate = (Call GetRecurringDateStringUDF iBirthdayMonth iBirthdayDay)
 		array_var aBirthdayEvent = (Call CreateEventUDF sBirthdayDate "Birthday")
 
-		Call AddEventUDF aBirthdayEvent 0
+		Ar_Append aEvents, aBirthdayEvent
 		
 		Sv_Destruct sBirthdayDate
 		let aBirthdayEvent := Ar_Null
 	endif
+
+	; Add
+
+	PrintC "Adding %g computed events for year %g to calendar." (Ar_Size aEvents) iYear
+
+	Call AddEventsUDF aEvents 0
+
+	; Clean-Up
+
+	let aEvents := Ar_Null
 
 end
