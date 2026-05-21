@@ -6,6 +6,11 @@ begin function { array_var aEvent }
 
 	; Main
 
+	if eval (aEvent == Ar_Null) || (Ar_Size aEvent) == -1
+		PrintC "Cannot encode event to string, event is null."
+		return
+	endif
+
 	array_var aComponents = Ar_List aEvent["id"], aEvent["date"], aEvent["name"]
 	string_var sEncodedEvent = Sv_Join aComponents, "@@@"
 
