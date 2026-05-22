@@ -1,0 +1,89 @@
+begin function { array_var aEventsById, array_var aEventIdsByDate, short iEventFilterMode, short iEventSourceKind }
+
+	; Collects decoded events from one event storage source for the active event-list filter.
+	; Event filter mode: 0 = yearly, 1 = monthly, 2 = daily.
+	; Adds transient "_source" state to each returned event.
+
+	; UDFs
+
+	ref DecodeEventIdsFromStringUDF = CompileScript "PipLog\Event\DecodeEventIdsFromString.gek"
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+
+	; State
+
+	array_var aEvents = Ar_Construct "array"
+
+	; Main
+
+	if eval ((Ar_Size aEventsById) == -1) || ((Ar_Size aEventIdsByDate) == -1)
+		SetFunctionValue aEvents
+		return
+	endif
+
+	foreach (array_var aDateEntry) <- aEventIdsByDate
+		string_var sDate = aDateEntry["key"]
+		string_var sEncodedIds = aDateEntry["value"]
+		array_var aDateComponents = Sv_Split sDate, "-"
+		short bMatchesFilter = 0
+
+		if eval (Ar_Size aDateComponents) == 3
+			string_var sYear = aDateComponents[0]
+			string_var sMonth = aDateComponents[1]
+
+			if iEventFilterMode == 0
+				; Yearly
+				if eval sYear != "*"
+					let bMatchesFilter := 1
+				endif
+			elseif iEventFilterMode == 1
+				; Monthly
+				if eval (sYear == "*") && (sMonth == "*")
+					let bMatchesFilter := 1
+				endif
+			elseif iEventFilterMode == 2
+				; Daily
+				if eval (sYear == "*") && (sMonth != "*")
+					let bMatchesFilter := 1
+				endif
+			endif
+
+			Sv_Destruct sYear, sMonth
+		endif
+
+		if eval bMatchesFilter
+			array_var aEventIds = (Call DecodeEventIdsFromStringUDF sEncodedIds)
+
+			foreach (array_var aEventIdEntry) <- aEventIds
+				string_var sEventId = aEventIdEntry["value"]
+
+				if eval !(Ar_HasKey aEventsById, sEventId)
+					Sv_Destruct sEventId
+					continue
+				endif
+
+				string_var sEncodedEvent = aEventsById[sEventId]
+				array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+				if eval (aEvent == Ar_Null) || ((Ar_Size aEvent) == -1)
+					Sv_Destruct sEventId, sEncodedEvent
+					let aEvent := Ar_Null
+					continue
+				endif
+
+				let aEvent["_source"] := iEventSourceKind
+				Ar_Append aEvents, aEvent
+
+				Sv_Destruct sEventId, sEncodedEvent
+				let aEvent := Ar_Null
+			loop
+
+			let aEventIds := Ar_Null
+		endif
+
+		Sv_Destruct sDate, sEncodedIds
+		let aDateComponents := Ar_Null
+	loop
+
+	SetFunctionValue aEvents
+
+end
