@@ -1,4 +1,4 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileParam }
 
 	; Click callback (MapMenu#520).
 	; Parses the active UI component path to determine which entry was clicked,

@@ -1,4 +1,4 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileParam }
 
 	; Opens a text input prompt for creating a one-time event on the selected date.
 	; The confirm callback reads *PLC_sSelectedCalendarDate from the view model.

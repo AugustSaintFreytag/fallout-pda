@@ -1,4 +1,4 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Handles event-list tile clicks by updating selected event view-model state.
 

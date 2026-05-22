@@ -1,4 +1,4 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileParam }
 
 	; Handles a click on a calendar grid tile by updating the calendar view model.
 	; The UI control loop owns visual selection, tools, and summary text writes.

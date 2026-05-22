@@ -1,4 +1,4 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileParam }
 
 	; Opens the Sleep/Wait menu preconfigured to wait until the selected future date.
 

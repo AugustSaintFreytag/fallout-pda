@@ -1,9 +1,9 @@
-begin function { short iMenuID }
+begin function { short iMenuId }
 
 	; Resets all calendar session state when the Pip-Boy is closed.
 	; View month is reset to current so the calendar reopens on today's month.
 
-	if iMenuID != 1023
+	if iMenuId != 1023
 		return
 	endif
 

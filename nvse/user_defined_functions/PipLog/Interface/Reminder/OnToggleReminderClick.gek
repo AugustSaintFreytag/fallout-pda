@@ -1,4 +1,4 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileParam }
 
 	; Toggles a one-shot reminder for the selected future calendar date.
 	; The UI control loop owns applying the updated state to CM_TrackButton.

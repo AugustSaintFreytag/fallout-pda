@@ -1,4 +1,4 @@
-begin function { short iMenuID }
+begin function { short iMenuId }
 
 	; Updates the calendar hover date in the view model.
 	; The UI control loop owns writing summary text and scrollbar state.

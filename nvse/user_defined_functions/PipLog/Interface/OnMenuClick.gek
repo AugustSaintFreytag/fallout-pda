@@ -1,4 +1,4 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileParam }
 
 	; Handles main Pip-Log buttons and calendar month arrows by mutating the view model.
 	; UIControlLoop.gek owns applying those values to menu tiles.
@@ -34,8 +34,8 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 	short bButton3Target = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/target" == 1
 	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
 
-	if eval (iTileID >= 510) && (iTileID <= 512)
-		if eval (iTileID == 510) && (bButton1Target)
+	if eval (iTileId >= 510) && (iTileId <= 512)
+		if eval (iTileId == 510) && (bButton1Target)
 			if iViewMode == 0
 				let iViewMode := 1
 				Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
@@ -80,7 +80,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 			StopSound UIMenuCancel
 			PlaySound UIPipBoySelect 1
 		elseif iViewMode > 0
-			if eval (iTileID == 511) && (bButton2Target)
+			if eval (iTileId == 511) && (bButton2Target)
 				if iViewMode == 3
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
 				elseif iViewMode == 2
@@ -105,7 +105,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 
 				StopSound UIMenuCancel
 				PlaySound UIPipBoySelect 1
-			elseif eval (iTileID == 512) && (bButton3Target)
+			elseif eval (iTileId == 512) && (bButton3Target)
 				if iViewMode == 2
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
 				else
@@ -122,7 +122,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 				PlaySound UIPipBoySelect 1
 			endif
 		endif
-	elseif eval (iTileID == 513) || (iTileID == 514)
+	elseif eval (iTileId == 513) || (iTileId == 514)
 		short iCalendarYear = Player.AuxiliaryVariableGetFloat "*PLC_iCalendarYear"
 		short iCalendarMonth = Player.AuxiliaryVariableGetFloat "*PLC_iCalendarMonth"
 
@@ -131,7 +131,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 			let iCalendarMonth := GameMonth
 		endif
 
-		if iTileID == 513
+		if iTileId == 513
 			let iCalendarMonth += 1
 
 			if iCalendarMonth > 11
