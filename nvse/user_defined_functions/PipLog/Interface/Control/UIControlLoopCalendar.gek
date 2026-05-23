@@ -1,0 +1,125 @@
+begin function {}
+
+	; Applies calendar view state to calendar tiles, summary text, and date actions.
+
+	; UDFs
+
+	ref GenerateCalendarTilesUDF = CompileScript "PipLog\Interface\Calendar\GenerateCalendarTiles.gek"
+	ref PulseSelectedDateTileUDF = CompileScript "PipLog\Interface\Calendar\PulseSelectedDateTile.gek"
+	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
+
+	; State
+
+	short bDidGenerateCalendar = Player.AuxiliaryVariableGetFloat "*PLC_bDidGenerateCalendar"
+	short bIsCalendarSummaryModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsCalendarSummaryModified"
+	short bIsCalendarSelectionModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsCalendarSelectionModified"
+	short bIsCalendarViewModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsCalendarViewModified"
+	short bIsSelectedCalendarDateFuture = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateFuture"
+	short bIsSelectedCalendarDateTracked = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateTracked"
+
+	string_var sCalendarDateSummary = Player.AuxiliaryVariableGetString "*PLC_sCalendarDateSummary"
+	string_var sPreviousSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sPreviousSelectedCalendarDate"
+	string_var sSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
+	string_var sHoveredCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sHoveredCalendarDate"
+
+	; View Controls
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 0
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
+
+	if eval (Sv_Length sSelectedCalendarDate) > 0
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 1
+	else
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
+	endif
+
+	; Tiles
+
+	if eval (!bDidGenerateCalendar) || (bIsCalendarViewModified)
+		PrintC "Generating calendar tiles. Did generate: %g, view modified: %g" bDidGenerateCalendar bIsCalendarViewModified
+		Call GenerateCalendarTilesUDF
+		let bDidGenerateCalendar := 1
+	else
+		;Call PulseSelectedDateTileUDF
+	endif
+
+	; Summary Text
+
+	if eval bIsCalendarSummaryModified || bIsCalendarSelectionModified || bIsCalendarViewModified
+		string_var sSummaryDate = ""
+
+		if eval (Sv_Length sHoveredCalendarDate) > 0
+			let sSummaryDate := Sv_Construct "%z" sHoveredCalendarDate
+		elseif eval (Sv_Length sSelectedCalendarDate) > 0
+			let sSummaryDate := Sv_Construct "%z" sSelectedCalendarDate
+		endif
+
+		Call UpdateSelectedDaySummaryUDF sSummaryDate
+
+		Sv_Destruct sCalendarDateSummary, sSummaryDate
+		let sCalendarDateSummary := Player.AuxiliaryVariableGetString "*PLC_sCalendarDateSummary"
+		let bIsCalendarSummaryModified := 1
+	endif
+
+	if bIsCalendarSummaryModified
+		PrintC "Updating calendar summary text. Summary modified: %g" bIsCalendarSummaryModified
+
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_current_value" 0
+
+		short iNumLines = (Sv_Count, "%r" sCalendarDateSummary)
+		short iNumLinesFromChars = ((Sv_Length sCalendarDateSummary) / 32)
+		float fScrollDelta = ((iNumLinesFromChars + iNumLines) + 8)
+
+		if fScrollDelta < 10
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/visible" 0
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_ScrollDelta" 0
+		else
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/visible" 1
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_ScrollDelta" fScrollDelta
+		endif
+
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_DataText/string" ($sCalendarDateSummary)
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 0
+	endif
+
+	; Selection
+
+	if eval (bIsCalendarSelectionModified) && (bDidGenerateCalendar)
+		PrintC "Updating calendar selection. Selection modified: %g, did generate: %g" bIsCalendarSelectionModified bDidGenerateCalendar
+
+		if eval (Sv_Length sPreviousSelectedCalendarDate) > 0
+			string_var sOldTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sPreviousSelectedCalendarDate
+			SetUIFloatAlt ($sOldTilePath) 0
+			Sv_Destruct sOldTilePath
+		endif
+
+		if eval (Sv_Length sSelectedCalendarDate) > 0
+			string_var sNewTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sSelectedCalendarDate
+			SetUIFloatAlt ($sNewTilePath) 1
+			Sv_Destruct sNewTilePath
+		endif
+
+		if eval (Sv_Length sSelectedCalendarDate) > 0
+			if bIsSelectedCalendarDateFuture
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_WaitButton/target" 1
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/target" 1
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/_Value" bIsSelectedCalendarDateTracked
+			else
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_WaitButton/target" 0
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/target" 0
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/_Value" 0
+			endif
+		else
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_WaitButton/target" 0
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/target" 0
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_TrackButton/_Value" 0
+		endif
+
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 0
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sCalendarDateSummary, sPreviousSelectedCalendarDate, sSelectedCalendarDate, sHoveredCalendarDate
+
+end

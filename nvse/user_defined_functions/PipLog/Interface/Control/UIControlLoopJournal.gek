@@ -1,0 +1,26 @@
+begin function {}
+
+	; Applies journal view state to the journal list.
+
+	; UDFs
+
+	ref GenerateJournalListUDF = CompileScript "PipLog\Interface\Journal\GenerateJournalList.gek"
+
+	; State
+
+	short bIsJournalListModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsJournalListModified"
+
+	; View Controls
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 1
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
+
+	; List
+
+	if bIsJournalListModified
+		PrintC "Generating journal list. List modified: %g" bIsJournalListModified
+		Call GenerateJournalListUDF
+	endif
+
+end
