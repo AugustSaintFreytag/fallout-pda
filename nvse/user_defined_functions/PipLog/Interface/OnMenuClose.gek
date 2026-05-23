@@ -28,7 +28,7 @@ begin function { short iMenuId }
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 0
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" 0
-	Player.AuxiliaryVariableSetFloat "*PLC_iEventFilterMode" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_iIntervalKind" 0
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0

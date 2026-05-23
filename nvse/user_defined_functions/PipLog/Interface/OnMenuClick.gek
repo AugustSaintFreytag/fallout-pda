@@ -25,7 +25,6 @@ begin function { short iMenuId, short iTileId, string_var sTileParam }
 
 	ref OnTileDeselectUDF = CompileScript "PipLog\Interface\Calendar\OnTileDeselect.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
 	; Main
 
@@ -61,7 +60,7 @@ begin function { short iMenuId, short iTileId, string_var sTileParam }
 					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" GameMonth
 					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" GameYear
 
-					Call UpdateSelectedDaySummaryUDF sToday
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 					
 					Sv_Destruct sToday
 				endif
@@ -84,15 +83,15 @@ begin function { short iMenuId, short iTileId, string_var sTileParam }
 				if iViewMode == 3
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
 				elseif iViewMode == 2
-					short iEventFilterMode = Player.AuxiliaryVariableGetFloat "*PLC_iEventFilterMode"
+					short iIntervalKind = Player.AuxiliaryVariableGetFloat "*PLC_iIntervalKind"
 
-					let iEventFilterMode += 1
+					let iIntervalKind += 1
 
-					if iEventFilterMode > 2
-						let iEventFilterMode := 0
+					if iIntervalKind > 2
+						let iIntervalKind := 0
 					endif
 
-					Player.AuxiliaryVariableSetFloat "*PLC_iEventFilterMode" iEventFilterMode
+					Player.AuxiliaryVariableSetFloat "*PLC_iIntervalKind" iIntervalKind
 					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
 					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
 					Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
