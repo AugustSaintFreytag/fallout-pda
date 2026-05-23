@@ -1,0 +1,15 @@
+begin function { array_var aInput, ref rBlock }
+
+	array_var aOutput = Ar_Construct "array"
+
+	foreach array_var aElement <- aInput
+		string_var aValue = Call rBlock (aElement["value"])
+		Ar_Append aOutput, aValue
+
+		Sv_Destruct aValue
+	loop
+
+	SetFunctionValue aOutput
+	let aOutput := Ar_Null
+
+end
