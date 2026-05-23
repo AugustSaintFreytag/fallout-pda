@@ -7,17 +7,27 @@ begin function { array_var aEvents }
 
 	ref AddEventToListUDF = CompileScript "PipLog\Interface\Event\AddEventToList.gek"
 
+	; State
+
+	short iTileIndex = 0
+	short iNumEvents = Ar_Size aEvents
+
 	; Main
 
-	if eval (Ar_Size aEvents) <= 0
+	if iNumEvents == -1
+		SetFunctionValue 0
 		return
 	endif
 
-	foreach array_var aElement <- aEvents
-		array_var aEvent = aElement["value"]
+	while iTileIndex < iNumEvents
+		array_var aEvent = aEvents[iTileIndex]
+
 		Call AddEventToListUDF aEvent iTileIndex
 
 		let aEvent := Ar_Null
+		let iTileIndex += 1
 	loop
+
+	SetFunctionValue iTileIndex
 
 end
