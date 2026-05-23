@@ -15,8 +15,6 @@ begin function { short iYear, short iMonth, short iDay }
 	string_var sDay = Call GetPaddedIntUDF iDay 2
 
 	string_var sResult = Sv_Construct "%z-%z-%z" sYear sMonth sDay
-
-	PrintC "Returning storage date string %z." sResult
 	
 	SetFunctionValue sResult
 
