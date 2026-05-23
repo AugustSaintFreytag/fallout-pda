@@ -12,7 +12,7 @@ begin function { string_var sInput }
 
 	let aJournalEntry[1] := sInput
 	Call SetJournalEntryUDF aJournalEntry iEditEntryIndex
-	Player.AuxiliaryVariableSetFloat "*PLC_bShouldUpdateJournalUI" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
 
 	Sv_Destruct sJournalEntryKey
 	let aJournalEntry := Ar_Null

@@ -31,6 +31,6 @@ begin function { short iMenuId, short iTileId, string_var sTileParam }
 
 	Call DeleteJournalEntryUDF iEntryIndex
 
-	Player.AuxiliaryVariableSetFloat "*PLC_bShouldUpdateJournalUI" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
 
 end

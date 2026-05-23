@@ -8,18 +8,29 @@ begin function { short iEntryIndex }
 	float fEntryY = 0
 
 	if iEntryIndex != 0
-		let fEntryY += GetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" (iEntryIndex - 1))
-		let fEntryY += GetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/height" (iEntryIndex - 1))
+		string_var sPreviousEntryYPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" (iEntryIndex - 1)
+		string_var sPreviousEntryHeightPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/height" (iEntryIndex - 1)
+
+		let fEntryY += GetUIFloatAlt ($sPreviousEntryYPath)
+		let fEntryY += GetUIFloatAlt ($sPreviousEntryHeightPath)
+
+		Sv_Destruct sPreviousEntryYPath, sPreviousEntryHeightPath
 	endif
 
-	SetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" iEntryIndex) fEntryY
+	string_var sEntryYPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" iEntryIndex
+	string_var sEntryHeightPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/height" iEntryIndex
 
-	float fEntryHeight = GetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/height" iEntryIndex)
-	float fEntryTopOffset = GetUIFloatAlt (Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" iEntryIndex)
-	float fScrollTemplateHeight = fEntryHeight + fEntryTopOffset + 64
+	SetUIFloatAlt ($sEntryYPath) fEntryY
+
+	float fEntryHeight = GetUIFloatAlt ($sEntryHeightPath)
+	float fScrollTemplateHeight = fEntryHeight + fEntryY + 64
 
 	;PrintC "Journal entry %g: height %.2f, total scroll height %.2f." iEntryIndex fEntryHeight fScrollTemplateHeight
 
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/_templateheight" fScrollTemplateHeight
+
+	; Clean-Up
+
+	Sv_Destruct sEntryYPath, sEntryHeightPath
 
 end

@@ -1,0 +1,30 @@
+begin function { short iMenuId, short iTileId, string_var sTileParam }
+
+	; Opens a text input prompt for creating a new journal entry.
+	; The confirm callback delegates storage to Journal\AppendJournalEntry.gek.
+
+	Sv_Destruct sTileParam
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		return
+	endif
+
+	if eval (GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab") != 3
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 3
+		return
+	endif
+
+	; UDFs
+
+	ref OnCreateJournalEntryConfirmUDF = CompileScript "PipLog\Interface\Journal\OnCreateJournalEntryConfirm.gek"
+
+	; Main
+
+	ShowTextInputMenu OnCreateJournalEntryConfirmUDF 700 500 "Please type your journal entry below:"
+
+end
