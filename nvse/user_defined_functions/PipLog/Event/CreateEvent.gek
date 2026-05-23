@@ -14,4 +14,6 @@ begin function { string_var sDate, string_var sName }
 
 	SetFunctionValue aEvent
 
+	let aEvent := Ar_Null
+
 end

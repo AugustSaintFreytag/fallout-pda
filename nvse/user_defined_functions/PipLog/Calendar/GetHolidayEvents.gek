@@ -8,6 +8,7 @@ begin function {}
 	; UDFs
 
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
+	ref GetRandomIdUDF = CompileScript "PipLog\Utils\GetRandomId.gek"
 
 	; Main
 
@@ -67,5 +68,6 @@ begin function {}
 	; Clean-Up
 
 	let aEntries := Ar_Null
+	let aEvents := Ar_Null
 
 end
