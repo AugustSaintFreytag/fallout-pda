@@ -1,0 +1,56 @@
+begin function { array_var aEvents }
+
+	; UDFs
+
+	ref EllipsizeUDF = CompileScript "PipLog\Utils\Ellipsize.gek"
+
+	; Index Events (Key: date + name)
+
+	array_var aEventsByKey = Ar_Construct "stringmap"
+
+	foreach (array_var aEventElement) <- aEvents
+		array_var aEvent = aEventElement["value"]
+
+		if eval (aEvent == Ar_Null) || !(Ar_HasKey aEvent, "date") || !(Ar_HasKey aEvent, "name")
+			Print "Cannot sort array of events containing malformed or invalid event."
+			continue
+		endif
+
+		string_var sDate = aEvent["date"]
+		string_var sName = aEvent["name"]
+		
+		string_var sKey = Sv_Construct "%z_%z" sDate sName
+		let aEventsByKey[sKey] := aEvent
+
+		Sv_Destruct sDate, sName, sKey
+		let aEvent := Ar_Null
+	loop
+
+	; Sort Keys
+
+	array_var aKeys = Ar_Keys aEventsByKey
+
+	; PrintC "Collected %g event keys to be sorted: %z." (Ar_Size aKeys) (Call EllipsizeUDF (Sv_Join aKeys, ", ") 112)
+
+	let aKeys := Ar_Sort aKeys
+
+	; PrintC "Sorted %g event keys: %z." (Ar_Size aKeys) (Call EllipsizeUDF (Sv_Join aKeys, ", ") 112)
+
+	; Restore
+
+	array_var aSortedEvents = Ar_Construct "array"
+
+	foreach (array_var aKeyElement) <- aKeys
+		string_var sKey = aKeyElement["value"]
+		Ar_Append aSortedEvents, aEventsByKey[sKey]
+
+		Sv_Destruct sKey
+	loop
+
+	SetFunctionValue aSortedEvents
+
+	let aEventsByKey := Ar_Null
+	let aKeys := Ar_Null
+	let aSortedEvents := Ar_Null
+
+end
