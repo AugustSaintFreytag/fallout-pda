@@ -20,8 +20,6 @@ begin function {}
 	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
 	AddTileFromTemplate "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect|CM_EventParentRect_Template|CM_EventParentRect"
 
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_current_value" 0
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/_templateheight" 0
 
 	short iTileIndex = 0
 

@@ -655,7 +655,7 @@
 
 		</rect>
 
-		<!--Larger section for holding all of the written journal entries-->
+		<!--Larger section for holding event list rows-->
 		<hotrect name="CM_EventTextRect">
 			<locus>1</locus>
 			<wheelable>&true;</wheelable>
@@ -665,30 +665,29 @@
 				<copy>1</copy>
 				<onlyifnot src="parent" trait="_editing"/>
 			</visible>
-
 			<x>0</x>
 			<y>50</y>
 			<width>697</width>
 			<height>515</height>
 			<_templateheight></_templateheight>
 
-			<!--Scroll bar for the Journal, might need some refinement-->
+			<!--Scroll bar for the event list-->
 			<hotrect name="CM_EventScrollbar">
 				<include src="scrollbar_vert.xml"/>
 				<y>26</y>				<!--The placement of the top arrow-->
 				<height>468.5</height>	<!--The placement of the bottom arrow-->
 				<_x>-15</_x>
-				<_wheelmoved> <copy src="parent()" trait="wheelmoved"/> </_wheelmoved>
-				<_number_of_visible_items>
-					<copy src="parent" trait="height"/>
-					<div src="me" trait="_scrolldelta" />
-				</_number_of_visible_items>
+				<_wheelmoved><copy src="parent()" trait="wheelmoved"/></_wheelmoved>
 				<_number_of_items>
 					<copy src="parent" trait="_templateheight"/>
-					<div src="me" trait="_scrolldelta" />
+					<div src="me" trait="_ScrollDelta" />
 				</_number_of_items>
-				
-				<_ScrollDelta> 16 </_ScrollDelta>
+				<_number_of_visible_items>
+					<copy src="parent" trait="height"/>
+					<div src="me" trait="_ScrollDelta" />
+				</_number_of_visible_items>
+				<!-- Canonical casing of scroll delta via `scrollbar_vert.xml` -->
+				<_ScrollDelta>32</_ScrollDelta>
 			</hotrect>
 
 			<!-- Event Parent w/ Event children tiles stored here
@@ -794,11 +793,11 @@
 				<_wheelmoved> <copy src="parent()" trait="wheelmoved"/> </_wheelmoved>
 				<_number_of_visible_items>
 					<copy src="parent" trait="height"/>
-					<div src="me" trait="_scrolldelta" />
+					<div src="me" trait="_ScrollDelta" />
 				</_number_of_visible_items>
 				<_number_of_items>
 					<copy src="parent" trait="_templateheight"/>
-					<div src="me" trait="_scrolldelta" />
+					<div src="me" trait="_ScrollDelta" />
 				</_number_of_items>
 				
 				<_ScrollDelta> 16 </_ScrollDelta>
@@ -1806,16 +1805,14 @@
 		<!-- Tile positioning (set in GECK)-->
 		<y></y>
 		<x></x>
+		<height></height>
 		<width><copy src="parent" trait="width"/></width>
 
 		<!-- Tile string (set in GECK)-->
 		<string></string><!--The title of the holiday-->
 		<_event_id></_event_id>
 		<_event_date></_event_date>
-		<_event_source>0</_event_source>
-		<_value1>0</_value1>
-		<_value2>0</_value2>
-		<_value3>0</_value3>
+		<_source>0</_source>
 
 		<!-- Tile Display-->
 		<_horbuf><copy src="parent" trait="_horbuf"/></_horbuf>
