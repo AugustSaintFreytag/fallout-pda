@@ -1,23 +1,15 @@
 begin function {}
 
-	; Rebuilds the event list for the active event filter mode.
-	; Filter modes: 0 = one-time, 1 = monthly, 2 = yearly.
+	; Rebuilds the event list UI for the active event filter mode.
 
 	; UDFs
 
-	ref CompareEventsByDateUDF = CompileScript "PipLog\Event\CompareEventsByDate.gek"
-	ref SortEventsUDF = CompileScript "PipLog\Event\SortEvents.gek"
-	ref GetFilteredEventsUDF = CompileScript "PipLog\Event\GetFilteredEvents.gek"
 	ref AddEventsToListUDF = CompileScript "PipLog\Interface\Event\AddEventsToList.gek"
+	ref GetAllEventsForFilterUDF = CompileScript "PipLog\Event\GetAllEventsForFilter.gek"
 
 	; State
 
 	short iEventFilterMode = Player.AuxiliaryVariableGetFloat "*PLC_iEventFilterMode"
-
-	array_var aGlobalEventsById = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsById"
-	array_var aGlobalEventIdsByDate = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsByDate"
-	array_var aPlayerEventsById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
-	array_var aPlayerEventIdsByDate = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsByDate"
 
 	; Add Tile
 
@@ -26,24 +18,15 @@ begin function {}
 
 	; Add Events
 
-	array_var aGlobalEvents = (Call GetFilteredEventsUDF aGlobalEventsById aGlobalEventIdsByDate iEventFilterMode 0)
-	array_var aPlayerEvents = (Call GetFilteredEventsUDF aPlayerEventsById aPlayerEventIdsByDate iEventFilterMode 1)
+	array_var aEvents = Call GetAllEventsForFilterUDF iEventFilterMode
 
-	array_var aEvents = Ar_Construct "array"
+	PrintC "Prepared %g events to be displayed in event list (%g unsorted, %g global events, %g player events)." (Ar_Size aEvents) (Ar_Size aEvents) (Ar_Size aGlobalEvents) (Ar_Size aPlayerEvents)
 
-	Ar_Cat aEvents aGlobalEvents
-	Ar_Cat aEvents aPlayerEvents
-
-	; array_var aSortedEvents = Ar_CustomSort aEvents, CompareEventsByDateUDF ; Apparently broken, returns empty array
-	array_var aSortedEvents = (Call SortEventsUDF aEvents)
-
-	PrintC "Prepared %g events to be displayed in event list (%g unsorted, %g global events, %g player events)." (Ar_Size aSortedEvents) (Ar_Size aEvents) (Ar_Size aGlobalEvents) (Ar_Size aPlayerEvents)
-
-	Call AddEventsToListUDF aSortedEvents
+	Call AddEventsToListUDF aEvents
 
 	; Set Content Dimensions
 
-	short iNumEvents = Ar_Size aSortedEvents
+	short iNumEvents = Ar_Size aEvents
 
 	float fEventHeight = 42
 	float fTotalEventHeight = iNumEvents * fEventHeight
@@ -63,13 +46,6 @@ begin function {}
 
 	; Clean-Up
 
-	let aGlobalEventsById := Ar_Null
-	let aGlobalEventIdsByDate := Ar_Null
-	let aPlayerEventsById := Ar_Null
-	let aPlayerEventIdsByDate := Ar_Null
-	let aGlobalEvents := Ar_Null
-	let aPlayerEvents := Ar_Null
 	let aEvents := Ar_Null
-	let aSortedEvents := Ar_Null
 
 end

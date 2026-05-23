@@ -1,8 +1,8 @@
 begin function { array_var aEventsById, array_var aEventIdsByDate, short iEventFilterMode, short iEventSourceKind }
 
-	; Collects decoded events from one event storage source for the active event-list filter.
-	; Event filter mode: 0 = yearly, 1 = monthly, 2 = daily.
-	; Adds transient "_source" state to each returned event.
+	; Collects decoded events from one event storage source for the active event list filter.
+	; Event filter mode: 0 = date-specific (YYYY-MM-DD), 1 = monthly-recurring (*-*-DD), 2 = yearly-recurring (*-MM-DD).
+	; Injects a transient "_source" property to each returned event.
 
 	; UDFs
 
@@ -31,17 +31,17 @@ begin function { array_var aEventsById, array_var aEventIdsByDate, short iEventF
 			string_var sMonth = aDateComponents[1]
 
 			if iEventFilterMode == 0
-				; Yearly
+				; Date-specific
 				if eval sYear != "*"
 					let bMatchesFilter := 1
 				endif
 			elseif iEventFilterMode == 1
-				; Monthly
+				; Monthly recurring
 				if eval (sYear == "*") && (sMonth == "*")
 					let bMatchesFilter := 1
 				endif
 			elseif iEventFilterMode == 2
-				; Daily
+				; Yearly recurring
 				if eval (sYear == "*") && (sMonth != "*")
 					let bMatchesFilter := 1
 				endif
@@ -85,5 +85,9 @@ begin function { array_var aEventsById, array_var aEventIdsByDate, short iEventF
 	loop
 
 	SetFunctionValue aEvents
+
+	; Clean-Up
+
+	let aEvents := Ar_Null
 
 end

@@ -1,0 +1,46 @@
+begin function { short iEventFilterMode }
+
+	; Collects events from all storage sources for the active event list filter.
+	; Event filter mode: 0 = yearly, 1 = monthly, 2 = daily.
+
+	; UDFs
+
+	ref GetFilteredEventsFromPropertiesUDF = CompileScript "PipLog\Event\GetFilteredEventsFromProperties.gek"
+	ref SortEventsUDF = CompileScript "PipLog\Event\SortEvents.gek"
+
+	; Main
+
+	array_var aGlobalEventsById = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsById"
+	array_var aGlobalEventIdsByDate = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsByDate"
+	array_var aPlayerEventsById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
+	array_var aPlayerEventIdsByDate = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsByDate"
+
+	; Collection
+
+	array_var aGlobalEvents = (Call GetFilteredEventsFromPropertiesUDF aGlobalEventsById aGlobalEventIdsByDate iEventFilterMode 0)
+	array_var aPlayerEvents = (Call GetFilteredEventsFromPropertiesUDF aPlayerEventsById aPlayerEventIdsByDate iEventFilterMode 1)
+
+	array_var aEvents = Ar_Construct "array"
+
+	Ar_Cat aEvents aGlobalEvents
+	Ar_Cat aEvents aPlayerEvents
+
+	; Apparently broken, returns empty array, even for uniform elements.
+	; array_var aSortedEvents = Ar_CustomSort aEvents, CompareEventsByDateUDF
+
+	array_var aSortedEvents = (Call SortEventsUDF aEvents)
+
+	SetFunctionValue aSortedEvents
+
+	; Clean-Up
+
+	let aGlobalEventsById := Ar_Null
+	let aGlobalEventIdsByDate := Ar_Null
+	let aPlayerEventsById := Ar_Null
+	let aPlayerEventIdsByDate := Ar_Null
+	let aGlobalEvents := Ar_Null
+	let aPlayerEvents := Ar_Null
+	let aEvents := Ar_Null
+	let aSortedEvents := Ar_Null
+
+end
