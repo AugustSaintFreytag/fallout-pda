@@ -5,29 +5,59 @@ begin function {}
 
 	; UDFs
 
-	ref AppendEventListSourceUDF = CompileScript "PipLog\Interface\Event\AppendEventListSource.gek"
+	ref CompareEventsByDateUDF = CompileScript "PipLog\Event\CompareEventsByDate.gek"
+	ref SortEventsUDF = CompileScript "PipLog\Event\SortEvents.gek"
+	ref GetFilteredEventsUDF = CompileScript "PipLog\Event\GetFilteredEvents.gek"
+	ref AddEventsToListUDF = CompileScript "PipLog\Interface\Event\AddEventsToList.gek"
 
 	; State
 
 	short iEventFilterMode = Player.AuxiliaryVariableGetFloat "*PLC_iEventFilterMode"
+
 	array_var aGlobalEventsById = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsById"
 	array_var aGlobalEventIdsByDate = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsByDate"
 	array_var aPlayerEventsById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
 	array_var aPlayerEventIdsByDate = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsByDate"
 
-	; Main
+	; Add Tile
 
 	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
 	AddTileFromTemplate "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect|CM_EventParentRect_Template|CM_EventParentRect"
 
+	; Add Events
 
-	short iTileIndex = 0
+	array_var aGlobalEvents = (Call GetFilteredEventsUDF aGlobalEventsById aGlobalEventIdsByDate iEventFilterMode 0)
+	array_var aPlayerEvents = (Call GetFilteredEventsUDF aPlayerEventsById aPlayerEventIdsByDate iEventFilterMode 1)
 
-	let iTileIndex := (Call AppendEventListSourceUDF aGlobalEventsById aGlobalEventIdsByDate iEventFilterMode iTileIndex 0)
-	let iTileIndex := (Call AppendEventListSourceUDF aPlayerEventsById aPlayerEventIdsByDate iEventFilterMode iTileIndex 1)
+	array_var aEvents = Ar_Construct "array"
 
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/_templateheight" (iTileIndex * 42)
+	Ar_Cat aEvents aGlobalEvents
+	Ar_Cat aEvents aPlayerEvents
+
+	; array_var aSortedEvents = Ar_CustomSort aEvents, CompareEventsByDateUDF ; Apparently broken, returns empty array
+	array_var aSortedEvents = (Call SortEventsUDF aEvents)
+
+	PrintC "Prepared %g events to be displayed in event list (%g unsorted, %g global events, %g player events)." (Ar_Size aSortedEvents) (Ar_Size aEvents) (Ar_Size aGlobalEvents) (Ar_Size aPlayerEvents)
+
+	Call AddEventsToListUDF aSortedEvents
+
+	; Set Content Dimensions
+
+	short iNumEvents = Ar_Size aSortedEvents
+
+	float fEventHeight = 42
+	float fTotalEventHeight = iNumEvents * fEventHeight
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/_templateheight" fTotalEventHeight
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/visible" 1
+
+	float fNumVisibleItems = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_visible_items")
+	float fNumItems = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_items")
+	float fScrollDelta = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_ScrollDelta")
+
+	; Conclude
+
+	PrintC "Event list scroll metrics: rows=%g, template height=%g, visible items=%g, total items=%g, scroll delta=%g." iTileIndex fTotalEventHeight fNumVisibleItems fNumItems fScrollDelta
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 0
 
@@ -37,5 +67,9 @@ begin function {}
 	let aGlobalEventIdsByDate := Ar_Null
 	let aPlayerEventsById := Ar_Null
 	let aPlayerEventIdsByDate := Ar_Null
+	let aGlobalEvents := Ar_Null
+	let aPlayerEvents := Ar_Null
+	let aEvents := Ar_Null
+	let aSortedEvents := Ar_Null
 
 end
