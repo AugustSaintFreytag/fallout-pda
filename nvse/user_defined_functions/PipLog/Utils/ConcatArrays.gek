@@ -1,0 +1,12 @@
+begin function { array_var aOutput, array_var aInput }
+
+	foreach array_var aElement <- aInput
+		Ar_Append aOutput, (aElement["value"])
+	loop
+
+	SetFunctionValue aOutput
+
+	let aOutput := Ar_Null
+	let aInput := Ar_Null
+
+end
