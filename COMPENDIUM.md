@@ -247,6 +247,10 @@ Or use `let` for assignment after initialization:
 let fTimeChanceFactor := (Call SomeUDF someArg)
 ```
 
+#### Limitations
+
+A single line cannot exceed a maximum of 512 characters. Inline functions (like lambdas and callbacks) are squashed by a precompile step and count as a single line. It is advised to split logic into smaller chunks.
+
 ---
 
 ## Engine APIs
