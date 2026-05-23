@@ -36,15 +36,6 @@ begin function { array_var aEvent, short iIndex }
 	let sTilePropertyPath := Sv_Construct "%z/string" sTileBasePath
 	SetUIStringAlt ($sTilePropertyPath) ($sEventName)
 
-	let sTilePropertyPath := Sv_Construct "%z/_event_id" sTileBasePath
-	SetUIStringAlt ($sTilePropertyPath) ($sEventId)
-
-	let sTilePropertyPath := Sv_Construct "%z/_event_date" sTileBasePath
-	SetUIStringAlt ($sTilePropertyPath) ($sEventDate)
-
-	let sTilePropertyPath := Sv_Construct "%z/_source" sTileBasePath
-	SetUIFloatAlt ($sTilePropertyPath) iEventSourceKind
-
 	let sTilePropertyPath := Sv_Construct "%z/y" sTileBasePath
 	SetUIFloatAlt ($sTilePropertyPath) fEventY
 
