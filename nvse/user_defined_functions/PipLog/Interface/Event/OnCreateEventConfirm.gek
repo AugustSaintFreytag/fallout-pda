@@ -18,13 +18,13 @@ begin function { string_var sEventTitle }
 
 	; UDFs
 
-	ref GetDateComponentsFromStringUDF = CompileScript "PipLog\DateTime\GetDateComponentsFromString.gek"
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 	ref AddPlayerEventUDF = CompileScript "PipLog\Event\AddPlayerEvent.gek"
 	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
 	; Main
 
-	array_var aDate = (Call GetDateComponentsFromStringUDF sSelectedDate)
+	array_var aDate = (Call ParseStorageDateToComponentsUDF sSelectedDate)
 
 	if eval aDate == Ar_Null
 		Sv_Destruct sSelectedDate

@@ -8,15 +8,15 @@ begin function { short iDay, short iMonth, short iYear }
 	; UDFs
 
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref GetRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetRecurringDateString.gek"
-	ref GetMonthlyDateStringUDF = CompileScript "PipLog\DateTime\GetMonthlyDateString.gek"
+	ref GetYearlyRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetYearlyRecurringDateString.gek"
+	ref GetMonthlyRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetMonthlyRecurringDateString.gek"
 	ref CollectEventsForPatternUDF = CompileScript "PipLog\Calendar\CollectEventsForPattern.gek"
 
 	; State
 
 	string_var sDateSpecific = (Call GetStorageDateStringUDF iYear iMonth iDay)
-	string_var sDateYearly = (Call GetRecurringDateStringUDF iMonth iDay)
-	string_var sDateMonthly = (Call GetMonthlyDateStringUDF iDay)
+	string_var sDateYearly = (Call GetYearlyRecurringDateStringUDF iMonth iDay)
+	string_var sDateMonthly = (Call GetMonthlyRecurringDateStringUDF iDay)
 
 	array_var aGlobalEventsById = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsById"
 	array_var aGlobalEventsByDate = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsByDate"

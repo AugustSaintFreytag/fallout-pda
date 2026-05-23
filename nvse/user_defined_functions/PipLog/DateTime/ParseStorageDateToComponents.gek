@@ -13,6 +13,7 @@ begin function { string_var sDate }
 
 		SetFunctionValue Ar_Null
 		let aComponents := Ar_Null
+		
 		return
 	endif
 

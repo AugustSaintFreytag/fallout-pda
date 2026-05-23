@@ -4,13 +4,15 @@ begin function { short iDay }
 	; Matches the given day number regardless of year or month.
 	; Caller is responsible for Sv_Destruct on the returned string.
 
-	string_var sDay = $iDay
+	; UDFs
 
-	if Sv_Length sDay < 2
-		let sDay := Sv_Construct "0%z" sDay
-	endif
+	ref GetPaddedIntUDF = CompileScript "PipLog\Utils\GetPaddedInt.gek"
 
-	string_var sResult = Sv_Construct "*-*-%z" sDay
+	; Formatting
+
+	string_var sDay = Call GetPaddedIntUDF iDay 2
+
+	string_var sResult = "*-*-" + sDay
 	SetFunctionValue sResult
 
 	Sv_Destruct sDay

@@ -1,15 +1,24 @@
 begin function { short iYear, short iMonth, short iDay }
 
-	; Returns a zero-padded YYYY.MM.DD date string for display purposes.
-	; iMonth is 0-indexed; output month is 1-indexed.
-	; Delegates to GetDateString with "." as the delimiter.
+	; Returns a zero-padded date string intended for display to the player.
+	; Example: GetDateString 2277 0 20 "-" -> "20.01.2077"
 
 	; UDFs
 
-	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+	ref GetPaddedIntUDF = CompileScript "PipLog\Utils\GetPaddedInt.gek"
 
-	; Main
+	; Formatting
 
-	SetFunctionValue (Call GetDateStringUDF iYear iMonth iDay ".")
+	string_var sYear = Call GetPaddedIntUDF iYear
+	string_var sMonth = Call GetPaddedIntUDF (iMonth + 1)
+	string_var sDay = Call GetPaddedIntUDF iDay
+
+	string_var sResult = $sDay + "." + $sMonth + "." + $sYear
+	
+	SetFunctionValue sResult
+
+	; Clean-Up
+
+	Sv_Destruct sYear, sMonth, sDay
 
 end

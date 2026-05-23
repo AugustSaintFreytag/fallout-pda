@@ -8,7 +8,7 @@ begin function { short iMenuId, short iTileId, string_var sTileParam }
 	; UDFs
 
 	ref OnTileDeselectUDF = CompileScript "PipLog\Interface\Calendar\OnTileDeselect.gek"
-	ref GetDateComponentsFromStringUDF = CompileScript "PipLog\DateTime\GetDateComponentsFromString.gek"
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 	ref GetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\GetPlayerDateReminder.gek"
 
@@ -24,7 +24,7 @@ begin function { short iMenuId, short iTileId, string_var sTileParam }
 	Sv_Replace "/CM_Box_Main|" sComponent
 
 	if eval (sComponent != sCurrentSelectedDate)
-		array_var aComponents = (Call GetDateComponentsFromStringUDF sComponent)
+		array_var aComponents = (Call ParseStorageDateToComponentsUDF sComponent)
 
 		if eval aComponents == Ar_Null
 			PrintC "Could not select tile, date string '%z' is invalid." (sComponent)

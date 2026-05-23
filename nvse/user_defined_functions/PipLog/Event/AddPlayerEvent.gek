@@ -20,8 +20,8 @@ begin function { short iDay, short iMonth, short iYear, string_var sEventName, s
 	; UDFs
 
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref GetRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetRecurringDateString.gek"
-	ref GetMonthlyDateStringUDF = CompileScript "PipLog\DateTime\GetMonthlyDateString.gek"
+	ref GetYearlyRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetYearlyRecurringDateString.gek"
+	ref GetMonthlyRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetMonthlyRecurringDateString.gek"
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
 	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
 
@@ -32,9 +32,9 @@ begin function { short iDay, short iMonth, short iYear, string_var sEventName, s
 	if iFrequency == 1
 		let sDate := (Call GetStorageDateStringUDF iYear iMonth iDay)
 	elseif iFrequency == 3
-		let sDate := (Call GetMonthlyDateStringUDF iDay)
+		let sDate := (Call GetMonthlyRecurringDateStringUDF iDay)
 	elseif iFrequency == 4
-		let sDate := (Call GetRecurringDateStringUDF iMonth iDay)
+		let sDate := (Call GetYearlyRecurringDateStringUDF iMonth iDay)
 	endif
 
 	; Main

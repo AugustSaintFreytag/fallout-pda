@@ -4,18 +4,16 @@ begin function { short iMonth, short iDay }
 	; iMonth is 0-indexed (0 = January); output month is 1-indexed and zero-padded.
 	; Caller is responsible for Sv_Destruct on the returned string.
 
-	string_var sMonth = $(iMonth + 1)
-	string_var sDay = $iDay
+	; UDFs
 
-	if Sv_Length sMonth < 2
-		let sMonth := Sv_Construct "0%z" sMonth
-	endif
+	ref GetPaddedIntUDF = CompileScript "PipLog\Utils\GetPaddedInt.gek"
 
-	if Sv_Length sDay < 2
-		let sDay := Sv_Construct "0%z" sDay
-	endif
+	; Formatting
 
-	string_var sResult = Sv_Construct "*-%z-%z" sMonth sDay
+	string_var sMonth = Call GetPaddedIntUDF (iMonth + 1) 2
+	string_var sDay = Call GetPaddedIntUDF iDay 2
+
+	string_var sResult = "*-" + sMonth + "-" + sDay
 	SetFunctionValue sResult
 
 	Sv_Destruct sMonth, sDay
