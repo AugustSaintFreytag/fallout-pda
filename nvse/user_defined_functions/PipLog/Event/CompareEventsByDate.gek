@@ -13,6 +13,8 @@ begin function { array_var aLeft, array_var aRight }
 	if eval ((Ar_Size aLeftEvent) == -1) || ((Ar_Size aRightEvent) == -1)
 		let aLeftEvent := Ar_Null
 		let aRightEvent := Ar_Null
+
+		SetFunctionValue 0
 		return
 	endif
 
@@ -25,6 +27,8 @@ begin function { array_var aLeft, array_var aRight }
 		SetFunctionValue 1
 	elseif eval (sLeftDate == sRightDate) && (sLeftName < sRightName)
 		SetFunctionValue 1
+	else
+		SetFunctionValue 0
 	endif
 
 	; Clean-Up
