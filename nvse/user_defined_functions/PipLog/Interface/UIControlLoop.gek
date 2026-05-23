@@ -16,9 +16,11 @@ begin function {}
 	ref GenerateEventListUDF = CompileScript "PipLog\Interface\Event\GenerateEventList.gek"
 	ref GetEventByIdUDF = CompileScript "PipLog\Event\GetEventById.gek"
 	ref GetEventDateLabelUDF = CompileScript "PipLog\Interface\Event\GetEventDateLabel.gek"
+	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
 	; Core State
 
+	short iFrame = Player.AuxiliaryVariableGetFloat "*PLC_iFrame"
 	short iSelectedTab = GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab"
 	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
 
@@ -32,7 +34,7 @@ begin function {}
 	short bIsSelectedCalendarDateFuture = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateFuture"
 	short bIsSelectedCalendarDateTracked = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateTracked"
 
-	short iEventFilterMode = Player.AuxiliaryVariableGetFloat "*PLC_iEventFilterMode"
+	short iIntervalKind = Player.AuxiliaryVariableGetFloat "*PLC_iIntervalKind"
 	short bIsEventListModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsEventListModified"
 	short bIsEventSelectionModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsEventSelectionModified"
 	short bIsSelectedEventPlayer = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedEventPlayer"
@@ -40,9 +42,17 @@ begin function {}
 	string_var sCalendarDateSummary = Player.AuxiliaryVariableGetString "*PLC_sCalendarDateSummary"
 	string_var sPreviousSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sPreviousSelectedCalendarDate"
 	string_var sSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
+	string_var sHoveredCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sHoveredCalendarDate"
 	string_var sPreviousSelectedEventTileName = Player.AuxiliaryVariableGetString "*PLC_sPreviousSelectedEventTileName"
 	string_var sSelectedEventTileName = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventTileName"
 	string_var sSelectedEventId = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventId"
+
+	; Frame
+
+	let iFrame += 1
+	Player.AuxiliaryVariableSetFloat "*PLC_iFrame" iFrame
+
+	; Main
 
 	if eval (iSelectedTab != 3)
 		let iViewMode := 0
@@ -54,9 +64,9 @@ begin function {}
 		Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
 	endif
 
-	if eval (iEventFilterMode < 0) || (iEventFilterMode > 2)
-		let iEventFilterMode := 0
-		Player.AuxiliaryVariableSetFloat "*PLC_iEventFilterMode" 0
+	if eval (iIntervalKind < 0) || (iIntervalKind > 2)
+		let iIntervalKind := 0
+		Player.AuxiliaryVariableSetFloat "*PLC_iIntervalKind" 0
 	endif
 
 	; General Visibility
@@ -99,12 +109,22 @@ begin function {}
 	if iViewMode == 2
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 1
 
-		if iEventFilterMode == 0
+		if iIntervalKind == 0
 			SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 3
-		elseif iEventFilterMode == 1
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 1
-		else
+		elseif iIntervalKind == 1
 			SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 0
+		else
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 1
+		endif
+
+		; DEBUG DEBUG DEBUG
+		if eval (iFrame % 60) == 0
+			float fScrollDeltaA = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_ScrollDelta")
+			float fScrollDeltaB = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_scroll_delta")
+			float fScrollCurrentValue = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_current_value")
+			float fParentRectY = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/y")
+
+			PrintC "Event list scroll bar at delta a %.2f, delta b %.2f, current %.2f, parent rect at %.2f" fScrollDeltaA fScrollDeltaB fScrollCurrentValue fParentRectY
 		endif
 	else
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
@@ -129,6 +149,22 @@ begin function {}
 	endif
 
 	; Calendar View (Summary Text)
+
+	if eval (iViewMode == 1) && (bIsCalendarSummaryModified || bIsCalendarSelectionModified || bIsCalendarViewModified)
+		string_var sSummaryDate = ""
+
+		if eval (Sv_Length sHoveredCalendarDate) > 0
+			let sSummaryDate := Sv_Construct "%z" sHoveredCalendarDate
+		elseif eval (Sv_Length sSelectedCalendarDate) > 0
+			let sSummaryDate := Sv_Construct "%z" sSelectedCalendarDate
+		endif
+
+		Call UpdateSelectedDaySummaryUDF sSummaryDate
+
+		Sv_Destruct sCalendarDateSummary, sSummaryDate
+		let sCalendarDateSummary := Player.AuxiliaryVariableGetString "*PLC_sCalendarDateSummary"
+		let bIsCalendarSummaryModified := 1
+	endif
 
 	if eval (iViewMode == 1) && (bIsCalendarSummaryModified)
 		PrintC "Updating calendar summary text. View mode: %g, summary modified: %g" iViewMode bIsCalendarSummaryModified
@@ -243,6 +279,6 @@ begin function {}
 
 	; Clean-Up
 
-	Sv_Destruct sCalendarDateSummary, sPreviousSelectedCalendarDate, sSelectedCalendarDate, sPreviousSelectedEventTileName, sSelectedEventTileName, sSelectedEventId
+	Sv_Destruct sCalendarDateSummary, sPreviousSelectedCalendarDate, sSelectedCalendarDate, sHoveredCalendarDate, sPreviousSelectedEventTileName, sSelectedEventTileName, sSelectedEventId
 
 end

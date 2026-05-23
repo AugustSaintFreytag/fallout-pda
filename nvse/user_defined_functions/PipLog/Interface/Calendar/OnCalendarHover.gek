@@ -3,10 +3,6 @@ begin function { short iMenuId }
 	; Updates the calendar hover date in the view model.
 	; The UI control loop owns writing summary text and scrollbar state.
 
-	; UDFs
-
-	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
-
 	; Main
 
 	string_var sComponent = GetActiveUIComponentFullName ; Component name is also encoded date string.
@@ -27,7 +23,7 @@ begin function { short iMenuId }
 
 	if eval (sComponent != sCurrentHover)
 		Player.AuxiliaryVariableSetString "*PLC_sHoveredCalendarDate" ($sComponent)
-		Call UpdateSelectedDaySummaryUDF sComponent
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 	endif
 
 	; Clean-Up

@@ -20,7 +20,6 @@ begin function { string_var sEventTitle }
 
 	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 	ref AddPlayerEventUDF = CompileScript "PipLog\Event\AddPlayerEvent.gek"
-	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
 	; Main
 
@@ -37,10 +36,12 @@ begin function { string_var sEventTitle }
 
 	let aDate := Ar_Null
 
-	Call AddPlayerEventUDF iDay iMonth iYear sEventTitle 1
-	Call UpdateSelectedDaySummaryUDF sSelectedDate
+	Call AddPlayerEventUDF iDay iMonth iYear sEventTitle 0
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 
 	; Clean-Up
 

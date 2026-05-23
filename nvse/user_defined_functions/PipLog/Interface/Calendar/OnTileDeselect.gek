@@ -6,7 +6,6 @@ begin function {}
 	; UDFs
 
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
 	; State
 
@@ -35,12 +34,10 @@ begin function {}
 	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" -1
 	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" -1
 
-	string_var sHoveredDate = Player.AuxiliaryVariableGetString "*PLC_sHoveredCalendarDate"
-
-	Call UpdateSelectedDaySummaryUDF sHoveredDate
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 
 	; Clean-Up
 
-	Sv_Destruct sSelectedDate, sHoveredDate
+	Sv_Destruct sSelectedDate
 
 end
