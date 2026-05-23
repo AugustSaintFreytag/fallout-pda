@@ -10,11 +10,13 @@ begin function { short iYear, short iMonth, short iDay }
 
 	; Formatting
 
-	string_var sYear = Call GetPaddedIntUDF iYear
-	string_var sMonth = Call GetPaddedIntUDF (iMonth + 1)
-	string_var sDay = Call GetPaddedIntUDF iDay
+	string_var sYear = Call GetPaddedIntUDF iYear 2
+	string_var sMonth = Call GetPaddedIntUDF (iMonth + 1) 2
+	string_var sDay = Call GetPaddedIntUDF iDay 2
 
-	string_var sResult = $sYear + "-" $sMonth + "-" + $sDay
+	string_var sResult = Sv_Construct "%z-%z-%z" sYear sMonth sDay
+
+	PrintC "Returning storage date string %z." sResult
 	
 	SetFunctionValue sResult
 

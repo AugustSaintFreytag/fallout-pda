@@ -1,7 +1,7 @@
-begin function { short iEventFilterMode }
+begin function { short iIntervalKind }
 
 	; Collects events from all storage sources for the active event list filter.
-	; Event filter mode: 0 = yearly, 1 = monthly, 2 = daily.
+	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = weekly, 4 = daily.
 
 	; UDFs
 
@@ -17,8 +17,8 @@ begin function { short iEventFilterMode }
 
 	; Collection
 
-	array_var aGlobalEvents = (Call GetFilteredEventsFromPropertiesUDF aGlobalEventsById aGlobalEventIdsByDate iEventFilterMode 0)
-	array_var aPlayerEvents = (Call GetFilteredEventsFromPropertiesUDF aPlayerEventsById aPlayerEventIdsByDate iEventFilterMode 1)
+	array_var aGlobalEvents = (Call GetFilteredEventsFromPropertiesUDF aGlobalEventsById aGlobalEventIdsByDate iIntervalKind 0)
+	array_var aPlayerEvents = (Call GetFilteredEventsFromPropertiesUDF aPlayerEventsById aPlayerEventIdsByDate iIntervalKind 1)
 
 	array_var aEvents = Ar_Construct "array"
 

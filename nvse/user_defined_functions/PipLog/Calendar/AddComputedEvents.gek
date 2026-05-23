@@ -10,7 +10,7 @@ begin function { short iYear }
 
 	; UDFs
 
-	ref GetYearlyRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetYearlyRecurringDateString.gek"
+	ref GetRecurringDatePatternStringUDF = CompileScript "PipLog\DateTime\GetRecurringDatePatternString.gek"
 	ref GetEasterDateUDF = CompileScript "PipLog\Calendar\GetEasterDate.gek"
 	ref GetThanksgivingDateUDF = CompileScript "PipLog\Calendar\GetThanksgivingDate.gek"
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
@@ -52,7 +52,7 @@ begin function { short iYear }
 		short iBirthdayMonth = Player.AuxiliaryVariableGetFloat "PLC_iBirthdayMonth"
 		short iBirthdayDay = Player.AuxiliaryVariableGetFloat "PLC_iBirthdayDay"
 		
-		string_var sBirthdayDate = (Call GetYearlyRecurringDateStringUDF iBirthdayMonth iBirthdayDay)
+		string_var sBirthdayDate = (Call GetRecurringDatePatternStringUDF 1 iBirthdayMonth iBirthdayDay)
 		array_var aBirthdayEvent = (Call CreateEventUDF sBirthdayDate "Birthday")
 
 		Ar_Append aEvents, aBirthdayEvent

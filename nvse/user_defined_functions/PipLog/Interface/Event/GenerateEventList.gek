@@ -1,15 +1,16 @@
 begin function {}
 
-	; Rebuilds the event list UI for the active event filter mode.
+	; Rebuilds the event list UI for the active interval kind.
 
 	; UDFs
 
+	ref MapStringArrayUDF = CompileScript "PipLog\Utils\MapStringArray.gek"
 	ref AddEventsToListUDF = CompileScript "PipLog\Interface\Event\AddEventsToList.gek"
-	ref GetAllEventsForFilterUDF = CompileScript "PipLog\Event\GetAllEventsForFilter.gek"
+	ref GetEventsForIntervalKindUDF = CompileScript "PipLog\Event\GetEventsForIntervalKind.gek"
 
 	; State
 
-	short iEventFilterMode = Player.AuxiliaryVariableGetFloat "*PLC_iEventFilterMode"
+	short iIntervalKind = Player.AuxiliaryVariableGetFloat "*PLC_iIntervalKind"
 
 	; Add Tile
 
@@ -18,9 +19,7 @@ begin function {}
 
 	; Add Events
 
-	array_var aEvents = Call GetAllEventsForFilterUDF iEventFilterMode
-
-	PrintC "Prepared %g events to be displayed in event list (%g unsorted, %g global events, %g player events)." (Ar_Size aEvents) (Ar_Size aEvents) (Ar_Size aGlobalEvents) (Ar_Size aPlayerEvents)
+	array_var aEvents = Call GetEventsForIntervalKindUDF iIntervalKind
 
 	Call AddEventsToListUDF aEvents
 
@@ -38,9 +37,14 @@ begin function {}
 	float fNumItems = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_items")
 	float fScrollDelta = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_ScrollDelta")
 
+	; Store for Interaction
+
+	array_var aEventIds = Call MapStringArrayUDF aEvents ({ array_var aEvent } => aEvent["id"])
+	Player.AuxiliaryVariableSetFromArray "*PLC_aDisplayedEventIds" aEventIds
+
 	; Conclude
 
-	PrintC "Event list scroll metrics: rows=%g, template height=%g, visible items=%g, total items=%g, scroll delta=%g." iTileIndex fTotalEventHeight fNumVisibleItems fNumItems fScrollDelta
+	PrintC "Event list scroll metrics: items=%g, template height=%g, visible items=%g, total items=%g, scroll delta=%g." iNumEvents fTotalEventHeight fNumVisibleItems fNumItems fScrollDelta
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 0
 
