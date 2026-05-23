@@ -17,6 +17,7 @@ begin function { short iMenuId }
 	endif
 
 	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
+	UnloadUIComponent "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect"
 
 	; Reset selection state (menu is closed; aux vars cleared for next open)
 	Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
@@ -32,6 +33,7 @@ begin function { short iMenuId }
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
 	
 	Player.AuxiliaryVariableErase "*PLC_sHoveredCalendarDate"
 	Player.AuxiliaryVariableErase "*PLC_sSelectedCalendarDate"
@@ -40,5 +42,7 @@ begin function { short iMenuId }
 	Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
 	Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
 	Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedEventTileName"
+	Player.AuxiliaryVariableErase "*PLC_aDisplayedJournalEntryIds"
+	Player.AuxiliaryVariableErase "*PLC_aDisplayedJournalEntryIndices"
 
 end
