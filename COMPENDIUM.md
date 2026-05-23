@@ -101,7 +101,7 @@ short bHas = Ar_HasKey aArray, iKey  ; 1 if key exists
 
 #### Checking Initialization
 
-`Ar_Size` returns `-1` for a null/uninitialized array. Always guard before use:
+`Ar_Size` returns `-1` for a null/uninitialized array.
 
 ```gek
 short iSize = Ar_Size aArray
