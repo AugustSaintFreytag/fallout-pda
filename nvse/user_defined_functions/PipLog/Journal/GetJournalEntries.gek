@@ -23,8 +23,7 @@ begin function {}
 	endif
 
 	foreach (array_var aElement) <- aEncodedEntries
-		string_var sEncodedEntry = aElement["value"]
-		array_var aEntry = (Call DecodeJournalEntryFromStringUDF sEncodedEntry)
+		array_var aEntry = Call DecodeJournalEntryFromStringUDF (*aElement)
 
 		if eval (Ar_Size aEntry) != -1
 			Ar_Append aJournalEntries, aEntry
