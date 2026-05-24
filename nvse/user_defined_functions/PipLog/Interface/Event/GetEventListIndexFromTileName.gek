@@ -1,0 +1,17 @@
+begin function { string_var sTileName }
+
+	; Main
+
+	string_var sId = Sv_Construct "%z" sTileName
+
+	Sv_Replace "CM_Event|" sId
+
+	short iTileIndex = #(sId)
+
+	SetFunctionValue iTileIndex
+
+	; Clean-Up
+
+	Sv_Destruct sId
+
+end
