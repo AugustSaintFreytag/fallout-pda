@@ -5,18 +5,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 	; UDFs
 
 	ref GetEventByIdUDF = CompileScript "PipLog\Event\GetEventById.gek"
-
-	; UDFs (Local)
-
-	ref GetCurrentTileIndexFromName = (begin function {}
-		string_var sTileIndex = sTileName
-		Sv_Replace "CM_Event|" sTileIndex
-		short iTileIndex = #(sTileIndex)
-
-		SetFunctionValue iTileIndex
-
-		Sv_Destruct sTileIndex
-	end)
+	ref GetTileIndexFromNameUDF = CompileScript "PipLog\Interface\GetTileIndexFromName.gek"
 
 	; Main
 
@@ -40,7 +29,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; State
 
-	short iTileIndex = Call GetCurrentTileIndexFromName
+	short iTileIndex = Call GetTileIndexFromNameUDF sTileName
 
 	array_var aEventIds = Player.AuxiliaryVariableGetAsArray "*PLC_aDisplayedEventIds"
 
