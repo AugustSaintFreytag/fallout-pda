@@ -1,15 +1,12 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Handles a click on a calendar grid tile by updating the calendar view model.
 	; The UI control loop owns visual selection, tools, and summary text writes.
 
-	Sv_Destruct sTileParam
-
 	; UDFs
 
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 	ref OnTileDeselectUDF = CompileScript "PipLog\Interface\Calendar\OnTileDeselect.gek"
-	ref GetDateComponentsFromStringUDF = CompileScript "PipLog\DateTime\GetDateComponentsFromString.gek"
-	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 	ref GetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\GetPlayerDateReminder.gek"
 
 	; State
@@ -20,11 +17,13 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 
 	string_var sComponent = GetActiveUIComponentFullName
 
+	PrintC "Clicked on tile '%z'." sComponent
+
 	Sv_Replace "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/|" sComponent
 	Sv_Replace "/CM_Box_Main|" sComponent
 
 	if eval (sComponent != sCurrentSelectedDate)
-		array_var aComponents = (Call GetDateComponentsFromStringUDF sComponent)
+		array_var aComponents = (Call ParseStorageDateToComponentsUDF sComponent)
 
 		if eval aComponents == Ar_Null
 			PrintC "Could not select tile, date string '%z' is invalid." (sComponent)
@@ -59,7 +58,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" 0
 		endif
 
-		Call UpdateSelectedDaySummaryUDF sComponent
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 	else
 		Call OnTileDeselectUDF
 	endif

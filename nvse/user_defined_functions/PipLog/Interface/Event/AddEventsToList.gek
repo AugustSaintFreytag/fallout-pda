@@ -1,0 +1,33 @@
+begin function { array_var aEvents }
+
+	; Adds all event-list rows for a decoded event array.
+	; Returns the number of rows added.
+
+	; UDFs
+
+	ref AddEventToListUDF = CompileScript "PipLog\Interface\Event\AddEventToList.gek"
+
+	; State
+
+	short iTileIndex = 0
+	short iNumEvents = Ar_Size aEvents
+
+	; Main
+
+	if iNumEvents == -1
+		SetFunctionValue 0
+		return
+	endif
+
+	while iTileIndex < iNumEvents
+		array_var aEvent = aEvents[iTileIndex]
+
+		Call AddEventToListUDF aEvent iTileIndex
+
+		let aEvent := Ar_Null
+		let iTileIndex += 1
+	loop
+
+	SetFunctionValue iTileIndex
+
+end

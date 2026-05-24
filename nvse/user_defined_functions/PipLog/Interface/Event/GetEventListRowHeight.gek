@@ -1,0 +1,26 @@
+begin function { string_var sEventName }
+
+	; Returns fixed event-list row height.
+	; Text metrics are logged for calibration while row titles remain single-height.
+
+	; Config
+
+	short iCharsPerLine = 36
+	float fRowHeight = 42
+
+	; State
+
+	short iTextLength = Sv_Length sEventName
+	short iLineCount = iTextLength / iCharsPerLine
+
+	; Main
+
+	if eval (iTextLength == 0) || ((iTextLength % iCharsPerLine) > 0)
+		let iLineCount += 1
+	endif
+
+	PrintC "Set event row height to %g units (%g characters, %g lines)." fRowHeight iTextLength iLineCount
+
+	SetFunctionValue fRowHeight
+
+end

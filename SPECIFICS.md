@@ -20,6 +20,14 @@ Some additional flags can gate against constant redrawing in the UI control loop
 `bIsCalendarSummaryModified`	; Dirty flag for selected date summary text
 `bIsCalendarSelectionModified`	; Dirty flag for an individual tile's visual selection
 
+`iEventFilterMode`				; 0 = one-time player events, 1 = monthly player events, 2 = yearly player events
+`sSelectedEventId`				; Actual assigned event id of the selected event-list row
+`sSelectedEventTileName`		; Current event-list tile name used by the UI control loop for selection visuals
+`sPreviousSelectedEventTileName`	; Previous event-list tile name used by the UI control loop for deselection visuals
+`bIsSelectedEventPlayer`		; Whether the selected event belongs to persistent player storage and can be edited/deleted
+`bIsEventListModified`			; Dirty flag for rebuilding event-list tiles
+`bIsEventSelectionModified`		; Dirty flag for the event side panel and selected row visual
+
 ## Events
 
 Assuming an event is a structure:

@@ -1,0 +1,92 @@
+begin function {}
+
+	; Applies events view state to event list, interval control, and event selection.
+
+	; UDFs
+
+	ref GenerateEventListUDF = CompileScript "PipLog\Interface\Event\GenerateEventList.gek"
+	ref GetEventByIdUDF = CompileScript "PipLog\Event\GetEventById.gek"
+	ref GetEventDateLabelUDF = CompileScript "PipLog\Interface\Event\GetEventDateLabel.gek"
+
+	; State
+
+	short iIntervalKind = Player.AuxiliaryVariableGetFloat "*PLC_iIntervalKind"
+	short bIsEventListModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsEventListModified"
+	short bIsEventSelectionModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsEventSelectionModified"
+	short bIsSelectedEventPlayer = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedEventPlayer"
+
+	string_var sPreviousSelectedEventTileName = Player.AuxiliaryVariableGetString "*PLC_sPreviousSelectedEventTileName"
+	string_var sSelectedEventTileName = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventTileName"
+	string_var sSelectedEventId = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventId"
+
+	; View Controls
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 0
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 1
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
+
+	if iIntervalKind == 0
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 3
+	elseif iIntervalKind == 1
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 0
+	else
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 1
+	endif
+
+	; List
+
+	if bIsEventListModified
+		PrintC "Generating event list. List modified: %g" bIsEventListModified
+		Call GenerateEventListUDF
+	endif
+
+	; Selection
+
+	if bIsEventSelectionModified
+		PrintC "Updating event selection. Selection modified: %g" bIsEventSelectionModified
+
+		if eval (Sv_Length sPreviousSelectedEventTileName) > 0
+			string_var sOldEventTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/%z/_selected" sPreviousSelectedEventTileName
+			SetUIFloatAlt ($sOldEventTilePath) 0
+			Sv_Destruct sOldEventTilePath
+		endif
+
+		if eval (Sv_Length sSelectedEventId) > 0
+			if eval (Sv_Length sSelectedEventTileName) > 0
+				string_var sNewEventTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/%z/_selected" sSelectedEventTileName
+				SetUIFloatAlt ($sNewEventTilePath) 1
+				Sv_Destruct sNewEventTilePath
+			endif
+
+			array_var aSelectedEvent = (Call GetEventByIdUDF sSelectedEventId bIsSelectedEventPlayer)
+
+			if eval aSelectedEvent == Ar_Null
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 0
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" 0
+			else
+				string_var sSelectedEventName = aSelectedEvent["name"]
+				string_var sSelectedEventDate = aSelectedEvent["date"]
+				string_var sSelectedEventDateLabel = (Call GetEventDateLabelUDF sSelectedEventDate)
+
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 1
+				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" bIsSelectedEventPlayer
+				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_1R/string" ($sSelectedEventName)
+				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_2R/string" ($sSelectedEventDateLabel)
+
+				Sv_Destruct sSelectedEventName, sSelectedEventDate, sSelectedEventDateLabel
+			endif
+
+			let aSelectedEvent := Ar_Null
+		else
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 0
+			SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" 0
+		endif
+
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 0
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sPreviousSelectedEventTileName, sSelectedEventTileName, sSelectedEventId
+
+end

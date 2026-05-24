@@ -1,0 +1,61 @@
+begin function {}
+
+	; Rebuilds the event list UI for the active interval kind.
+
+	; UDFs
+
+	ref MapStringArrayUDF = CompileScript "PipLog\Utils\MapStringArray.gek"
+	ref AddEventsToListUDF = CompileScript "PipLog\Interface\Event\AddEventsToList.gek"
+	ref GetEventsForIntervalKindUDF = CompileScript "PipLog\Event\GetEventsForIntervalKind.gek"
+
+	; State
+
+	short iIntervalKind = Player.AuxiliaryVariableGetFloat "*PLC_iIntervalKind"
+
+	; Add Tile
+
+	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
+	AddTileFromTemplate "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect|CM_EventParentRect_Template|CM_EventParentRect"
+
+	; Add Events
+
+	array_var aEvents = Call GetEventsForIntervalKindUDF iIntervalKind
+
+	Call AddEventsToListUDF aEvents
+
+	; Set Content Dimensions
+
+	short iNumEvents = Ar_Size aEvents
+
+	float fEventHeight = 42
+	float fTotalEventHeight = iNumEvents * fEventHeight
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/_templateheight" fTotalEventHeight
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/visible" 1
+
+	float fNumVisibleItems = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_visible_items")
+	float fNumItems = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_items")
+	float fScrollDelta = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_ScrollDelta")
+
+	; Store for Interaction
+
+	array_var aEventIds = Call MapStringArrayUDF aEvents ({ array_var aEvent } => aEvent["id"])
+
+	if eval (Ar_Size aEventIds) > 0
+		Player.AuxiliaryVariableSetFromArray "*PLC_aDisplayedEventIds" aEventIds
+	else
+		Player.AuxiliaryVariableErase "*PLC_aDisplayedEventIds"
+	endif
+
+	; Conclude
+
+	PrintC "Event list scroll metrics: items=%g, template height=%g, visible items=%g, total items=%g, scroll delta=%g." iNumEvents fTotalEventHeight fNumVisibleItems fNumItems fScrollDelta
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 0
+
+	; Clean-Up
+
+	let aEvents := Ar_Null
+	let aEventIds := Ar_Null
+
+end

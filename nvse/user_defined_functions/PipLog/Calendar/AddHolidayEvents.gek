@@ -1,24 +1,23 @@
-begin function {  }
+begin function {}
 
 	; Registers each holiday in aHolidays into global event storage.
-	; aHolidays should be a positional array of event stringmaps as returned by GetHolidays.
+	; aHolidays should be a positional array of event stringmaps as returned by GetHolidayEvents.
 
 	; UDFs
 
-	ref GetHolidaysUDF = CompileScript "PipLog\Calendar\GetHolidays.gek"
-	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
+	ref GetHolidayEventsUDF = CompileScript "PipLog\Calendar\GetHolidayEvents.gek"
+	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
 
 	; Main
 
-	array_var aHolidays = (Call GetHolidaysUDF)
+	array_var aHolidayEvents = (Call GetHolidayEventsUDF)
 
-	foreach array_var aElement <- aHolidays
-		array_var aHolidayEvent = aElement["value"]
-		Call AddEventUDF aHolidayEvent 0
-	loop
+	PrintC "Adding %g holiday events to calendar." (Ar_Size aHolidayEvents)
+
+	Call AddEventsUDF aHolidayEvents 0
 
 	; Clean-Up
 
-	let aHolidays := Ar_Null
+	let aHolidayEvents := Ar_Null
 
 end

@@ -1,0 +1,45 @@
+begin function { string_var sId }
+
+	; Removes the entry with id sId from persistent storage.
+
+	; UDFs
+
+	ref GetJournalEntryIndexUDF = CompileScript "PipLog\Journal\GetJournalEntryIndex.gek"
+	ref UpdateJournalEntryIndexUDF = CompileScript "PipLog\Journal\UpdateJournalEntryIndex.gek"
+
+	; Main
+
+	if eval (Sv_Length sId) <= 0
+		PrintC "Cannot remove journal entry, missing or invalid id."
+		return
+	endif
+
+	short iIndex = Call GetJournalEntryIndexUDF sId
+
+	if eval iIndex == Ar_BadNumericIndex
+		PrintC "Cannot remove journal entry, could not resolve index from id '%z'." sId
+		return
+	endif
+
+	array_var aEncodedEntries = Player.AuxiliaryVariableGetAsArray "PLC_aPlayerJournal"
+
+	; Erase
+
+	Ar_Erase aEncodedEntries, iIndex
+	PrintC "Removed journal entry with id '%z' at index %g." sId iIndex
+
+	; Store
+
+	if eval (Ar_Size aEncodedEntries) > 0
+		Player.AuxiliaryVariableSetFromArray "PLC_aPlayerJournal" aEncodedEntries
+	else
+		Player.AuxiliaryVariableErase "PLC_aPlayerJournal"
+	endif
+	
+	Call UpdateJournalEntryIndexUDF
+
+	; Clean-Up
+
+	let aEncodedEntries := Ar_Null
+
+end

@@ -514,6 +514,7 @@
 			</width>
 			<height>106</height>
 			<_tileselected>0</_tileselected>
+			<_editable>0</_editable>
 
 			<image name="CM_EventLineH1">
 				<visible><copy src="parent" trait="_tileselected"/></visible>
@@ -561,9 +562,57 @@
 				<zoom><copy src="parent" trait="_zoom"/></zoom>
 			</text>
 
+			<hotrect name="CM_Event_Edit">
+				<id>524</id>
+				<visible>
+					<copy src="parent" trait="_tileselected"/>
+					<and src="parent" trait="_editable"/>
+				</visible>
+				<width>24</width>
+				<height>
+					<copy src="me" trait="width"/>
+				</height>
+				<x>
+					<copy src="sibling(CM_Event_Delete)" trait="x"/>
+					<sub>
+						<copy src="me" trait="width"/>
+						<mul>1.15</mul>
+						<add>10</add>
+					</sub>
+				</x>
+				<y><copy src="sibling(CM_Event_Delete)" trait="y"/></y>
+				<target>1</target>
+				<locus>1</locus>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clicksound>UIMenuFocus</clicksound>
+				<image name="EntryEdit_ico">
+					<depth>
+						<copy src="parent" trait="depth"/>
+						<sub>1</sub>
+					</depth>
+					<_filename_1>Interface\piplog\calendar_pencil.dds</_filename_1>
+					<_filename_2>Interface\piplog\calendar_pencil_filled.dds</_filename_2>
+					<width><copy src="parent" trait="width"/></width>
+					<height><copy src="parent" trait="height"/></height>
+					<clips> &true; </clips>
+					<filename>
+						<copy>1</copy>
+						<add>
+							<copy>1</copy>
+							<onlyif src="parent" trait="mouseover"/>
+						</add>
+						<copy src="me" trait="_filename_"/>
+					</filename>
+					<zoom>&scale;</zoom>
+				</image>
+			</hotrect>
+
 			<hotrect name="CM_Event_Delete">
 				<id>525</id>
-				<visible><copy src="parent" trait="_tileselected"/></visible>
+				<visible>
+					<copy src="parent" trait="_tileselected"/>
+					<and src="parent" trait="_editable"/>
+				</visible>
 				<width>24</width>
 				<height>
 					<copy src="me" trait="width"/>
@@ -606,7 +655,7 @@
 
 		</rect>
 
-		<!--Larger section for holding all of the written journal entries-->
+		<!--Larger section for holding event list rows-->
 		<hotrect name="CM_EventTextRect">
 			<locus>1</locus>
 			<wheelable>&true;</wheelable>
@@ -616,30 +665,29 @@
 				<copy>1</copy>
 				<onlyifnot src="parent" trait="_editing"/>
 			</visible>
-
 			<x>0</x>
 			<y>50</y>
 			<width>697</width>
 			<height>515</height>
 			<_templateheight></_templateheight>
 
-			<!--Scroll bar for the Journal, might need some refinement-->
+			<!--Scroll bar for the event list-->
 			<hotrect name="CM_EventScrollbar">
 				<include src="scrollbar_vert.xml"/>
 				<y>26</y>				<!--The placement of the top arrow-->
 				<height>468.5</height>	<!--The placement of the bottom arrow-->
 				<_x>-15</_x>
-				<_wheelmoved> <copy src="parent()" trait="wheelmoved"/> </_wheelmoved>
-				<_number_of_visible_items>
-					<copy src="parent" trait="height"/>
-					<div src="me" trait="_scrolldelta" />
-				</_number_of_visible_items>
+				<_wheelmoved><copy src="parent()" trait="wheelmoved"/></_wheelmoved>
 				<_number_of_items>
 					<copy src="parent" trait="_templateheight"/>
-					<div src="me" trait="_scrolldelta" />
+					<div src="me" trait="_ScrollDelta" />
 				</_number_of_items>
-				
-				<_ScrollDelta> 16 </_ScrollDelta>
+				<_number_of_visible_items>
+					<copy src="parent" trait="height"/>
+					<div src="me" trait="_ScrollDelta" />
+				</_number_of_visible_items>
+				<!-- Canonical casing of scroll delta via `scrollbar_vert.xml` -->
+				<_ScrollDelta>32</_ScrollDelta>
 			</hotrect>
 
 			<!-- Event Parent w/ Event children tiles stored here
@@ -745,11 +793,11 @@
 				<_wheelmoved> <copy src="parent()" trait="wheelmoved"/> </_wheelmoved>
 				<_number_of_visible_items>
 					<copy src="parent" trait="height"/>
-					<div src="me" trait="_scrolldelta" />
+					<div src="me" trait="_ScrollDelta" />
 				</_number_of_visible_items>
 				<_number_of_items>
 					<copy src="parent" trait="_templateheight"/>
-					<div src="me" trait="_scrolldelta" />
+					<div src="me" trait="_ScrollDelta" />
 				</_number_of_items>
 				
 				<_ScrollDelta> 16 </_ScrollDelta>
@@ -1757,13 +1805,14 @@
 		<!-- Tile positioning (set in GECK)-->
 		<y></y>
 		<x></x>
+		<height></height>
 		<width><copy src="parent" trait="width"/></width>
 
 		<!-- Tile string (set in GECK)-->
 		<string></string><!--The title of the holiday-->
-		<_value1>0</_value1>
-		<_value2>0</_value2>
-		<_value3>0</_value3>
+		<_event_id></_event_id>
+		<_event_date></_event_date>
+		<_source>0</_source>
 
 		<!-- Tile Display-->
 		<_horbuf><copy src="parent" trait="_horbuf"/></_horbuf>

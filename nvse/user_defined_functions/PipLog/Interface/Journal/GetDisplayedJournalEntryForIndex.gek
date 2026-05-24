@@ -1,0 +1,32 @@
+begin function { short iIndex }
+
+	; Resolves a displayed journal list index to the current full journal entry.
+
+	; UDFs
+
+	ref GetJournalEntryByIdUDF = CompileScript "PipLog\Journal\GetJournalEntryById.gek"
+
+	; State
+
+	array_var aDisplayedJournalEntryIds = Player.AuxiliaryVariableGetAsArray "*PLC_aDisplayedJournalEntryIds"
+	short iNumDisplayedJournalEntries = Ar_Size aDisplayedJournalEntryIds
+
+	; Main
+
+	if eval (iNumDisplayedJournalEntries == -1) || (iIndex < 0) || (iIndex >= iNumDisplayedJournalEntries)
+		let aDisplayedJournalEntryIds := Ar_Null
+		SetFunctionValue Ar_Null
+		return
+	endif
+
+	string_var sId = aDisplayedJournalEntryIds[iIndex]
+	array_var aJournalEntry = (Call GetJournalEntryByIdUDF sId)
+
+	SetFunctionValue aJournalEntry
+
+	; Clean-Up
+
+	Sv_Destruct sId
+	let aDisplayedJournalEntryIds := Ar_Null
+
+end

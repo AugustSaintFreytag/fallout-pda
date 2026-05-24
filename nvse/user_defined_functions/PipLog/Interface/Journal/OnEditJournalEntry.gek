@@ -1,53 +1,62 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileName }
 
-	; Click callback (MapMenu#520).
-	; Parses the active UI component path to determine which entry was clicked,
-	; corrects for sort direction, then opens a text input menu pre-filled with
-	; the existing entry text. The closure writes the edited text back via aux vars.
-	;
-	; Uses "*PLC_iEditEntryIndex" to pass the resolved index to the closure,
-	; since the outer function's frame is no longer live when the closure executes.
-
-	Sv_Destruct sTileParam
+	; Opens a text input prompt for editing the clicked displayed journal entry.
+	; NOTE: If `GetActiveUIComponentFullName` would return the qualified UI component path, this could be easier.
 
 	; UDFs
 
-	ref SetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
+	ref GetDisplayedJournalEntryForIndexUDF = CompileScript "PipLog\Interface\Journal\GetDisplayedJournalEntryForIndex.gek"
 	ref OnEditJournalEntryConfirmUDF = CompileScript "PipLog\Interface\Journal\OnEditJournalEntryConfirm.gek"
+	ref GetJournalEntryIndexFromEditButtonPathUDF = CompileScript "PipLog\Interface\Journal\GetJournalEntryIndexFromEditButtonPath.gek"
+	ref EllipsizeUDF = CompileScript "PipLog\Utils\Ellipsize.gek"
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		PrintC "Cannot edit journal entry, incompatible menu mode %g (expected: 1023)." (GetActiveMenuMode)
+		return
+	endif
+
+	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
+
+	if iViewMode != 3
+		PrintC "Cannot edit journal entry, incompatible view mode %g (expected: 3)." iViewMode
+		return
+	endif
 
 	; State
 
-	short iNumJournalEntries = Player.AuxiliaryVariableGetFloat "PLC_iNumJournalEntries"
-	short bSort = Player.AuxiliaryVariableGetFloat "PLC_bSort"
+	string_var sActiveComponentPath = GetActiveUIComponentFullName
+	string_var sCompPreview = (Call EllipsizeUDF sActiveComponentPath 36)
 
-	; Main — parse active component path to extract entry display index
+	PrintC "Received click on journal entry edit button, name '%z', id '%g', path '%z'." sTileName iTileId sCompPreview
 
-	string_var sComponent = GetActiveUIComponentFullName
-	
-	Sv_Replace "/CM_JournalEntry/EntryEdit|", sComponent
-	Sv_Replace "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry|", sComponent
-	
-	short iEntryIndex = #sComponent
-	Sv_Destruct sComponent
+	short iIndex = Call GetJournalEntryIndexFromEditButtonPathUDF sActiveComponentPath
+	array_var aJournalEntry = (Call GetDisplayedJournalEntryForIndexUDF iIndex)
 
-	; Invert display index to storage index when sorted newest-first
-	if bSort == 1
-		let iEntryIndex := (iNumJournalEntries - 1) - iEntryIndex
+	; Main
+
+	if eval (aJournalEntry == Ar_Null) || ((Ar_Size aJournalEntry) == -1)
+		PrintC "Cannot edit journal entry, could not resolve displayed index %g from '%z'." iIndex sTileName
+
+		Sv_Destruct sActiveComponentPath, sCompPreview
+		let aJournalEntry := Ar_Null
+
+		return
 	endif
 
-	; Store resolved index so the async closure can read it
-	Player.AuxiliaryVariableSetFloat "*PLC_iEditEntryIndex" iEntryIndex
+	string_var sJournalEntryId = aJournalEntry["id"]
+	string_var sJournalEntryText = aJournalEntry["text"]
+	string_var sEntryPrompt = Sv_Construct "Editing Journal Entry #%g:" (iIndex + 1)
 
-	; Read the current entry text for pre-fill
-	string_var sJournalEntryKey = Sv_Construct "PLC_aJournalEntry%g" iEntryIndex
-	array_var aJournalEntry = Player.AuxiliaryVariableGetAsArray ($sJournalEntryKey)
-	Sv_Destruct sJournalEntryKey
+	Player.AuxiliaryVariableSetString "*PLC_sEditJournalEntryId" ($sJournalEntryId)
 
-	ShowTextInputMenu OnEditJournalEntryConfirmUDF 700 500 "Entry:"
-	SetTextInputString "%z" aJournalEntry[1]
+	ShowTextInputMenu OnEditJournalEntryConfirmUDF 700 500 ($sEntryPrompt)
+	SetTextInputString "%z" sJournalEntryText
 
 	; Clean-Up
 
+	Sv_Destruct sActiveComponentPath, sCompPreview, sJournalEntryId, sJournalEntryText, sEntryPrompt
 	let aJournalEntry := Ar_Null
 
 end

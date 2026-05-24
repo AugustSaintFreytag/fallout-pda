@@ -7,7 +7,7 @@ begin function { string_var sDate }
 
 	; UDFs
 
-	ref GetDateComponentsFromStringUDF = CompileScript "PipLog\DateTime\GetDateComponentsFromString.gek"
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 	ref GetEventsForDayUDF = CompileScript "PipLog\Calendar\GetEventsForDay.gek"
 	ref GetPlayerStatValuesUDF = CompileScript "PipLog\Stats\GetPlayerStatValues.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
@@ -16,7 +16,7 @@ begin function { string_var sDate }
 
 	; State
 
-	array_var aDate = (Call GetDateComponentsFromStringUDF sDate)
+	array_var aDate = (Call ParseStorageDateToComponentsUDF sDate)
 
 	if eval aDate == Ar_Null
 		PrintC "Could not formulate calendar summary string for invalid date '%z'." sDate
@@ -55,7 +55,7 @@ begin function { string_var sDate }
 
 			let sResult += $sEventName
 			let sResult += "%r"
-			
+
 			Sv_Destruct sEventName
 		loop
 	endif

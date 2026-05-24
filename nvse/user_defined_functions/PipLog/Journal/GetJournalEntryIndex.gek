@@ -1,0 +1,23 @@
+begin function { string_var sId }
+
+	array_var aJournalEntryIndexById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerJournalIndex"
+
+	if eval !(Ar_HasKey aJournalEntryIndexById, sId)
+		PrintC "Could not find journal entry index for id '%z' in cached index." sId
+		SetFunctionValue Ar_BadNumericIndex
+
+		let aJournalEntryIndexById := Ar_Null
+		return
+	endif
+
+	short iIndex = aJournalEntryIndexById[sId]
+
+	PrintC "Resolved journal entry index %g for id '%z' from cached index." iIndex sId
+
+	SetFunctionValue iIndex
+
+	; Clean-Up
+
+	let aJournalEntryIndexById := Ar_Null
+
+end

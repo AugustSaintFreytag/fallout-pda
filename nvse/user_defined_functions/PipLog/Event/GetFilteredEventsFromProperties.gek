@@ -1,0 +1,94 @@
+begin function { array_var aEventsById, array_var aEventIdsByDate, short iIntervalKind, short iEventSourceKind }
+
+	; Collects decoded events from one event storage source for the active event list filter.
+	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = weekly, 4 = daily.
+	; Supported storage patterns: date-specific = YYYY-MM-DD, yearly = *-MM-DD, monthly = *-*-DD.
+	; Injects a transient "_source" property to each returned event.
+
+	; UDFs
+
+	ref DecodeEventIdsFromStringUDF = CompileScript "PipLog\Event\DecodeEventIdsFromString.gek"
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+
+	; State
+
+	array_var aEvents = Ar_Construct "array"
+
+	; Main
+
+	if eval ((Ar_Size aEventsById) == -1) || ((Ar_Size aEventIdsByDate) == -1)
+		SetFunctionValue aEvents
+		return
+	endif
+
+	foreach (array_var aDateEntry) <- aEventIdsByDate
+		string_var sDate = aDateEntry["key"]
+		string_var sEncodedIds = aDateEntry["value"]
+		array_var aDateComponents = Sv_Split sDate, "-"
+		short bMatchesFilter = 0
+
+		if eval (Ar_Size aDateComponents) == 3
+			string_var sYear = aDateComponents[0]
+			string_var sMonth = aDateComponents[1]
+
+			if iIntervalKind == 0
+				; Date-specific
+				if eval sYear != "*"
+					let bMatchesFilter := 1
+				endif
+			elseif iIntervalKind == 1
+				; Yearly recurring
+				if eval (sYear == "*") && (sMonth != "*")
+					let bMatchesFilter := 1
+				endif
+			elseif iIntervalKind == 2
+				; Monthly recurring
+				if eval (sYear == "*") && (sMonth == "*")
+					let bMatchesFilter := 1
+				endif
+			endif
+
+			Sv_Destruct sYear, sMonth
+		endif
+
+		if eval bMatchesFilter
+			array_var aEventIds = (Call DecodeEventIdsFromStringUDF sEncodedIds)
+
+			foreach (array_var aEventIdEntry) <- aEventIds
+				string_var sEventId = aEventIdEntry["value"]
+
+				if eval !(Ar_HasKey aEventsById, sEventId)
+					Sv_Destruct sEventId
+					continue
+				endif
+
+				string_var sEncodedEvent = aEventsById[sEventId]
+				array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+				if eval (aEvent == Ar_Null) || ((Ar_Size aEvent) == -1)
+					Sv_Destruct sEventId, sEncodedEvent
+					let aEvent := Ar_Null
+					continue
+				endif
+
+				let aEvent["_source"] := iEventSourceKind
+				Ar_Append aEvents, aEvent
+
+				Sv_Destruct sEventId, sEncodedEvent
+				let aEvent := Ar_Null
+			loop
+
+			let aEventIds := Ar_Null
+		endif
+
+		Sv_Destruct sDate, sEncodedIds
+		let aDateComponents := Ar_Null
+	loop
+
+	SetFunctionValue aEvents
+
+	; Clean-Up
+
+	let aEvents := Ar_Null
+
+end

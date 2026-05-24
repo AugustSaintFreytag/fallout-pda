@@ -1,0 +1,73 @@
+begin function { array_var aJournalEntry, short iTileIndex }
+
+	; Adds a single journal-list row for a decoded journal entry.
+
+	; UDFs
+
+	ref AddJournalEntryElementUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntryElement.gek"
+	ref GetApproximateTextHeightUDF = CompileScript "PipLog\Interface\GetApproximateTextHeight.gek"
+
+	; Main
+
+	if eval (aJournalEntry == Ar_Null) || ((Ar_Size aJournalEntry) == -1)
+		PrintC "Cannot add journal entry to UI list at tile index %g, entry is either null or invalid." iTileIndex
+		return
+	endif
+
+	string_var sJournalEntryText = aJournalEntry["text"]
+	string_var sJournalEntryLocation = aJournalEntry["location"]
+	string_var sJournalEntryDatetime = aJournalEntry["datetime"]
+
+	string_var sTileInsertCommand = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect|CM_Journal_Template|CM_Entry%g" iTileIndex
+	string_var sTileBasePath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry" iTileIndex
+	string_var sTilePropertyPath = ""
+
+	; Sizing
+
+	short iNumCharactersPerLine = 72
+	float fHeaderHeight = 60
+
+	float fTextHeight = (Call GetApproximateTextHeightUDF sJournalEntryText iNumCharactersPerLine)
+	float fEntryHeight = fHeaderHeight + fTextHeight
+
+	; Insertion
+
+	AddTileFromTemplate ($sTileInsertCommand)
+
+	let sTilePropertyPath := Sv_Construct "%z/_entry" sTileBasePath
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryText)
+
+	let sTilePropertyPath := Sv_Construct "%z/_location" sTileBasePath
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryLocation)
+
+	let sTilePropertyPath := Sv_Construct "%z/_time" sTileBasePath
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryDatetime)
+
+	let sTilePropertyPath := Sv_Construct "%z/timestamp/string" sTileBasePath
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryDatetime)
+
+	let sTilePropertyPath := Sv_Construct "%z/location/string" sTileBasePath
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryLocation)
+
+	let sTilePropertyPath := Sv_Construct "%z/CM_JournalText/string" sTileBasePath
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryText)
+
+	let sTilePropertyPath := Sv_Construct "%z/CM_JournalText/height" sTileBasePath
+	SetUIFloatAlt ($sTilePropertyPath) fTextHeight
+
+	let sTilePropertyPath := Sv_Construct "%z/user0" sTileBasePath
+	SetUIFloatAlt ($sTilePropertyPath) iTileIndex
+
+	let sTilePropertyPath := Sv_Construct "%z/EntryEdit/user0" sTileBasePath
+	SetUIFloatAlt ($sTilePropertyPath) iTileIndex
+
+	let sTilePropertyPath := Sv_Construct "%z/EntryDelete/user0" sTileBasePath
+	SetUIFloatAlt ($sTilePropertyPath) iTileIndex
+
+	Call AddJournalEntryElementUDF iTileIndex fEntryHeight
+
+	; Clean-Up
+
+	Sv_Destruct sJournalEntryText, sJournalEntryLocation, sJournalEntryDatetime, sTileInsertCommand, sTileBasePath, sTilePropertyPath
+
+end

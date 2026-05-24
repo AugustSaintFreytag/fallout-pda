@@ -1,9 +1,8 @@
+; DEPRECATED (use `AddEvents` instead)
 begin function { array_var aEvent, short bIsPlayerEvent }
 
-	; Encodes aEvent and registers it in the appropriate event storage maps.
+	; Encodes a system or player event and adds it to persistent storage.
 	; Pass bIsPlayerEvent = 1 for player-created events, 0 for global/mod events.
-	; Adds to the by-id registry and appends the event id to the by-date index.
-	; Global event maps use transient keys (*) and are rebuilt each game load.
 
 	; UDFs
 
@@ -26,7 +25,7 @@ begin function { array_var aEvent, short bIsPlayerEvent }
 	string_var sEventDate = aEvent["date"]
 	string_var sEncodedEvent = (Call EncodeEventToStringUDF aEvent)
 
-	; Update the by-id registry
+	; Event Storage
 
 	array_var aStoredEventsById = Player.AuxStringMapArrayGetAsArray ($sKeyById)
 
@@ -38,7 +37,7 @@ begin function { array_var aEvent, short bIsPlayerEvent }
 
 	Player.AuxStringMapArraySetFromArray ($sKeyById) aStoredEventsById
 
-	; Update the by-date index
+	; Event Date Storage
 
 	array_var aStoredEventIdsByDate = Player.AuxStringMapArrayGetAsArray ($sKeyByDate)
 

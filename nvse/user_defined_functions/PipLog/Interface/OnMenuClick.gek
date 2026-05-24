@@ -1,9 +1,7 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Handles main Pip-Log buttons and calendar month arrows by mutating the view model.
 	; UIControlLoop.gek owns applying those values to menu tiles.
-
-	Sv_Destruct sTileParam
 
 	; Guards
 
@@ -33,8 +31,8 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 	short bButton3Target = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/target" == 1
 	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
 
-	if eval (iTileID >= 510) && (iTileID <= 512)
-		if eval (iTileID == 510) && (bButton1Target)
+	if eval (iTileId >= 510) && (iTileId <= 512)
+		if eval (iTileId == 510) && (bButton1Target)
 			if iViewMode == 0
 				let iViewMode := 1
 				Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
@@ -59,12 +57,13 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" GameDay
 					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" GameMonth
 					Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" GameYear
+
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 					
 					Sv_Destruct sToday
 				endif
 
 				Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedCalendarDate"
-				Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 				Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
 
 				Sv_Destruct sSelectedDate
@@ -78,29 +77,50 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 			StopSound UIMenuCancel
 			PlaySound UIPipBoySelect 1
 		elseif iViewMode > 0
-			if eval (iTileID == 511) && (bButton2Target)
+			if eval (iTileId == 511) && (bButton2Target)
 				if iViewMode == 3
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
 				elseif iViewMode == 2
-					; Event category cycling deferred to a later phase.
+					short iIntervalKind = Player.AuxiliaryVariableGetFloat "*PLC_iIntervalKind"
+
+					let iIntervalKind += 1
+
+					if iIntervalKind > 2
+						let iIntervalKind := 0
+					endif
+
+					Player.AuxiliaryVariableSetFloat "*PLC_iIntervalKind" iIntervalKind
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+					Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
+					Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
+					Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedEventTileName"
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
 				else
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 3
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
 				endif
 
 				StopSound UIMenuCancel
 				PlaySound UIPipBoySelect 1
-			elseif eval (iTileID == 512) && (bButton3Target)
+			elseif eval (iTileId == 512) && (bButton3Target)
 				if iViewMode == 2
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 1
 				else
 					Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 2
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+					Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
+					Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
+					Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedEventTileName"
+					Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
 				endif
 
 				StopSound UIMenuCancel
 				PlaySound UIPipBoySelect 1
 			endif
 		endif
-	elseif eval (iTileID == 513) || (iTileID == 514)
+	elseif eval (iTileId == 513) || (iTileId == 514)
 		short iCalendarYear = Player.AuxiliaryVariableGetFloat "*PLC_iCalendarYear"
 		short iCalendarMonth = Player.AuxiliaryVariableGetFloat "*PLC_iCalendarMonth"
 
@@ -109,7 +129,7 @@ begin function { short iMenuID, short iTileID, string_var sTileParam }
 			let iCalendarMonth := GameMonth
 		endif
 
-		if iTileID == 513
+		if iTileId == 513
 			let iCalendarMonth += 1
 
 			if iCalendarMonth > 11

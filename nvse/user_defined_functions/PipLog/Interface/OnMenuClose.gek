@@ -1,9 +1,9 @@
-begin function { short iMenuID }
+begin function { short iMenuId }
 
 	; Resets all calendar session state when the Pip-Boy is closed.
 	; View month is reset to current so the calendar reopens on today's month.
 
-	if iMenuID != 1023
+	if iMenuId != 1023
 		return
 	endif
 
@@ -16,6 +16,9 @@ begin function { short iMenuID }
 		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarMonth" 0
 	endif
 
+	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
+	UnloadUIComponent "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect"
+
 	; Reset selection state (menu is closed; aux vars cleared for next open)
 	Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
 	Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" -1
@@ -26,10 +29,20 @@ begin function { short iMenuID }
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 0
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_iIntervalKind" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
 	
 	Player.AuxiliaryVariableErase "*PLC_sHoveredCalendarDate"
 	Player.AuxiliaryVariableErase "*PLC_sSelectedCalendarDate"
 	Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedCalendarDate"
 	Player.AuxiliaryVariableErase "*PLC_sCalendarDateSummary"
+	Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
+	Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
+	Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedEventTileName"
+	Player.AuxiliaryVariableErase "*PLC_sEditJournalEntryId"
+	Player.AuxiliaryVariableErase "*PLC_aDisplayedJournalEntryIds"
 
 end

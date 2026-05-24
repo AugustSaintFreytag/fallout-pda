@@ -1,27 +1,23 @@
-begin function { short iDay, short iMonth, short iYear, string_var sEventName, short iFrequency }
+begin function { short iDay, short iMonth, short iYear, string_var sEventName, short iIntervalKind }
 
 	; Adds a player-defined custom event to the persistent event registry.
 	; iMonth is 0-indexed.
-	; iFrequency values:
-	;   1 = one-time      (YYYY-MM-DD)
-	;   2 = weekly        (unsupported — returns early)
-	;   3 = monthly       (*-*-DD)
-	;   4 = yearly        (*-MM-DD)
+	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = weekly, 4 = daily.
+	; Supported storage patterns: date-specific = YYYY-MM-DD, yearly = *-MM-DD, monthly = *-*-DD.
 	; Events are stored as player events (bIsPlayerEvent = 1).
 
-	if iFrequency == 2
+	if eval (iIntervalKind == 3) || (iIntervalKind == 4)
 		return
 	endif
 
-	if eval (iFrequency < 1) || (iFrequency > 4)
+	if eval (iIntervalKind < 0) || (iIntervalKind > 4)
 		return
 	endif
 
 	; UDFs
 
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref GetRecurringDateStringUDF = CompileScript "PipLog\DateTime\GetRecurringDateString.gek"
-	ref GetMonthlyDateStringUDF = CompileScript "PipLog\DateTime\GetMonthlyDateString.gek"
+	ref GetRecurringDatePatternStringUDF = CompileScript "PipLog\DateTime\GetRecurringDatePatternString.gek"
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
 	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
 
@@ -29,12 +25,10 @@ begin function { short iDay, short iMonth, short iYear, string_var sEventName, s
 
 	string_var sDate = ""
 
-	if iFrequency == 1
+	if iIntervalKind == 0
 		let sDate := (Call GetStorageDateStringUDF iYear iMonth iDay)
-	elseif iFrequency == 3
-		let sDate := (Call GetMonthlyDateStringUDF iDay)
-	elseif iFrequency == 4
-		let sDate := (Call GetRecurringDateStringUDF iMonth iDay)
+	else
+		let sDate := (Call GetRecurringDatePatternStringUDF iIntervalKind iMonth iDay)
 	endif
 
 	; Main

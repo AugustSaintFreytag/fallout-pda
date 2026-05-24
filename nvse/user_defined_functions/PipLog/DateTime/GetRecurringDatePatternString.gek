@@ -1,0 +1,49 @@
+begin function { short iIntervalKind, short iMonth, short iDay }
+
+	; Returns a recurring date pattern string for a supported interval kind.
+	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = weekly, 4 = daily.
+	; Supported recurring storage patterns: yearly = *-MM-DD, monthly = *-*-DD.
+	; iMonth is 0-indexed (0 = January); output month is 1-indexed and zero-padded.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; UDFs
+
+	ref GetPaddedIntUDF = CompileScript "PipLog\Utils\GetPaddedInt.gek"
+
+	; Guards
+
+	if iIntervalKind == 0
+		PrintC "Cannot build recurring date pattern for date-specific interval kind."
+		SetFunctionValue ""
+		return
+	elseif eval (iIntervalKind < 0) || (iIntervalKind > 4)
+		PrintC "Cannot build recurring date pattern for invalid interval kind %g." iIntervalKind
+		SetFunctionValue ""
+		return
+	elseif eval (iIntervalKind == 3) || (iIntervalKind == 4)
+		PrintC "Cannot build recurring date pattern for unsupported interval kind %g." iIntervalKind
+		SetFunctionValue ""
+		return
+	endif
+
+	; Formatting
+
+	string_var sDay = Call GetPaddedIntUDF iDay 2
+	string_var sResult = ""
+
+	if iIntervalKind == 1
+		string_var sMonth = Call GetPaddedIntUDF (iMonth + 1) 2
+		let sResult := Sv_Construct "*-%z-%z" sMonth sDay
+		
+		Sv_Destruct sMonth
+	elseif iIntervalKind == 2
+		let sResult := Sv_Construct "*-*-%z" sDay
+	endif
+
+	SetFunctionValue sResult
+
+	; Clean-Up
+
+	Sv_Destruct sDay
+
+end

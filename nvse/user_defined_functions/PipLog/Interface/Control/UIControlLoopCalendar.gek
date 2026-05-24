@@ -1,113 +1,68 @@
 begin function {}
 
-	; Single source of truth for MapMenu XML state.
-	; Event handlers update the Pip-Log view model; this loop applies it to UI tiles.
-
-	; View mode: 0 = None, 1=calendar view, 2 = events view, 3 = journal view
-
-	if eval !(MenuMode 1023)
-		return
-	endif
+	; Applies calendar view state to calendar tiles, summary text, and date actions.
 
 	; UDFs
 
 	ref GenerateCalendarTilesUDF = CompileScript "PipLog\Interface\Calendar\GenerateCalendarTiles.gek"
 	ref PulseSelectedDateTileUDF = CompileScript "PipLog\Interface\Calendar\PulseSelectedDateTile.gek"
+	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 
-	; Core State
+	; State
 
-	short iSelectedTab = GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab"
-	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
-
-	short bIsLogOpen = Player.AuxiliaryVariableGetFloat "*PLC_bIsLogOpen"
-	
 	short bDidGenerateCalendar = Player.AuxiliaryVariableGetFloat "*PLC_bDidGenerateCalendar"
 	short bIsCalendarSummaryModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsCalendarSummaryModified"
 	short bIsCalendarSelectionModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsCalendarSelectionModified"
 	short bIsCalendarViewModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsCalendarViewModified"
-	
 	short bIsSelectedCalendarDateFuture = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateFuture"
 	short bIsSelectedCalendarDateTracked = Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedCalendarDateTracked"
 
 	string_var sCalendarDateSummary = Player.AuxiliaryVariableGetString "*PLC_sCalendarDateSummary"
 	string_var sPreviousSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sPreviousSelectedCalendarDate"
 	string_var sSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
+	string_var sHoveredCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sHoveredCalendarDate"
 
-	if eval (iSelectedTab != 3)
-		let iViewMode := 0
-		Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
-	endif
+	; View Controls
 
-	if eval (iViewMode < 0) || (iViewMode > 3)
-		let iViewMode := 0
-		Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
-	endif
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 0
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
 
-	; General Visibility
-
-	if eval (iViewMode > 0) && (!bIsLogOpen)
-		PrintC "View mode is %g, opening log view." iViewMode
-
-		Player.AuxiliaryVariableSetFloat "*PLC_bIsLogOpen" 1
-
-		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/visible" 0
-		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonA/target" 0
-		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonX/target" 0
-		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonY/target" 0
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled" 1
-		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/string" "Notes"
-	elseif eval (iViewMode == 0) && (bIsLogOpen)
-		PrintC "View mode is %g, closing log view." iViewMode
-
-		Player.AuxiliaryVariableSetFloat "*PLC_bIsLogOpen" 0
-
-		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/visible" 1
-		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonA/target" 1
-		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonX/target" 1
-		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonY/target" 1
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled" 0
-		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/string" "Log"
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_toggled" 0
-	endif
-
-	; Journal View
-
-	if iViewMode == 3
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 1
-	else
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 0
-	endif
-
-	; Events View
-
-	if iViewMode == 2
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 1
-	else
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
-	endif
-
-	if eval (iViewMode == 1) && ((Sv_Length sSelectedCalendarDate) > 0)
+	if eval (Sv_Length sSelectedCalendarDate) > 0
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 1
 	else
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
 	endif
 
-	; Calendar View (Tiles)
+	; Tiles
 
-	if iViewMode == 1
-		if eval (!bDidGenerateCalendar) || (bIsCalendarViewModified)
-			PrintC "Generating calendar tiles. View mode: %g, did generate: %g, view modified: %g" iViewMode bDidGenerateCalendar bIsCalendarViewModified
-			Call GenerateCalendarTilesUDF
-			let bDidGenerateCalendar := 1
-		else
-			;Call PulseSelectedDateTileUDF
-		endif
+	if eval (!bDidGenerateCalendar) || (bIsCalendarViewModified)
+		PrintC "Generating calendar tiles. Did generate: %g, view modified: %g" bDidGenerateCalendar bIsCalendarViewModified
+		Call GenerateCalendarTilesUDF
+		let bDidGenerateCalendar := 1
+	else
+		;Call PulseSelectedDateTileUDF
 	endif
 
-	; Calendar View (Summary Text)
+	; Summary Text
 
-	if eval (iViewMode == 1) && (bIsCalendarSummaryModified)
-		PrintC "Updating calendar summary text. View mode: %g, summary modified: %g" iViewMode bIsCalendarSummaryModified
+	if eval bIsCalendarSummaryModified || bIsCalendarSelectionModified || bIsCalendarViewModified
+		string_var sSummaryDate = ""
+
+		if eval (Sv_Length sHoveredCalendarDate) > 0
+			let sSummaryDate := Sv_Construct "%z" sHoveredCalendarDate
+		elseif eval (Sv_Length sSelectedCalendarDate) > 0
+			let sSummaryDate := Sv_Construct "%z" sSelectedCalendarDate
+		endif
+
+		Call UpdateSelectedDaySummaryUDF sSummaryDate
+
+		Sv_Destruct sCalendarDateSummary, sSummaryDate
+		let sCalendarDateSummary := Player.AuxiliaryVariableGetString "*PLC_sCalendarDateSummary"
+		let bIsCalendarSummaryModified := 1
+	endif
+
+	if bIsCalendarSummaryModified
+		PrintC "Updating calendar summary text. Summary modified: %g" bIsCalendarSummaryModified
 
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_current_value" 0
 
@@ -127,10 +82,10 @@ begin function {}
 		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 0
 	endif
 
-	; Calendar View (Selection)
+	; Selection
 
-	if eval (iViewMode == 1) && (bIsCalendarSelectionModified) && (bDidGenerateCalendar)
-		PrintC "Updating calendar selection. View mode: %g, selection modified: %g, did generate: %g" iViewMode bIsCalendarSelectionModified bDidGenerateCalendar
+	if eval (bIsCalendarSelectionModified) && (bDidGenerateCalendar)
+		PrintC "Updating calendar selection. Selection modified: %g, did generate: %g" bIsCalendarSelectionModified bDidGenerateCalendar
 
 		if eval (Sv_Length sPreviousSelectedCalendarDate) > 0
 			string_var sOldTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sPreviousSelectedCalendarDate
@@ -165,6 +120,6 @@ begin function {}
 
 	; Clean-Up
 
-	Sv_Destruct sCalendarDateSummary, sPreviousSelectedCalendarDate, sSelectedCalendarDate
+	Sv_Destruct sCalendarDateSummary, sPreviousSelectedCalendarDate, sSelectedCalendarDate, sHoveredCalendarDate
 
 end

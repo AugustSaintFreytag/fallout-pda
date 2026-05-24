@@ -1,0 +1,55 @@
+begin function {}
+
+	; Rebuilds the journal list UI from decoded player journal entries.
+
+	; UDFs
+
+	ref AddJournalEntriesToListUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntriesToList.gek"
+	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
+
+	; State
+
+	short bSort = Player.AuxiliaryVariableGetFloat "PLC_bSort"
+
+	; Add Tile
+
+	UnloadUIComponent "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect"
+	AddTileFromTemplate "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect|CM_JournalEntryRect_Template|CM_JournalEntryRect"
+	
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/_templateheight" 0
+
+	; Add Entries
+
+	array_var aJournalEntries = Call GetJournalEntriesUDF
+	short iNumJournalEntries = Ar_Size aJournalEntries
+
+	if iNumJournalEntries == -1
+		let iNumJournalEntries := 0
+	endif
+
+	array_var aDisplayedJournalEntryIds = Ar_Construct "array"
+
+	Call AddJournalEntriesToListUDF aJournalEntries bSort aDisplayedJournalEntryIds
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/visible" 1
+
+	; Store for Interaction
+
+	Player.AuxiliaryVariableSetFloat "PLC_iNumJournalEntries" iNumJournalEntries
+
+	if eval (Ar_Size aDisplayedJournalEntryIds) > 0
+		Player.AuxiliaryVariableSetFromArray "*PLC_aDisplayedJournalEntryIds" aDisplayedJournalEntryIds
+	else
+		Player.AuxiliaryVariableErase "*PLC_aDisplayedJournalEntryIds"
+	endif
+
+	; Conclude
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 0
+
+	; Clean-Up
+
+	let aJournalEntries := Ar_Null
+	let aDisplayedJournalEntryIds := Ar_Null
+
+end

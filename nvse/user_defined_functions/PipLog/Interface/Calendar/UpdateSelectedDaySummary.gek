@@ -6,7 +6,7 @@ begin function { string_var sDate }
 
 	; UDFs
 
-	ref GetCalendarSummaryStringUDF = CompileScript "PipLog\Main\GetCalendarSummaryString.gek"
+	ref GetCalendarSummaryStringUDF = CompileScript "PipLog\Calendar\GetCalendarSummaryString.gek"
 
 	; Main
 

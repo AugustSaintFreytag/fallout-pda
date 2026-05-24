@@ -1,0 +1,89 @@
+begin function { short iMenuId, short iTileId, string_var sTileName }
+
+	; Handles event-list tile clicks by updating selected event view-model state.
+
+	; UDFs
+
+	ref GetEventByIdUDF = CompileScript "PipLog\Event\GetEventById.gek"
+	ref GetEventListIndexFromTileNameUDF = CompileScript "PipLog\Interface\Event\GetEventListIndexFromTileName.gek"
+
+	; Main
+
+	PrintC "Handling click on event tile %z (%g)." sTileName iTileId
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		PrintC "Cannot select event tile, incompatible menu mode (top-most: %g, expected: 1023)." (GetActiveMenuMode)
+		return
+	endif
+
+	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
+
+	if iViewMode != 2
+		PrintC "Cannot select event tile, incompatible view mode %g (expected: 2)." iViewMode
+		return
+	endif
+
+	; State
+
+	short iTileIndex = Call GetEventListIndexFromTileNameUDF sTileName
+
+	array_var aEventIds = Player.AuxiliaryVariableGetAsArray "*PLC_aDisplayedEventIds"
+
+	if eval (Ar_Size aEventIds) <= iTileIndex
+		PrintC "Could not resolve event id for index %g via selected event tile '%z'." iTileIndex sTileName
+		let aEventIds := Ar_Null
+
+		return
+	endif
+
+	string_var sEventId = aEventIds[iTileIndex]
+	let aEventIds := Ar_Null
+
+	array_var aEvent = Call GetEventByIdUDF sEventId
+
+	if eval (aEvent == Ar_Null)
+		PrintC "Could not get event for resolved id '%z' via selected event tile '%z'." sEventId sTileName
+
+		Sv_Destruct sEventId
+		let aEventIds := Ar_Null
+
+		return
+	endif
+
+	string_var sSelectedEventId = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventId"
+	string_var sSelectedTileName = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventTileName"
+
+	; Main
+
+	Player.AuxiliaryVariableSetString "*PLC_sPreviousSelectedEventTileName" ($sSelectedTileName)
+
+	if eval (sEventId == sSelectedEventId) && ((Sv_Length sEventId) > 0)
+		; Already active event was clicked, deselect.
+
+		PrintC "Deselected event '%z', id '%z' via selected event tile (%z)." (aEvent["name"]) sEventId sTileName
+		Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
+		Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
+	else
+		; Event was clicked, select.
+		PrintC "Selected event '%z', id '%z' via selected event tile (%z)." (aEvent["name"]) sEventId sTileName
+		Player.AuxiliaryVariableSetString "*PLC_sSelectedEventId" ($sEventId)
+		Player.AuxiliaryVariableSetString "*PLC_sSelectedEventTileName" ($sTileName)
+		; Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" (iEventSourceKind == 1)
+
+		; Currently unknowable whether an event is system or player.
+		; Could store as flags with event and read as necessary.
+		; Could provide an interim "GetEventSourceById" where it is checked which aux var string maps contains the event.
+	endif
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+
+	; Clean-Up
+
+	let aEvent := Ar_Null
+
+	Sv_Destruct sEventId, sSelectedEventId, sSelectedTileName
+
+end

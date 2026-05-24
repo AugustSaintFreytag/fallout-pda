@@ -1,0 +1,45 @@
+begin function { array_var aJournalEntries, short bSort, array_var aDisplayedJournalEntryIds }
+
+	; Adds all journal-list rows and records their displayed IDs.
+	; bSort == 0 displays oldest-first; bSort == 1 displays newest-first.
+	; Returns the number of rows added.
+
+	; UDFs
+
+	ref AddJournalEntryToListUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntryToList.gek"
+
+	; State
+
+	short iTileIndex = 0
+	short iNumJournalEntries = Ar_Size aJournalEntries
+
+	; Main
+
+	if iNumJournalEntries == -1
+		SetFunctionValue 0
+		return
+	endif
+
+	while iTileIndex < iNumJournalEntries
+		short iStorageIndex = iTileIndex
+
+		if bSort == 1
+			let iStorageIndex := (iNumJournalEntries - 1) - iTileIndex
+		endif
+
+		array_var aJournalEntry = aJournalEntries[iStorageIndex]
+
+		Call AddJournalEntryToListUDF aJournalEntry iTileIndex
+
+		string_var sJournalEntryId = aJournalEntry["id"]
+
+		Ar_Append aDisplayedJournalEntryIds, sJournalEntryId
+
+		Sv_Destruct sJournalEntryId
+		let aJournalEntry := Ar_Null
+		let iTileIndex += 1
+	loop
+
+	SetFunctionValue iTileIndex
+
+end

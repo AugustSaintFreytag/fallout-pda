@@ -21,7 +21,11 @@ begin function { string_var sDate, short iState }
 		endif
 	endif
 
-	Player.AuxStringMapArraySetFromArray "PLC_aPlayerReminders" aPlayerReminders
+	if eval (Ar_Size aPlayerReminders) > 0
+		Player.AuxStringMapArraySetFromArray "PLC_aPlayerReminders" aPlayerReminders
+	else
+		Player.AuxiliaryVariableErase "PLC_aPlayerReminders"
+	endif
 
 	; Clean-Up
 

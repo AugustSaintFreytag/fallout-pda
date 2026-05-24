@@ -1,0 +1,19 @@
+begin function { string_var sTilePath }
+
+	; Main
+
+	string_var sPath = Sv_Construct "%z" sTilePath
+
+	Sv_Replace "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry|" sPath
+	Sv_Replace "/CM_JournalEntry/EntryDelete|" sPath
+
+	short iIndex = #(sPath)
+	SetFunctionValue iIndex
+
+	;PrintC "Resolved journal entry index %g from remove button path '%z'." iIndex sPath
+
+	; Clean-Up
+
+	Sv_Destruct sPath
+
+end

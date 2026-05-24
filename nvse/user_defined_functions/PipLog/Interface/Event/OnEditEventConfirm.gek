@@ -1,0 +1,36 @@
+begin function { string_var sEventTitle }
+
+	; Applies a renamed event title to the selected player event.
+
+	if eval (Sv_Length sEventTitle) == 0
+		return
+	endif
+
+	; UDFs
+
+	ref SetEventNameUDF = CompileScript "PipLog\Event\SetEventName.gek"
+
+	; State
+
+	string_var sSelectedEventId = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventId"
+
+	; Main
+
+	if eval (Sv_Length sSelectedEventId) == 0
+		Sv_Destruct sSelectedEventId
+		return
+	endif
+
+	Call SetEventNameUDF sSelectedEventId sEventTitle
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
+
+	; Clean-Up
+
+	Sv_Destruct sSelectedEventId
+
+end

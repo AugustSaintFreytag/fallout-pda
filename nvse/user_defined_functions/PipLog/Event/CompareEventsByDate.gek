@@ -1,0 +1,40 @@
+begin function { array_var aLeft, array_var aRight }
+
+	; Ar_CustomSort comparator for event stringmaps by storage date, then name.
+	; Returns true when left should sort before right.
+
+	; State
+
+	array_var aLeftEvent = aLeft[0]
+	array_var aRightEvent = aRight[0]
+
+	; Main
+
+	if eval ((Ar_Size aLeftEvent) == -1) || ((Ar_Size aRightEvent) == -1)
+		let aLeftEvent := Ar_Null
+		let aRightEvent := Ar_Null
+
+		SetFunctionValue 0
+		return
+	endif
+
+	string_var sLeftDate = aLeftEvent["date"]
+	string_var sRightDate = aRightEvent["date"]
+	string_var sLeftName = aLeftEvent["name"]
+	string_var sRightName = aRightEvent["name"]
+
+	if eval sLeftDate < sRightDate
+		SetFunctionValue 1
+	elseif eval (sLeftDate == sRightDate) && (sLeftName < sRightName)
+		SetFunctionValue 1
+	else
+		SetFunctionValue 0
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sLeftDate, sRightDate, sLeftName, sRightName
+	let aLeftEvent := Ar_Null
+	let aRightEvent := Ar_Null
+
+end

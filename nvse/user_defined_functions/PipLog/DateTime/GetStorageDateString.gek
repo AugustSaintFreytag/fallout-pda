@@ -1,15 +1,25 @@
 begin function { short iYear, short iMonth, short iDay }
 
-	; Returns a zero-padded YYYY-MM-DD date string for use as a storage key.
+	; Returns a zero-padded date string intended for storage.
 	; iMonth is 0-indexed; output month is 1-indexed.
-	; Delegates to GetDateString with "-" as the delimiter.
+	; Example: GetDateString 2277 0 20 "-" -> "2277-01-20"
 
 	; UDFs
 
-	ref GetDateStringUDF = CompileScript "PipLog\DateTime\GetDateString.gek"
+	ref GetPaddedIntUDF = CompileScript "PipLog\Utils\GetPaddedInt.gek"
 
-	; Main
+	; Formatting
 
-	SetFunctionValue (Call GetDateStringUDF iYear iMonth iDay "-")
+	string_var sYear = Call GetPaddedIntUDF iYear 2
+	string_var sMonth = Call GetPaddedIntUDF (iMonth + 1) 2
+	string_var sDay = Call GetPaddedIntUDF iDay 2
+
+	string_var sResult = Sv_Construct "%z-%z-%z" sYear sMonth sDay
+	
+	SetFunctionValue sResult
+
+	; Clean-Up
+
+	Sv_Destruct sYear, sMonth, sDay
 
 end

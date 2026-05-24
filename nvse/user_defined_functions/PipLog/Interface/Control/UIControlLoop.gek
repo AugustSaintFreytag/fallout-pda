@@ -1,0 +1,90 @@
+begin function {}
+
+	; Single source of truth for MapMenu XML state.
+	; Event handlers update the Pip-Log view model; this loop applies it to UI tiles.
+	; View mode: 0 = None, 1 = calendar view, 2 = events view, 3 = journal view.
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		return
+	endif
+
+	; UDFs
+
+	ref UIControlLoopCalendarUDF = CompileScript "PipLog\Interface\Control\UIControlLoopCalendar.gek"
+	ref UIControlLoopEventsUDF = CompileScript "PipLog\Interface\Control\UIControlLoopEvents.gek"
+	ref UIControlLoopJournalUDF = CompileScript "PipLog\Interface\Control\UIControlLoopJournal.gek"
+
+	; Core State
+
+	short iFrame = Player.AuxiliaryVariableGetFloat "*PLC_iFrame"
+	short iSelectedTab = GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab"
+	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
+	short bIsLogOpen = Player.AuxiliaryVariableGetFloat "*PLC_bIsLogOpen"
+	short iIntervalKind = Player.AuxiliaryVariableGetFloat "*PLC_iIntervalKind"
+
+	; Frame
+
+	let iFrame += 1
+	Player.AuxiliaryVariableSetFloat "*PLC_iFrame" iFrame
+
+	; Main
+
+	if eval (iSelectedTab != 3)
+		let iViewMode := 0
+		Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
+	endif
+
+	if eval (iViewMode < 0) || (iViewMode > 3)
+		let iViewMode := 0
+		Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
+	endif
+
+	if eval (iIntervalKind < 0) || (iIntervalKind > 2)
+		let iIntervalKind := 0
+		Player.AuxiliaryVariableSetFloat "*PLC_iIntervalKind" 0
+	endif
+
+	; General Visibility
+
+	if eval (iViewMode > 0) && (!bIsLogOpen)
+		PrintC "View mode is %g, opening log view." iViewMode
+
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsLogOpen" 1
+
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/visible" 0
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonA/target" 0
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonX/target" 0
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonY/target" 0
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled" 1
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/string" "Notes"
+	elseif eval (iViewMode == 0) && (bIsLogOpen)
+		PrintC "View mode is %g, closing log view." iViewMode
+
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsLogOpen" 0
+
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/visible" 1
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonA/target" 1
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonX/target" 1
+		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonY/target" 1
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled" 0
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/string" "Log"
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_toggled" 0
+	endif
+
+	; View Dispatch
+
+	if iViewMode == 1
+		Call UIControlLoopCalendarUDF
+	elseif iViewMode == 2
+		Call UIControlLoopEventsUDF
+	elseif iViewMode == 3
+		Call UIControlLoopJournalUDF
+	else
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 0
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
+	endif
+
+end

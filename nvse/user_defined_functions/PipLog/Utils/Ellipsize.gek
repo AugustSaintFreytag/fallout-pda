@@ -1,0 +1,38 @@
+begin function { string_var sInput, short iMaxLength }
+
+	; Returns sInput truncated to iMaxLength with "..." when needed.
+
+	; State
+
+	string_var sResult = ""
+
+	; Main
+
+	if iMaxLength <= 0
+		SetFunctionValue sResult
+		return
+	endif
+
+	if eval (Sv_Length sInput) <= iMaxLength
+		let sResult := Sv_Construct "%z" sInput
+		SetFunctionValue sResult
+		return
+	endif
+
+	if iMaxLength <= 3
+		let sResult := sInput[0:iMaxLength]
+		SetFunctionValue sResult
+		return
+	endif
+
+	short iSliceLength = iMaxLength - 3
+	string_var sPrefix = sInput[0:iSliceLength]
+	let sResult := Sv_Construct "%z..." sPrefix
+
+	SetFunctionValue sResult
+
+	; Clean-Up
+
+	Sv_Destruct sPrefix
+
+end

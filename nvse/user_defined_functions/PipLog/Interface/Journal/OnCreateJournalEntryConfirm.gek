@@ -1,0 +1,20 @@
+begin function { string_var sJournalEntryText }
+
+	; Creates a journal entry from text input and marks the journal list dirty.
+	; AppendJournalEntry owns the storage details and compatibility dirty flags.
+
+	; Guards
+
+	if eval (Sv_Length sJournalEntryText) == 0
+		return
+	endif
+
+	; UDFs
+
+	ref AppendJournalEntryUDF = CompileScript "PipLog\Journal\AppendJournalEntry.gek"
+
+	; Main
+
+	Call AppendJournalEntryUDF sJournalEntryText
+
+end

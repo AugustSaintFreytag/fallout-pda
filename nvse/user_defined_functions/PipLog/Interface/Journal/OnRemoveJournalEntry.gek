@@ -1,36 +1,56 @@
-begin function { short iMenuID, short iTileID, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileName }
 
-	; Click callback (MapMenu#521).
-	; Parses the active UI component path to determine which entry was clicked,
-	; corrects for sort direction, then delegates to the data-layer delete helper.
-
-	Sv_Destruct sTileParam
+	; Deletes the clicked displayed journal entry.
 
 	; UDFs
 
-	ref DeleteJournalEntryUDF = CompileScript "PipLog\Journal\DeleteJournalEntry.gek"
+	ref RemoveJournalEntryUDF = CompileScript "PipLog\Journal\RemoveJournalEntry.gek"
+	ref GetDisplayedJournalEntryForIndexUDF = CompileScript "PipLog\Interface\Journal\GetDisplayedJournalEntryForIndex.gek"
+	ref GetJournalEntryIndexFromRemoveButtonPathUDF = CompileScript "PipLog\Interface\Journal\GetJournalEntryIndexFromRemoveButtonPath.gek"
+	ref EllipsizeUDF = CompileScript "PipLog\Utils\Ellipsize.gek"
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		PrintC "Cannot delete journal entry, incompatible menu mode %g (expected: 1023)." (GetActiveMenuMode)
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 3
+		PrintC "Cannot delete journal entry, incompatible view mode %g (expected: 3)." (Player.AuxiliaryVariableGetFloat "*PLC_iViewMode")
+		return
+	endif
 
 	; State
 
-	short iNumJournalEntries = Player.AuxiliaryVariableGetFloat "PLC_iNumJournalEntries"
-	short bSort = Player.AuxiliaryVariableGetFloat "PLC_bSort"
+	string_var sActiveComponentPath = GetActiveUIComponentFullName
+	string_var sCompPreview = (Call EllipsizeUDF sActiveComponentPath 36)
+	short iIndex = Call GetJournalEntryIndexFromRemoveButtonPathUDF sActiveComponentPath
 
-	; Main — parse active component path to extract entry display index
+	PrintC "Received click on journal entry delete button, name '%z', id '%g', path '%z'." sTileName iTileId sCompPreview
 
-	string_var sComponent = GetActiveUIComponentFullName
-	Sv_Replace "/CM_JournalEntry/EntryEdit|", sComponent
-	Sv_Replace "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry|", sComponent
-	
-	short iEntryIndex = #sComponent
-	Sv_Destruct sComponent
+	array_var aJournalEntry = (Call GetDisplayedJournalEntryForIndexUDF iIndex)
 
-	; Invert display index to storage index when sorted newest-first
-	if bSort == 1
-		let iEntryIndex := (iNumJournalEntries - 1) - iEntryIndex
+	; Main
+
+	if eval (aJournalEntry == Ar_Null) || ((Ar_Size aJournalEntry) == -1)
+		PrintC "Cannot remove journal entry, could not resolve displayed index %g from '%z'." iIndex sActiveComponentPath
+
+		Sv_Destruct sActiveComponentPath, sCompPreview
+		let aJournalEntry := Ar_Null
+
+		return
 	endif
 
-	Call DeleteJournalEntryUDF iEntryIndex
+	string_var sJournalEntryId = aJournalEntry["id"]
 
-	Player.AuxiliaryVariableSetFloat "*PLC_bShouldUpdateJournalUI" 1
+	Call RemoveJournalEntryUDF sJournalEntryId
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
+
+	; Clean-Up
+
+	Sv_Destruct sActiveComponentPath, sCompPreview, sJournalEntryId
+	let aJournalEntry := Ar_Null
 
 end

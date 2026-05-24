@@ -1,0 +1,106 @@
+begin function { array_var aEvents, short bIsPlayerEvent }
+
+	; Encodes multiple system or player events and adds them to persistent storage.
+	; Pass bIsPlayerEvent = 1 for player-created events, 0 for global/mod events.
+
+	if eval (Ar_Size aEvents) == -1
+		PrintC "Cannot add events, event list is null."
+		return
+	endif
+
+	; UDFs
+
+	ref EncodeEventToStringUDF = CompileScript "PipLog\Event\EncodeEventToString.gek"
+	ref AppendEventIdToListUDF = CompileScript "PipLog\Event\AppendEventIdToList.gek"
+
+	; State
+
+	string_var sKeyById = "*PLC_aGlobalEventsById"
+	string_var sKeyByDate = "*PLC_aGlobalEventsByDate"
+
+	if eval bIsPlayerEvent
+		let sKeyById := "PLC_aPlayerEventsById"
+		let sKeyByDate := "PLC_aPlayerEventsByDate"
+	endif
+
+	; Storage Read (Events by Id)
+
+	array_var aStoredEventsById = Player.AuxStringMapArrayGetAsArray ($sKeyById)
+
+	if eval (Ar_Size aStoredEventsById) == -1
+		let aStoredEventsById := Ar_Construct "stringmap"
+	endif
+
+	; Storage Read (Event Ids by Date)
+
+	array_var aStoredEventIdsByDate = Player.AuxStringMapArrayGetAsArray ($sKeyByDate)
+
+	if eval (Ar_Size aStoredEventIdsByDate) == -1
+		let aStoredEventIdsByDate := Ar_Construct "stringmap"
+	endif
+
+	; Iterate
+
+	foreach array_var aElement <- aEvents
+		array_var aEvent = aElement["value"]
+
+		if eval (Ar_Size aEvent) == -1
+			PrintC "Skipping invalid event entry while adding events."
+			let aEvent := Ar_Null
+			continue
+		endif
+
+		string_var sEventId = aEvent["id"]
+		string_var sEventDate = aEvent["date"]
+		string_var sEncodedEvent = (Call EncodeEventToStringUDF aEvent)
+
+		if eval (Sv_Length sEventId) == 0
+			PrintC "Skipping event with missing id."
+			Sv_Destruct sEventId, sEventDate, sEncodedEvent
+			let aEvent := Ar_Null
+			continue
+		endif
+
+		if eval (Sv_Length sEventDate) == 0
+			PrintC "Skipping event '%z' with missing date." sEventId
+			Sv_Destruct sEventId, sEventDate, sEncodedEvent
+			let aEvent := Ar_Null
+			continue
+		endif
+
+		if eval (Sv_Length sEncodedEvent) == 0
+			PrintC "Skipping event '%z' because it could not be encoded." sEventId
+			Sv_Destruct sEventId, sEventDate, sEncodedEvent
+			let aEvent := Ar_Null
+			continue
+		endif
+
+		let aStoredEventsById[sEventId] := sEncodedEvent
+
+		string_var sCurrentIds = ""
+
+		if eval (Ar_HasKey aStoredEventIdsByDate, sEventDate)
+			let sCurrentIds := aStoredEventIdsByDate[sEventDate]
+		endif
+
+		string_var sUpdatedIds = (Call AppendEventIdToListUDF sCurrentIds sEventId)
+
+		let aStoredEventIdsByDate[sEventDate] := sUpdatedIds
+
+		Sv_Destruct sEventId, sEventDate, sEncodedEvent, sCurrentIds, sUpdatedIds
+		let aEvent := Ar_Null
+	loop
+
+	; Commit
+
+	Player.AuxStringMapArraySetFromArray ($sKeyById) aStoredEventsById
+	Player.AuxStringMapArraySetFromArray ($sKeyByDate) aStoredEventIdsByDate
+
+	; Clean-Up
+
+	Sv_Destruct sKeyById, sKeyByDate
+
+	let aStoredEventsById := Ar_Null
+	let aStoredEventIdsByDate := Ar_Null
+
+end

@@ -1,0 +1,14 @@
+begin function { short iValue, short iLength }
+
+	; Returns iValue as a zero-padded string with at least iLength characters.
+	; Example: GetPaddedInt 1 2 -> "01"
+
+	string_var sResult = $iValue
+
+	while (Sv_Length sResult) < iLength
+		let sResult := "0" + sResult
+	loop
+
+	SetFunctionValue sResult
+
+end
