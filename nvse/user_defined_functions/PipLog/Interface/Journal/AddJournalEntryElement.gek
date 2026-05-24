@@ -1,4 +1,4 @@
-begin function { short iEntryIndex }
+begin function { short iEntryIndex, float fEntryHeight }
 
 	; Positions a journal entry's UI row at the correct vertical offset by measuring
 	; the cumulative height of all preceding entries, then updates the scroll template height.
@@ -21,8 +21,8 @@ begin function { short iEntryIndex }
 	string_var sEntryHeightPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/height" iEntryIndex
 
 	SetUIFloatAlt ($sEntryYPath) fEntryY
+	SetUIFloatAlt ($sEntryHeightPath) fEntryHeight
 
-	float fEntryHeight = GetUIFloatAlt ($sEntryHeightPath)
 	float fScrollTemplateHeight = fEntryHeight + fEntryY + 64
 
 	;PrintC "Journal entry %g: height %.2f, total scroll height %.2f." iEntryIndex fEntryHeight fScrollTemplateHeight
