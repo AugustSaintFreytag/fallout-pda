@@ -6,6 +6,7 @@ begin function { array_var aJournalEntry, short iIndex }
 	; UDFs
 
 	ref EncodeJournalEntryToStringUDF = CompileScript "PipLog\Journal\EncodeJournalEntryToString.gek"
+	ref UpdateJournalEntryIndexUDF = CompileScript "PipLog\Journal\UpdateJournalEntryIndex.gek"
 
 	; State
 
@@ -25,7 +26,11 @@ begin function { array_var aJournalEntry, short iIndex }
 		let aEncodedEntries[iIndex] := sEncodedEntry
 	endif
 
+	; Store
+
 	Player.AuxiliaryVariableSetFromArray "PLC_aPlayerJournal" aEncodedEntries
+
+	Call UpdateJournalEntryIndexUDF
 
 	; Clean-Up
 

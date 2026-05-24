@@ -2,7 +2,6 @@ begin function { string_var sText }
 
 	; Captures the current datetime and player location, builds a journal entry,
 	; and appends it to persistent storage.
-	; Registered as the handler for the "SD_AddJournalEntry" modder event.
 
 	; UDFs
 

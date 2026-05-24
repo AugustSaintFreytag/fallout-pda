@@ -7,7 +7,6 @@ begin function {}
 
 	; UDFs
 
-	ref GetRandomIdUDF = CompileScript "PipLog\Utility\GetRandomId.gek"
 	ref DecodeJournalEntryFromStringUDF = CompileScript "PipLog\Journal\DecodeJournalEntryFromString.gek"
 
 	; State

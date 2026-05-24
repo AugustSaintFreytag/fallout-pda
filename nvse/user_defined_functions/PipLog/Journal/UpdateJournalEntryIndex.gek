@@ -1,0 +1,31 @@
+begin function {}
+
+	; UDFs
+
+	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
+	ref DecodeJournalEntryFromStringUDF = CompileScript "PipLog\Journal\DecodeJournalEntryFromString.gek"
+
+	; Main
+
+	array_var aJournalEntries = Call GetJournalEntriesUDF
+	array_var aJournalEntryIndexById = Sv_Construct "stringmap"
+
+	foreach array_var aElement <- aJournalEntries
+		short iIndex = aElement["key"]
+		array_var aJournalEntry = aElement["value"]
+		string_var sJournalEntryId = aJournalEntry["id"]
+
+		let aJournalEntryIndexById[sJournalEntryId] := iIndex
+
+		Sv_Destruct sJournalEntryId
+		let aJournalEntry := Ar_Null
+	loop
+
+	Player.AuxStringMapArraySetFromArray "PLC_aPlayerJournalIndex" aJournalEntryIndexById
+
+	; Clean-Up
+
+	let aJournalEntries := Ar_Null
+	let aJournalEntryIndexById := Ar_Null
+
+end
