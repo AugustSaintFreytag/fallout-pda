@@ -1,4 +1,4 @@
-begin function { array_var aJournalEntry, short iTileIndex, short iStorageIndex }
+begin function { array_var aJournalEntry, short iTileIndex }
 
 	; Adds a single journal-list row for a decoded journal entry.
 
@@ -37,23 +37,32 @@ begin function { array_var aJournalEntry, short iTileIndex, short iStorageIndex 
 	let sTilePropertyPath := Sv_Construct "%z/_entry" sTileBasePath
 	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryText)
 
-	let sTilePropertyPath := Sv_Construct "%z/CM_JournalText/height" sTileBasePath
-	SetUIFloatAlt ($sTilePropertyPath) fTextHeight
-
 	let sTilePropertyPath := Sv_Construct "%z/_location" sTileBasePath
 	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryLocation)
 
 	let sTilePropertyPath := Sv_Construct "%z/_time" sTileBasePath
 	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryDatetime)
 
+	let sTilePropertyPath := Sv_Construct "%z/timestamp/string" sTileBasePath
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryDatetime)
+
+	let sTilePropertyPath := Sv_Construct "%z/location/string" sTileBasePath
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryLocation)
+
+	let sTilePropertyPath := Sv_Construct "%z/CM_JournalText/string" sTileBasePath
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryText)
+
+	let sTilePropertyPath := Sv_Construct "%z/CM_JournalText/height" sTileBasePath
+	SetUIFloatAlt ($sTilePropertyPath) fTextHeight
+
 	let sTilePropertyPath := Sv_Construct "%z/user0" sTileBasePath
-	SetUIFloatAlt ($sTilePropertyPath) iStorageIndex
+	SetUIFloatAlt ($sTilePropertyPath) iTileIndex
 
 	let sTilePropertyPath := Sv_Construct "%z/EntryEdit/user0" sTileBasePath
-	SetUIFloatAlt ($sTilePropertyPath) iStorageIndex
+	SetUIFloatAlt ($sTilePropertyPath) iTileIndex
 
 	let sTilePropertyPath := Sv_Construct "%z/EntryDelete/user0" sTileBasePath
-	SetUIFloatAlt ($sTilePropertyPath) iStorageIndex
+	SetUIFloatAlt ($sTilePropertyPath) iTileIndex
 
 	Call AddJournalEntryElementUDF iTileIndex fEntryHeight
 

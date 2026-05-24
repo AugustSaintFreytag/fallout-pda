@@ -1,6 +1,6 @@
-begin function { array_var aJournalEntries, short bSort, array_var aDisplayedJournalEntryIds, array_var aDisplayedJournalEntryIndices }
+begin function { array_var aJournalEntries, short bSort, array_var aDisplayedJournalEntryIds }
 
-	; Adds all journal-list rows and records their displayed-to-storage mapping.
+	; Adds all journal-list rows and records their displayed IDs.
 	; bSort == 0 displays oldest-first; bSort == 1 displays newest-first.
 	; Returns the number of rows added.
 
@@ -29,12 +29,11 @@ begin function { array_var aJournalEntries, short bSort, array_var aDisplayedJou
 
 		array_var aJournalEntry = aJournalEntries[iStorageIndex]
 
-		Call AddJournalEntryToListUDF aJournalEntry iTileIndex iStorageIndex
+		Call AddJournalEntryToListUDF aJournalEntry iTileIndex
 
 		string_var sJournalEntryId = aJournalEntry["id"]
 
 		Ar_Append aDisplayedJournalEntryIds, sJournalEntryId
-		Ar_Append aDisplayedJournalEntryIndices, iStorageIndex
 
 		Sv_Destruct sJournalEntryId
 		let aJournalEntry := Ar_Null

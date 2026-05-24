@@ -28,9 +28,8 @@ begin function {}
 	endif
 
 	array_var aDisplayedJournalEntryIds = Ar_Construct "array"
-	array_var aDisplayedJournalEntryIndices = Ar_Construct "array"
 
-	Call AddJournalEntriesToListUDF aJournalEntries bSort aDisplayedJournalEntryIds aDisplayedJournalEntryIndices
+	Call AddJournalEntriesToListUDF aJournalEntries bSort aDisplayedJournalEntryIds
 
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/visible" 1
 
@@ -38,7 +37,6 @@ begin function {}
 
 	Player.AuxiliaryVariableSetFloat "PLC_iNumJournalEntries" iNumJournalEntries
 	Player.AuxiliaryVariableSetFromArray "*PLC_aDisplayedJournalEntryIds" aDisplayedJournalEntryIds
-	Player.AuxiliaryVariableSetFromArray "*PLC_aDisplayedJournalEntryIndices" aDisplayedJournalEntryIndices
 
 	; Conclude
 
@@ -48,6 +46,5 @@ begin function {}
 
 	let aJournalEntries := Ar_Null
 	let aDisplayedJournalEntryIds := Ar_Null
-	let aDisplayedJournalEntryIndices := Ar_Null
 
 end
