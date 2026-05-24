@@ -4,7 +4,6 @@ begin function { string_var sId }
 
 	; UDFs
 
-	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
 	ref GetJournalEntryIndexUDF = CompileScript "PipLog\Journal\GetJournalEntryIndex.gek"
 	ref UpdateJournalEntryIndexUDF = CompileScript "PipLog\Journal\UpdateJournalEntryIndex.gek"
 
@@ -22,21 +21,25 @@ begin function { string_var sId }
 		return
 	endif
 
-	array_var aJournalEntries = Call GetJournalEntriesUDF
+	array_var aEncodedEntries = Player.AuxiliaryVariableGetAsArray "PLC_aPlayerJournal"
 
 	; Erase
 
-	Ar_Erase aJournalEntries, iIndex
+	Ar_Erase aEncodedEntries, iIndex
 	PrintC "Removed journal entry with id '%z' at index %g." sId iIndex
 
 	; Store
 
-	Player.AuxiliaryVariableSetFromArray "PLC_aPlayerJournal" aJournalEntries
+	if eval (Ar_Size aEncodedEntries) > 0
+		Player.AuxiliaryVariableSetFromArray "PLC_aPlayerJournal" aEncodedEntries
+	else
+		Player.AuxiliaryVariableErase "PLC_aPlayerJournal"
+	endif
 	
 	Call UpdateJournalEntryIndexUDF
 
 	; Clean-Up
 
-	let aJournalEntries := Ar_Null
+	let aEncodedEntries := Ar_Null
 
 end
