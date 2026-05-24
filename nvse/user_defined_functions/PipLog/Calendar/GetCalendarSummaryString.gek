@@ -55,7 +55,7 @@ begin function { string_var sDate }
 
 			let sResult += $sEventName
 			let sResult += "%r"
-			
+
 			Sv_Destruct sEventName
 		loop
 	endif
