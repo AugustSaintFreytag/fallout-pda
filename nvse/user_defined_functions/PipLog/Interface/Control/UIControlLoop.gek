@@ -41,16 +41,24 @@ begin function {}
 		Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
 	endif
 
-	if eval (iIntervalKind < 0) || (iIntervalKind > 2)
+	if eval (iIntervalKind < 0) || (iIntervalKind > 3)
 		let iIntervalKind := 0
 		Player.AuxiliaryVariableSetFloat "*PLC_iIntervalKind" 0
+	endif
+
+	; General Button State
+
+	if iViewMode > 0
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/string" "Notes"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/ySIImage/filename" "interface\icons\Misc_Note.dds"
+	else
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/string" "Organizer"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/ySIImage/filename" "interface\icons\Misc_Calendar.dds"
 	endif
 
 	; General Visibility
 
 	if eval (iViewMode > 0) && (!bIsLogOpen)
-		PrintC "View mode is %g, opening log view." iViewMode
-
 		Player.AuxiliaryVariableSetFloat "*PLC_bIsLogOpen" 1
 
 		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/visible" 0
@@ -58,10 +66,7 @@ begin function {}
 		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonX/target" 0
 		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonY/target" 0
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled" 1
-		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/string" "Notes"
 	elseif eval (iViewMode == 0) && (bIsLogOpen)
-		PrintC "View mode is %g, closing log view." iViewMode
-
 		Player.AuxiliaryVariableSetFloat "*PLC_bIsLogOpen" 0
 
 		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/visible" 1
@@ -69,7 +74,6 @@ begin function {}
 		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonX/target" 1
 		SetUIFloatAlt "MapMenu/GLOW_BRANCH/MM_MainRect/MM_ButtonRect/MM_ButtonY/target" 1
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/_toggled" 0
-		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/string" "Log"
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_toggled" 0
 	endif
 
@@ -84,6 +88,10 @@ begin function {}
 	else
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 0
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Journal"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Journal.dds"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/string" "Events"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/ySIImage/filename" "interface\icons\Misc_Events.dds"
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
 	endif
 

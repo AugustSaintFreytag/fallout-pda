@@ -26,6 +26,11 @@ begin function {}
 
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 0
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_HeadlineRect/CM_Headline_LocationInfo/string" "Calendar"
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Journal"
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Journal.dds"
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/string" "Events"
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/ySIImage/filename" "interface\icons\Misc_Events.dds"
 
 	if eval (Sv_Length sSelectedCalendarDate) > 0
 		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 1
