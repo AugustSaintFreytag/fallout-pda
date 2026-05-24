@@ -50,7 +50,7 @@ begin function {}
 
 	ShowTextInputMenu OnBirthdayInputConfirmUDF 400 150 "Enter your character's birthday (YYYY.MM.DD):"
 	
-	SetTextInputString ($sDefault)
+	SetTextInputString "%z" sDefault
 	SetTextInputExtendedProps 0 0 10 10 3
 
 	; Clean-Up
