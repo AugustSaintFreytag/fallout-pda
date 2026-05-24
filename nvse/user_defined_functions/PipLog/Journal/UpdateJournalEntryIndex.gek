@@ -8,7 +8,7 @@ begin function {}
 	; Main
 
 	array_var aJournalEntries = Call GetJournalEntriesUDF
-	array_var aJournalEntryIndexById = Sv_Construct "stringmap"
+	array_var aJournalEntryIndexById = Ar_Construct "stringmap"
 
 	foreach array_var aElement <- aJournalEntries
 		short iIndex = aElement["key"]
