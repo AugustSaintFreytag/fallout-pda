@@ -8,7 +8,7 @@ begin function {}
 
 	; Main
 
-	float fCurrentTime = GetCurrentDateTimeString
+	float fCurrentTime = GetCurrentTime
 	short iHour = fCurrentTime
 	short iMinute = (fCurrentTime - iHour) * 60
 
