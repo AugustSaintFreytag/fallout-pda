@@ -1,20 +1,44 @@
 begin function { string_var sInput }
 
+	; Writes edited journal text back to the entry selected by OnEditJournalEntry.
+
+	; Guards
+
+	if eval (Sv_Length sInput) == 0
+		return
+	endif
+
 	; UDFs
 
+	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
 	ref SetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
 
-	; Handler
+	; State
 
 	short iEditEntryIndex = Player.AuxiliaryVariableGetFloat "*PLC_iEditEntryIndex"
-	string_var sJournalEntryKey = Sv_Construct "PLC_aJournalEntry%g" iEditEntryIndex
-	array_var aJournalEntry = Player.AuxiliaryVariableGetAsArray ($sJournalEntryKey)
+	array_var aJournalEntries = (Call GetJournalEntriesUDF)
+	short iNumJournalEntries = Ar_Size aJournalEntries
 
-	let aJournalEntry[1] := sInput
+	; Main
+
+	if eval (iNumJournalEntries == -1) || (iEditEntryIndex < 0) || (iEditEntryIndex >= iNumJournalEntries)
+		PrintC "Cannot confirm journal edit, invalid entry index %g." iEditEntryIndex
+
+		let aJournalEntries := Ar_Null
+		return
+	endif
+
+	array_var aJournalEntry = aJournalEntries[iEditEntryIndex]
+
+	let aJournalEntry["text"] := sInput
+
 	Call SetJournalEntryUDF aJournalEntry iEditEntryIndex
+
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
 
-	Sv_Destruct sJournalEntryKey
+	; Clean-Up
+
+	let aJournalEntries := Ar_Null
 	let aJournalEntry := Ar_Null
 
 end

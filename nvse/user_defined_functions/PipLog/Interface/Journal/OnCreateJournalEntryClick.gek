@@ -25,6 +25,6 @@ begin function { short iMenuId, short iTileId, string_var sTileParam }
 
 	; Main
 
-	ShowTextInputMenu OnCreateJournalEntryConfirmUDF 700 500 "Please type your journal entry below:"
+	ShowTextInputMenu OnCreateJournalEntryConfirmUDF 700 500 "New Journal Entry:"
 
 end

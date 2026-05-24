@@ -1,36 +1,57 @@
 begin function { short iMenuId, short iTileId, string_var sTileParam }
 
-	; Click callback (MapMenu#521).
-	; Parses the active UI component path to determine which entry was clicked,
-	; corrects for sort direction, then delegates to the data-layer delete helper.
+	; Deletes the clicked journal entry.
 
-	Sv_Destruct sTileParam
+	; Guards
+
+	if eval !(MenuMode 1023)
+		Sv_Destruct sTileParam
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 3
+		Sv_Destruct sTileParam
+		return
+	endif
 
 	; UDFs
 
 	ref DeleteJournalEntryUDF = CompileScript "PipLog\Journal\DeleteJournalEntry.gek"
+	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
+	ref GetTileIndexFromNameUDF = CompileScript "PipLog\Interface\GetTileIndexFromName.gek"
 
 	; State
 
-	short iNumJournalEntries = Player.AuxiliaryVariableGetFloat "PLC_iNumJournalEntries"
-	short bSort = Player.AuxiliaryVariableGetFloat "PLC_bSort"
-
-	; Main — parse active component path to extract entry display index
-
 	string_var sComponent = GetActiveUIComponentFullName
-	Sv_Replace "/CM_JournalEntry/EntryEdit|", sComponent
-	Sv_Replace "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry|", sComponent
-	
-	short iEntryIndex = #sComponent
-	Sv_Destruct sComponent
+	array_var aJournalEntries = (Call GetJournalEntriesUDF)
+	short iNumJournalEntries = Ar_Size aJournalEntries
+	short iEntryIndex = Call GetTileIndexFromNameUDF sTileParam
 
-	; Invert display index to storage index when sorted newest-first
-	if bSort == 1
-		let iEntryIndex := (iNumJournalEntries - 1) - iEntryIndex
+	; Main
+
+	if eval (Sv_Count "EntryDelete", sComponent) == 0
+		PrintC "Cannot remove journal entry, active component '%z' is not a delete button." sComponent
+
+		Sv_Destruct sComponent, sTileParam
+		let aJournalEntries := Ar_Null
+		return
+	endif
+
+	if eval (iNumJournalEntries == -1) || (iEntryIndex < 0) || (iEntryIndex >= iNumJournalEntries)
+		PrintC "Cannot remove journal entry, could not resolve valid entry index %g from '%z'." iEntryIndex sTileParam
+
+		Sv_Destruct sComponent, sTileParam
+		let aJournalEntries := Ar_Null
+		return
 	endif
 
 	Call DeleteJournalEntryUDF iEntryIndex
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
+
+	; Clean-Up
+
+	Sv_Destruct sComponent, sTileParam
+	let aJournalEntries := Ar_Null
 
 end

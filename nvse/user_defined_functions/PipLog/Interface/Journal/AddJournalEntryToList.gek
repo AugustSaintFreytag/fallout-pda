@@ -49,6 +49,12 @@ begin function { array_var aJournalEntry, short iTileIndex, short iStorageIndex 
 	let sTilePropertyPath := Sv_Construct "%z/user0" sTileBasePath
 	SetUIFloatAlt ($sTilePropertyPath) iStorageIndex
 
+	let sTilePropertyPath := Sv_Construct "%z/EntryEdit/user0" sTileBasePath
+	SetUIFloatAlt ($sTilePropertyPath) iStorageIndex
+
+	let sTilePropertyPath := Sv_Construct "%z/EntryDelete/user0" sTileBasePath
+	SetUIFloatAlt ($sTilePropertyPath) iStorageIndex
+
 	Call AddJournalEntryElementUDF iTileIndex fEntryHeight
 
 	; Clean-Up
