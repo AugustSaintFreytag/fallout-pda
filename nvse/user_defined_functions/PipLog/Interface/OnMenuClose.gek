@@ -42,7 +42,7 @@ begin function { short iMenuId }
 	Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
 	Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
 	Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedEventTileName"
+	Player.AuxiliaryVariableErase "*PLC_sEditJournalEntryId"
 	Player.AuxiliaryVariableErase "*PLC_aDisplayedJournalEntryIds"
-	Player.AuxiliaryVariableErase "*PLC_aDisplayedJournalEntryIndices"
 
 end
