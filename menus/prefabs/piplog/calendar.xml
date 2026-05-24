@@ -69,30 +69,10 @@
 		<text name="CM_Headline_LocationInfo">
 			<font><copy src="MM_Headline_LocationInfo" trait="font"/></font>
 			<justify> &right; </justify>
-			<_title_1>Calendar</_title_1>
-			<_title_2>Journal</_title_2>
-			<_title_3>Yearly Events</_title_3>
-			<_title_4>Monthly Events</_title_4>
-			<_title_5>Weekly Events</_title_5>
-			<_title_6>One-Time Events</_title_6>
-			<_Title>
-				<copy>1</copy>
-				<add src="CM_Button2" trait="_toggled"/>
-				<add>
-					<copy>2</copy>
-					<sub src="CM_Button2" trait="_toggled"/>
-					<onlyif src="CM_Button3" trait="_toggled"/>
-				</add>
-				<add>
-					<copy src="CM_Button2" trait="user0"/>
-					<onlyif src="CM_Button3" trait="_toggled"/>
-				</add>
-				<copy src="me()" trait="_Title_"/>
-			</_Title>
 			
 			<x><copy src="MM_Headline_LocationInfo" trait="x"/></x>
 			<y><copy src="MM_Headline_LocationInfo" trait="y"/></y>
-			<string><copy src="me()" trait="_Title"/></string>
+			<string>Calendar</string>
 		</text>
 		
 		<image name="CM_Headline_v2">
@@ -150,21 +130,12 @@
 				<and src="sibling(CM_Button1)" trait="visible"/>
 			</visible>
 
-			<string><copy src="me()" trait="_Title"/></string>
+			<string>Events</string>
 
 			<target>
 				<copy>1</copy>
 				<onlyifnot src="CM_CustomEventRect" trait="visible"/>
 			</target>
-
-			<_Title>
-				<copy src="me()" trait="_toggled"/>
-				<add>1</add>
-				<copy src="me()" trait="_Title_"/>
-			</_Title>
-
-			<_Title_1>Events</_Title_1>
-			<_Title_2>Back</_Title_2>
 
 			<mouseoversound>UIMenuFocus</mouseoversound>
 			<clicksound>UIPipBoySelect</clicksound>
@@ -201,47 +172,9 @@
 				<and src="sibling(CM_Button1)" trait="visible"/>
 			</visible>
 
-			<!-- If inside the Event tab, add user0 to the Headline_location title to update which type of event we are looking at-->
 			<user0>0</user0>
 
-			<_Title_1>Journal</_Title_1>
-			<_Title_2>Calendar</_Title_2>
-			<_Title_3>Next Event Type</_Title_3>
-
-			<_Title>
-				<!--Determine if we should display 'Journal' or 'Calendar' based on the state of CM_Button2.
-					This block defaults to 'Journal' (Title 1) and switches to 'Calendar' (Title 2) 
-					if CM_Button2 is toggled, provided the event menu (CM_Button3) is NOT toggled.-->
-				<copy>
-					<copy>1</copy>
-					<onlyif>
-						<copy src="me()" trait="_toggled"/>
-						<eq>1</eq>
-						<and>
-							<copy src="sibling(CM_Button3)" trait="_toggled"/>
-							<eq>0</eq>
-						</and>
-					</onlyif>
-				</copy>
-
-				<!--Add 2 to switch to 'Next Event Type' (Title 3) if the event menu (CM_Button3) is toggled.
-					This ensures that the button shows 'Next Event Type' when the event menu is active.-->
-				<add>
-					<copy>2</copy>
-					<onlyif>
-						<copy src="sibling(CM_Button3)" trait="_toggled"/>
-						<eq>1</eq>
-					</onlyif>
-				</add>
-
-				<!--Final adjustment: add 1 to the result to ensure correct title indexing.
-					Since _Title starts at 0, adding 1 aligns it with _Title_1, _Title_2, or _Title_3.-->
-				<add>1</add>
-				<copy src="me()" trait="_Title_"/>
-			</_Title>
-
-
-			<string><copy src="me()" trait="_Title"/></string>
+			<string>Journal</string>
 
 			<target>
 				<copy>1</copy>
@@ -288,24 +221,15 @@
 				<eq> 3 </eq>
 			</visible>
 
-			<string><copy src="me()" trait="_Title"/></string>
+			<string>Organizer</string>
 
 			<target>
 				<copy>1</copy>
 				<onlyifnot src="CM_CustomEventRect" trait="visible"/>
 			</target>
 
-			<_Title>
-				<copy src="me()" trait="_toggled"/>
-				<add>1</add>
-				<copy src="me()" trait="_Title_"/>
-			</_Title>
-
 			<mouseoversound>UIMenuFocus</mouseoversound>
 			<clicksound>UIPipBoySelect</clicksound>
-
-			<_Title_1>Log</_Title_1>
-			<_Title_2>Notes</_Title_2>
 
 			<_PCButtonText> C) </_PCButtonText>
 			<_toggled>0</_toggled>
@@ -736,7 +660,7 @@
 				<id>515</id>
 				<include src="text_box.xml"/>
 				<y>10</y>
-				<string>Write Entry</string>
+				<string>Create Entry</string>
 				<target>1</target>
 				<mouseoversound>UIMenuFocus</mouseoversound>
 				<clickSound>UIMenuOK</clickSound>
@@ -780,7 +704,7 @@
 
 			<x>0</x>
 			<y>100</y>
-			<width>697</width>
+			<width>687</width>
 			<height>470</height>
 			<_templateheight></_templateheight>
 

@@ -14,6 +14,11 @@ begin function {}
 
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 1
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 0
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_HeadlineRect/CM_Headline_LocationInfo/string" "Journal"
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Calendar"
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Calendar.dds"
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/string" "Events"
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/ySIImage/filename" "interface\icons\Misc_Events.dds"
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
 
 	; List

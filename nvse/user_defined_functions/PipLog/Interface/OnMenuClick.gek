@@ -85,7 +85,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 					let iIntervalKind += 1
 
-					if iIntervalKind > 2
+					if iIntervalKind > 3
 						let iIntervalKind := 0
 					endif
 

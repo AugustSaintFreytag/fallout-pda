@@ -23,14 +23,26 @@ begin function {}
 
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/_toggled" 0
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/_toggled" 1
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/string" "Calendar"
+	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/ySIImage/filename" "interface\icons\Misc_Calendar.dds"
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
 
 	if iIntervalKind == 0
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 3
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_HeadlineRect/CM_Headline_LocationInfo/string" "One-Time Events"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Show Yearly"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Event_Yearly.dds"
 	elseif iIntervalKind == 1
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 0
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_HeadlineRect/CM_Headline_LocationInfo/string" "Yearly Events"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Show Monthly"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Event_Monthly.dds"
+	elseif iIntervalKind == 2
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_HeadlineRect/CM_Headline_LocationInfo/string" "Monthly Events"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Show Daily"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Event_Daily.dds"
 	else
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/user0" 1
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_HeadlineRect/CM_Headline_LocationInfo/string" "Daily Events"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Show Unique"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Event_OneOff.dds"
 	endif
 
 	; List

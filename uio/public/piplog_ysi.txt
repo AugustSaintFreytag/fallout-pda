@@ -1,0 +1,8 @@
+Stentorious\PipBoyUITweaks\MapMenu\ySIDataYButtonIcon.xml::@prefabs\piplog\calendar.xml::CM_Button3
+#..\ySI\ySI.xml
+
+Stentorious\PipBoyUITweaks\MapMenu\ySIDataYButtonIcon.xml::@prefabs\piplog\calendar.xml::CM_Button2
+#..\ySI\ySI.xml
+
+Stentorious\PipBoyUITweaks\MapMenu\ySIDataYButtonIcon.xml::@prefabs\piplog\calendar.xml::CM_Button1
+#..\ySI\ySI.xml
