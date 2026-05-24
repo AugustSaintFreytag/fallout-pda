@@ -1,57 +1,56 @@
-begin function { short iMenuId, short iTileId, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileName }
 
-	; Deletes the clicked journal entry.
+	; Deletes the clicked displayed journal entry.
+
+	; UDFs
+
+	ref RemoveJournalEntryUDF = CompileScript "PipLog\Journal\RemoveJournalEntry.gek"
+	ref GetDisplayedJournalEntryForIndexUDF = CompileScript "PipLog\Interface\Journal\GetDisplayedJournalEntryForIndex.gek"
+	ref GetJournalEntryIndexFromRemoveButtonPathUDF = CompileScript "PipLog\Interface\Journal\GetJournalEntryIndexFromRemoveButtonPath.gek"
+	ref EllipsizeUDF = CompileScript "PipLog\Utils\Ellipsize.gek"
 
 	; Guards
 
 	if eval !(MenuMode 1023)
-		Sv_Destruct sTileParam
+		PrintC "Cannot delete journal entry, incompatible menu mode %g (expected: 1023)." (GetActiveMenuMode)
 		return
 	endif
 
 	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 3
-		Sv_Destruct sTileParam
+		PrintC "Cannot delete journal entry, incompatible view mode %g (expected: 3)." (Player.AuxiliaryVariableGetFloat "*PLC_iViewMode")
 		return
 	endif
-
-	; UDFs
-
-	ref DeleteJournalEntryUDF = CompileScript "PipLog\Journal\DeleteJournalEntry.gek"
-	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
-	ref GetTileIndexFromNameUDF = CompileScript "PipLog\Interface\GetTileIndexFromName.gek"
 
 	; State
 
-	string_var sComponent = GetActiveUIComponentFullName
-	array_var aJournalEntries = (Call GetJournalEntriesUDF)
-	short iNumJournalEntries = Ar_Size aJournalEntries
-	short iEntryIndex = Call GetTileIndexFromNameUDF sTileParam
+	string_var sActiveComponentPath = GetActiveUIComponentFullName
+	string_var sCompPreview = (Call EllipsizeUDF sActiveComponentPath 36)
+	short iIndex = Call GetJournalEntryIndexFromRemoveButtonPathUDF sActiveComponentPath
+
+	PrintC "Received click on journal entry delete button, name '%z', id '%g', path '%z'." sTileName iTileId sCompPreview
+
+	array_var aJournalEntry = (Call GetDisplayedJournalEntryForIndexUDF iIndex)
 
 	; Main
 
-	if eval (Sv_Count "EntryDelete", sComponent) == 0
-		PrintC "Cannot remove journal entry, active component '%z' is not a delete button." sComponent
+	if eval (aJournalEntry == Ar_Null) || ((Ar_Size aJournalEntry) == -1)
+		PrintC "Cannot remove journal entry, could not resolve displayed index %g from '%z'." iIndex sActiveComponentPath
 
-		Sv_Destruct sComponent, sTileParam
-		let aJournalEntries := Ar_Null
+		Sv_Destruct sActiveComponentPath, sCompPreview
+		let aJournalEntry := Ar_Null
+
 		return
 	endif
 
-	if eval (iNumJournalEntries == -1) || (iEntryIndex < 0) || (iEntryIndex >= iNumJournalEntries)
-		PrintC "Cannot remove journal entry, could not resolve valid entry index %g from '%z'." iEntryIndex sTileParam
+	string_var sJournalEntryId = aJournalEntry["id"]
 
-		Sv_Destruct sComponent, sTileParam
-		let aJournalEntries := Ar_Null
-		return
-	endif
-
-	Call DeleteJournalEntryUDF iEntryIndex
+	Call RemoveJournalEntryUDF sJournalEntryId
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
 
 	; Clean-Up
 
-	Sv_Destruct sComponent, sTileParam
-	let aJournalEntries := Ar_Null
+	Sv_Destruct sActiveComponentPath, sCompPreview, sJournalEntryId
+	let aJournalEntry := Ar_Null
 
 end

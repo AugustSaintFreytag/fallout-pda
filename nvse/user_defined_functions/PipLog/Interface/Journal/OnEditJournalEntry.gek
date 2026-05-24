@@ -1,16 +1,14 @@
 begin function { short iMenuId, short iTileId, string_var sTileName }
 
-	; Opens a text input prompt for editing the clicked journal entry.
+	; Opens a text input prompt for editing the clicked displayed journal entry.
+	; NOTE: If `GetActiveUIComponentFullName` would return the qualified UI component path, this could be easier.
 
 	; UDFs
 
-	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
-	ref GetTileIndexFromNameUDF = CompileScript "PipLog\Interface\GetTileIndexFromName.gek"
+	ref GetDisplayedJournalEntryForIndexUDF = CompileScript "PipLog\Interface\Journal\GetDisplayedJournalEntryForIndex.gek"
 	ref OnEditJournalEntryConfirmUDF = CompileScript "PipLog\Interface\Journal\OnEditJournalEntryConfirm.gek"
-
-	; Main
-
-	PrintC "Received click on journal entry with tile param '%z'." (sTileName)
+	ref GetJournalEntryIndexFromEditButtonPathUDF = CompileScript "PipLog\Interface\Journal\GetJournalEntryIndexFromEditButtonPath.gek"
+	ref EllipsizeUDF = CompileScript "PipLog\Utils\Ellipsize.gek"
 
 	; Guards
 
@@ -28,33 +26,37 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; State
 
-	array_var aJournalEntries = (Call GetJournalEntriesUDF)
-	short iNumJournalEntries = Ar_Size aJournalEntries
-	short iEntryIndex = Call GetTileIndexFromNameUDF sTileName
+	string_var sActiveComponentPath = GetActiveUIComponentFullName
+	string_var sCompPreview = (Call EllipsizeUDF sActiveComponentPath 36)
+
+	PrintC "Received click on journal entry edit button, name '%z', id '%g', path '%z'." sTileName iTileId sCompPreview
+
+	short iIndex = Call GetJournalEntryIndexFromEditButtonPathUDF sActiveComponentPath
+	array_var aJournalEntry = (Call GetDisplayedJournalEntryForIndexUDF iIndex)
 
 	; Main
 
-	if eval (iNumJournalEntries == -1) || (iEntryIndex < 0) || (iEntryIndex >= iNumJournalEntries)
-		PrintC "Cannot edit journal entry, could not resolve valid entry index %g from '%z'." iEntryIndex sTileName
+	if eval (aJournalEntry == Ar_Null) || ((Ar_Size aJournalEntry) == -1)
+		PrintC "Cannot edit journal entry, could not resolve displayed index %g from '%z'." iIndex sTileName
 
-		Sv_Destruct sActiveComponentPath
+		Sv_Destruct sActiveComponentPath, sCompPreview
 		let aJournalEntry := Ar_Null
 
 		return
 	endif
 
-	array_var aJournalEntry = aJournalEntries[iEntryIndex]
+	string_var sJournalEntryId = aJournalEntry["id"]
 	string_var sJournalEntryText = aJournalEntry["text"]
-	string_var sEntryPrompt = Sv_Construct "Editing Journal Entry #%g:" (iEntryIndex + 1)
+	string_var sEntryPrompt = Sv_Construct "Editing Journal Entry #%g:" (iIndex + 1)
 
-	Player.AuxiliaryVariableSetFloat "*PLC_iEditEntryIndex" iEntryIndex
+	Player.AuxiliaryVariableSetString "*PLC_sEditJournalEntryId" ($sJournalEntryId)
 
 	ShowTextInputMenu OnEditJournalEntryConfirmUDF 700 500 ($sEntryPrompt)
 	SetTextInputString "%z" sJournalEntryText
 
 	; Clean-Up
 
-	Sv_Destruct sActiveComponentPath, sJournalEntryId, sJournalEntryText, sEntryPrompt
+	Sv_Destruct sActiveComponentPath, sCompPreview, sJournalEntryId, sJournalEntryText, sEntryPrompt
 	let aJournalEntry := Ar_Null
 
 end

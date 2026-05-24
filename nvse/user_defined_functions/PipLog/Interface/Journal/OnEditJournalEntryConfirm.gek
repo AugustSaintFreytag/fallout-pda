@@ -10,35 +10,47 @@ begin function { string_var sInput }
 
 	; UDFs
 
-	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
+	ref GetJournalEntryByIdUDF = CompileScript "PipLog\Journal\GetJournalEntryById.gek"
+	ref GetJournalEntryIndexUDF = CompileScript "PipLog\Journal\GetJournalEntryIndex.gek"
 	ref SetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
 
 	; State
 
-	short iEditEntryIndex = Player.AuxiliaryVariableGetFloat "*PLC_iEditEntryIndex"
-	array_var aJournalEntries = (Call GetJournalEntriesUDF)
-	short iNumJournalEntries = Ar_Size aJournalEntries
+	string_var sEditJournalEntryId = Player.AuxiliaryVariableGetString "*PLC_sEditJournalEntryId"
+	array_var aJournalEntry = (Call GetJournalEntryByIdUDF sEditJournalEntryId)
 
 	; Main
 
-	if eval (iNumJournalEntries == -1) || (iEditEntryIndex < 0) || (iEditEntryIndex >= iNumJournalEntries)
-		PrintC "Cannot confirm journal edit, invalid entry index %g." iEditEntryIndex
+	if eval (aJournalEntry == Ar_Null) || ((Ar_Size aJournalEntry) == -1)
+		PrintC "Cannot confirm journal edit, invalid entry id '%z'." sEditJournalEntryId
 
-		let aJournalEntries := Ar_Null
+		Sv_Destruct sEditJournalEntryId
+		let aJournalEntry := Ar_Null
+
 		return
 	endif
 
-	array_var aJournalEntry = aJournalEntries[iEditEntryIndex]
+	short iEntryIndex = (Call GetJournalEntryIndexUDF sEditJournalEntryId)
+
+	if eval iEntryIndex == Ar_BadNumericIndex
+		PrintC "Cannot confirm journal edit, could not resolve index for entry id '%z'." sEditJournalEntryId
+
+		Sv_Destruct sEditJournalEntryId
+		let aJournalEntry := Ar_Null
+
+		return
+	endif
 
 	let aJournalEntry["text"] := sInput
 
-	Call SetJournalEntryUDF aJournalEntry iEditEntryIndex
+	Call SetJournalEntryUDF aJournalEntry iEntryIndex
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
+	Player.AuxiliaryVariableErase "*PLC_sEditJournalEntryId"
 
 	; Clean-Up
 
-	let aJournalEntries := Ar_Null
+	Sv_Destruct sEditJournalEntryId
 	let aJournalEntry := Ar_Null
 
 end

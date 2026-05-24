@@ -36,7 +36,12 @@ begin function {}
 	; Store for Interaction
 
 	Player.AuxiliaryVariableSetFloat "PLC_iNumJournalEntries" iNumJournalEntries
-	Player.AuxiliaryVariableSetFromArray "*PLC_aDisplayedJournalEntryIds" aDisplayedJournalEntryIds
+
+	if eval (Ar_Size aDisplayedJournalEntryIds) > 0
+		Player.AuxiliaryVariableSetFromArray "*PLC_aDisplayedJournalEntryIds" aDisplayedJournalEntryIds
+	else
+		Player.AuxiliaryVariableErase "*PLC_aDisplayedJournalEntryIds"
+	endif
 
 	; Conclude
 
