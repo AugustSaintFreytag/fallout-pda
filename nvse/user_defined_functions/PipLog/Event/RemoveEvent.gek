@@ -52,7 +52,12 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 	; Remove from the by-id registry
 
 	Ar_Erase aStoredEventsById, sEventId
-	Player.AuxStringMapArraySetFromArray ($sKeyById) aStoredEventsById
+
+	if eval (Ar_Size aStoredEventsById) > 0
+		Player.AuxStringMapArraySetFromArray ($sKeyById) aStoredEventsById
+	else
+		Player.AuxiliaryVariableErase ($sKeyById)
+	endif
 
 	; Update the by-date index
 
@@ -72,7 +77,11 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 				let aStoredEventIdsByDate[sEventDate] := sUpdatedIds
 			endif
 
-			Player.AuxStringMapArraySetFromArray ($sKeyByDate) aStoredEventIdsByDate
+			if eval (Ar_Size aStoredEventIdsByDate) > 0
+				Player.AuxStringMapArraySetFromArray ($sKeyByDate) aStoredEventIdsByDate
+			else
+				Player.AuxiliaryVariableErase ($sKeyByDate)
+			endif
 
 			Sv_Destruct sCurrentIds, sUpdatedIds
 		endif

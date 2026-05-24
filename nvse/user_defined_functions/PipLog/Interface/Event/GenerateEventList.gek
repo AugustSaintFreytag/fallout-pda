@@ -40,7 +40,12 @@ begin function {}
 	; Store for Interaction
 
 	array_var aEventIds = Call MapStringArrayUDF aEvents ({ array_var aEvent } => aEvent["id"])
-	Player.AuxiliaryVariableSetFromArray "*PLC_aDisplayedEventIds" aEventIds
+
+	if eval (Ar_Size aEventIds) > 0
+		Player.AuxiliaryVariableSetFromArray "*PLC_aDisplayedEventIds" aEventIds
+	else
+		Player.AuxiliaryVariableErase "*PLC_aDisplayedEventIds"
+	endif
 
 	; Conclude
 
@@ -51,5 +56,6 @@ begin function {}
 	; Clean-Up
 
 	let aEvents := Ar_Null
+	let aEventIds := Ar_Null
 
 end
