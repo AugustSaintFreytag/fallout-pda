@@ -1,9 +1,7 @@
-begin function { short iMenuId, short iTileId, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Opens a text input prompt for creating a new journal entry.
 	; The confirm callback delegates storage to Journal\AppendJournalEntry.gek.
-
-	Sv_Destruct sTileParam
 
 	; Guards
 

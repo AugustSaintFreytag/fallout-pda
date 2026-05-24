@@ -1,9 +1,7 @@
-begin function { short iMenuId, short iTileId, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Handles main Pip-Log buttons and calendar month arrows by mutating the view model.
 	; UIControlLoop.gek owns applying those values to menu tiles.
-
-	Sv_Destruct sTileParam
 
 	; Guards
 

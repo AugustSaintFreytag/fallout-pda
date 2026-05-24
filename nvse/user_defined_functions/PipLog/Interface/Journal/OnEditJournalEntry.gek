@@ -23,7 +23,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	if iViewMode != 3
 		PrintC "Cannot edit journal entry, incompatible view mode %g (expected: 3)." iViewMode
-		Sv_Destruct sTileName
 		return
 	endif
 
@@ -38,8 +37,9 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 	if eval (iNumJournalEntries == -1) || (iEntryIndex < 0) || (iEntryIndex >= iNumJournalEntries)
 		PrintC "Cannot edit journal entry, could not resolve valid entry index %g from '%z'." iEntryIndex sTileName
 
-		Sv_Destruct sTileName
-		let aJournalEntries := Ar_Null
+		Sv_Destruct sActiveComponentPath
+		let aJournalEntry := Ar_Null
+
 		return
 	endif
 
@@ -54,8 +54,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Clean-Up
 
-	Sv_Destruct sTileName, sJournalEntryText, sEntryPrompt
-	let aJournalEntries := Ar_Null
+	Sv_Destruct sActiveComponentPath, sJournalEntryId, sJournalEntryText, sEntryPrompt
 	let aJournalEntry := Ar_Null
 
 end

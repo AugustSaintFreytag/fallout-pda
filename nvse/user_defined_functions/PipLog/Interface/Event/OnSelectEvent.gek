@@ -15,7 +15,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	if eval !(MenuMode 1023)
 		PrintC "Cannot select event tile, incompatible menu mode (top-most: %g, expected: 1023)." (GetActiveMenuMode)
-		Sv_Destruct sTileName
 		return
 	endif
 
@@ -23,7 +22,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	if iViewMode != 2
 		PrintC "Cannot select event tile, incompatible view mode %g (expected: 2)." iViewMode
-		Sv_Destruct sTileName
 		return
 	endif
 
@@ -35,8 +33,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	if eval (Ar_Size aEventIds) <= iTileIndex
 		PrintC "Could not resolve event id for index %g via selected event tile '%z'." iTileIndex sTileName
-
-		Sv_Destruct sTileName
 		let aEventIds := Ar_Null
 
 		return
@@ -50,7 +46,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 	if eval (aEvent == Ar_Null)
 		PrintC "Could not get event for resolved id '%z' via selected event tile '%z'." sEventId sTileName
 
-		Sv_Destruct sEventId, sTileName
+		Sv_Destruct sEventId
 		let aEventIds := Ar_Null
 
 		return
@@ -88,6 +84,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	let aEvent := Ar_Null
 
-	Sv_Destruct sTileName, sEventId, sSelectedEventId, sSelectedTileName
+	Sv_Destruct sEventId, sSelectedEventId, sSelectedTileName
 
 end

@@ -1,8 +1,6 @@
-begin function { short iMenuId, short iTileId, string_var sTileParam }
+begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Opens a text input prompt to rename the currently selected player event.
-
-	Sv_Destruct sTileParam
 
 	; Guards
 
