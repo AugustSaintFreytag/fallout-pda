@@ -1,63 +1,45 @@
 begin function { string_var sId }
 
 	; Returns the decoded journal entry with id sId.
-	; Adds transient "_index" with the current storage index.
 	; Returns Ar_Null if no entry matches.
 
 	; UDFs
 
-	ref DecodeJournalEntryFromStringUDF = CompileScript "PipLog\Journal\DecodeJournalEntryFromString.gek"
+	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
 
 	; State
 
-	array_var aEncodedEntries = Player.AuxiliaryVariableGetAsArray "PLC_aPlayerJournal"
-	short iIndex = 0
-	short iNumEntries = Ar_Size aEncodedEntries
+	array_var aJournalEntries = (Call GetJournalEntriesUDF)
 
 	; Main
 
 	if eval (Sv_Length sId) == 0
-		let aEncodedEntries := Ar_Null
+		let aJournalEntries := Ar_Null
 		SetFunctionValue Ar_Null
 		return
 	endif
 
-	if iNumEntries == -1
-		let aEncodedEntries := Ar_Null
-		SetFunctionValue Ar_Null
-		return
-	endif
+	foreach array_var aElement <- aJournalEntries
+		array_var aJournalEntry = aElement["value"]
+		string_var sJournalEntryId = aJournalEntry["id"]
 
-	while iIndex < iNumEntries
-		string_var sEncodedEntry = aEncodedEntries[iIndex]
-		array_var aJournalEntry = (Call DecodeJournalEntryFromStringUDF sEncodedEntry)
-
-		if eval (Ar_Size aJournalEntry) != -1
-			string_var sJournalEntryId = aJournalEntry["id"]
-
-			if eval sJournalEntryId == sId
-				let aJournalEntry["_index"] := iIndex
-
-				SetFunctionValue aJournalEntry
-
-				Sv_Destruct sEncodedEntry, sJournalEntryId
-				let aEncodedEntries := Ar_Null
-
-				return
-			endif
+		if eval sJournalEntryId == sId
+			SetFunctionValue aJournalEntry
 
 			Sv_Destruct sJournalEntryId
+			let aJournalEntries := Ar_Null
+
+			return
 		endif
 
-		Sv_Destruct sEncodedEntry
+		Sv_Destruct sJournalEntryId
 		let aJournalEntry := Ar_Null
-		let iIndex += 1
 	loop
 
 	SetFunctionValue Ar_Null
 
 	; Clean-Up
 
-	let aEncodedEntries := Ar_Null
+	let aJournalEntries := Ar_Null
 
 end
