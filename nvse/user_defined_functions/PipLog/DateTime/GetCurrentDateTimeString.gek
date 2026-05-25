@@ -1,32 +1,21 @@
 begin function {}
 
-	; Returns the current in-game timestamp in the legacy journal display format.
+	; Returns the current in-game timestamp in storage format: yyyy-mm-dd hh:mm:ss.
 
 	; UDFs
 
-	ref GetPaddedIntUDF = CompileScript "PipLog\Utils\GetPaddedInt.gek"
+	ref GetStorageDateTimeStringUDF = CompileScript "PipLog\DateTime\GetStorageDateTimeString.gek"
 
 	; Main
 
 	float fCurrentTime = GetCurrentTime
 	short iHour = fCurrentTime
-	short iMinute = (fCurrentTime - iHour) * 60
+	float fMinute = (fCurrentTime - iHour) * 60
+	short iMinute = fMinute
+	short iSecond = (fMinute - iMinute) * 60
 
-	string_var sMinute = (Call GetPaddedIntUDF iMinute 2)
-	string_var sDay = (Call GetPaddedIntUDF GameDay 2)
-	string_var sMonth = (Call GetPaddedIntUDF (GameMonth + 1) 2)
-	string_var sYear = $GameYear
-
-	if eval (Sv_Length sYear) > 2
-		Sv_Erase sYear 0, 2
-	endif
-
-	string_var sDateTime = Sv_Construct "%z.%z.%z, %g:%z" sDay sMonth sYear iHour sMinute
+	string_var sDateTime = (Call GetStorageDateTimeStringUDF GameYear GameMonth GameDay iHour iMinute iSecond)
 
 	SetFunctionValue sDateTime
-
-	; Clean-Up
-
-	Sv_Destruct sMinute, sDay, sMonth, sYear
 
 end

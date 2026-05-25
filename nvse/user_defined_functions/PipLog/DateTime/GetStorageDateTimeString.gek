@@ -1,0 +1,26 @@
+begin function { short iYear, short iMonth, short iDay, short iHour, short iMinute, short iSecond }
+
+	; Returns a zero-padded datetime string intended for storage.
+	; iMonth is 0-indexed; output month is 1-indexed.
+	; Example: GetStorageDateTimeString 2281 0 20 9 5 0 -> "2281-01-20 09:05:00"
+
+	; UDFs
+
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref GetPaddedIntUDF = CompileScript "PipLog\Utils\GetPaddedInt.gek"
+
+	; Formatting
+
+	string_var sDate = (Call GetStorageDateStringUDF iYear iMonth iDay)
+	string_var sHour = (Call GetPaddedIntUDF iHour 2)
+	string_var sMinute = (Call GetPaddedIntUDF iMinute 2)
+	string_var sSecond = (Call GetPaddedIntUDF iSecond 2)
+	string_var sResult = Sv_Construct "%z %z:%z:%z" sDate sHour sMinute sSecond
+
+	SetFunctionValue sResult
+
+	; Clean-Up
+
+	Sv_Destruct sDate, sHour, sMinute, sSecond
+
+end
