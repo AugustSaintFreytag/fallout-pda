@@ -1,0 +1,30 @@
+begin function {}
+
+	; Returns the player name sanitized for use in exchange filenames.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; Main
+
+	string_var sPlayerName = GetPlayerName
+
+	if eval (Sv_Length sPlayerName) == 0
+		let sPlayerName := "Player"
+	endif
+
+	string_var sSafePlayerName = Sv_Construct "%z" sPlayerName
+
+	Sv_Replace "<|_" sSafePlayerName
+	Sv_Replace ">|_" sSafePlayerName
+	Sv_Replace ":|_" sSafePlayerName
+	Sv_Replace "/|_" sSafePlayerName
+	Sv_Replace "\|_" sSafePlayerName
+	Sv_Replace "?|_" sSafePlayerName
+	Sv_Replace "*|_" sSafePlayerName
+
+	SetFunctionValue sSafePlayerName
+
+	; Clean-Up
+
+	Sv_Destruct sPlayerName
+
+end

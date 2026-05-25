@@ -1,0 +1,50 @@
+begin function {}
+
+	; Exports player journal entries to Export\<Player Name>-JournalEntries.json.
+	; Returns 1 if WriteToJSON succeeds, otherwise 0.
+
+	; UDFs
+
+	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
+	ref GetCurrentDateTimeStringUDF = CompileScript "PipLog\DateTime\GetCurrentDateTimeString.gek"
+	ref GetRealDateTimeStringUDF = CompileScript "PipLog\Exchange\Utils\GetRealDateTimeString.gek"
+	ref GetExchangePathUDF = CompileScript "PipLog\Exchange\Utils\GetExchangePath.gek"
+
+	; Main
+
+	array_var aData = (Call GetJournalEntriesUDF)
+	array_var aDocument = Ar_Construct "stringmap"
+
+	string_var sPlayerName = GetPlayerName
+	string_var sDateTimeGame = (Call GetCurrentDateTimeStringUDF)
+	string_var sDateTimeReal = (Call GetRealDateTimeStringUDF)
+	string_var sPath = (Call GetExchangePathUDF "JournalEntries")
+
+	if eval (Sv_Length sPlayerName) == 0
+		let sPlayerName := "Player"
+	endif
+
+	let aDocument["version"] := 1
+	let aDocument["kind"] := "JournalEntries"
+	let aDocument["playerName"] := sPlayerName
+	let aDocument["dateTimeGame"] := sDateTimeGame
+	let aDocument["dateTimeReal"] := sDateTimeReal
+	let aDocument["data"] := aData
+
+	short bDidWrite = WriteToJSON aDocument ($sPath) "" 0 0 1 0
+
+	if eval !bDidWrite
+		PrintC "Could not export journal entries to '%z'." sPath
+	else
+		PrintC "Exported %g journal entries to '%z'." (Ar_Size aData) sPath
+	endif
+
+	SetFunctionValue bDidWrite
+
+	; Clean-Up
+
+	Sv_Destruct sPlayerName, sDateTimeGame, sDateTimeReal, sPath
+	let aData := Ar_Null
+	let aDocument := Ar_Null
+
+end

@@ -1,0 +1,76 @@
+begin function {}
+
+	; Exports player-created events to Export\<Player Name>-PlayerEvents.json.
+	; Returns 1 if WriteToJSON succeeds, otherwise 0.
+
+	; UDFs
+
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+	ref GetCurrentDateTimeStringUDF = CompileScript "PipLog\DateTime\GetCurrentDateTimeString.gek"
+	ref GetRealDateTimeStringUDF = CompileScript "PipLog\Exchange\Utils\GetRealDateTimeString.gek"
+	ref GetExchangePathUDF = CompileScript "PipLog\Exchange\Utils\GetExchangePath.gek"
+
+	; Main
+
+	array_var aStoredEventsById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
+	array_var aData = Ar_Construct "array"
+
+	if eval (Ar_Size aStoredEventsById) != -1
+		foreach array_var aElement <- aStoredEventsById
+			string_var sEncodedEvent = aElement["value"]
+			array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+			if eval (aEvent != Ar_Null) && ((Ar_Size aEvent) != -1)
+				array_var aExportEvent = Ar_Construct "stringmap"
+
+				let aExportEvent["id"] := aEvent["id"]
+				let aExportEvent["date"] := aEvent["date"]
+				let aExportEvent["name"] := aEvent["name"]
+				let aExportEvent["flags"] := aEvent["flags"]
+
+				Ar_Append aData, aExportEvent
+
+				let aExportEvent := Ar_Null
+			endif
+
+			Sv_Destruct sEncodedEvent
+			let aEvent := Ar_Null
+		loop
+	endif
+
+	array_var aDocument = Ar_Construct "stringmap"
+
+	string_var sPlayerName = GetPlayerName
+	string_var sDateTimeGame = (Call GetCurrentDateTimeStringUDF)
+	string_var sDateTimeReal = (Call GetRealDateTimeStringUDF)
+	string_var sPath = (Call GetExchangePathUDF "PlayerEvents")
+
+	if eval (Sv_Length sPlayerName) == 0
+		let sPlayerName := "Player"
+	endif
+
+	let aDocument["version"] := 1
+	let aDocument["kind"] := "PlayerEvents"
+	let aDocument["playerName"] := sPlayerName
+	let aDocument["dateTimeGame"] := sDateTimeGame
+	let aDocument["dateTimeReal"] := sDateTimeReal
+	let aDocument["data"] := aData
+
+	short bDidWrite = WriteToJSON aDocument ($sPath) "" 0 0 1 0
+
+	if eval !bDidWrite
+		PrintC "Could not export player events to '%z'." sPath
+	else
+		PrintC "Exported %g player events to '%z'." (Ar_Size aData) sPath
+	endif
+
+	SetFunctionValue bDidWrite
+
+	; Clean-Up
+
+	Sv_Destruct sPlayerName, sDateTimeGame, sDateTimeReal, sPath
+	let aStoredEventsById := Ar_Null
+	let aData := Ar_Null
+	let aDocument := Ar_Null
+
+end

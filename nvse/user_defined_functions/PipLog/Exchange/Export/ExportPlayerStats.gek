@@ -1,0 +1,115 @@
+begin function {}
+
+	; Exports tracked player stats to Export\<Player Name>-PlayerStats.json.
+	; Returns 1 if WriteToJSON succeeds, otherwise 0.
+
+	; UDFs
+
+	ref DecodeStatsStringToMapUDF = CompileScript "PipLog\Exchange\Utils\DecodeStatsStringToMap.gek"
+	ref SplitCommaStringToArrayUDF = CompileScript "PipLog\Exchange\Utils\SplitCommaStringToArray.gek"
+	ref GetCurrentDateTimeStringUDF = CompileScript "PipLog\DateTime\GetCurrentDateTimeString.gek"
+	ref GetRealDateTimeStringUDF = CompileScript "PipLog\Exchange\Utils\GetRealDateTimeString.gek"
+	ref GetExchangePathUDF = CompileScript "PipLog\Exchange\Utils\GetExchangePath.gek"
+
+	; State
+
+	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
+	array_var aQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
+	array_var aData = Ar_Construct "stringmap"
+
+	; Stats
+
+	if eval (Ar_Size aAllStats) != -1
+		foreach array_var aElement <- aAllStats
+			string_var sDate = aElement["key"]
+			string_var sEncodedStats = aElement["value"]
+			array_var aDay = Ar_Construct "stringmap"
+			array_var aStats = (Call DecodeStatsStringToMapUDF sEncodedStats)
+			array_var aQuests = Ar_Construct "array"
+
+			if eval (Ar_Size aQuestStats) != -1
+				if eval (Ar_HasKey aQuestStats, sDate)
+					string_var sQuestList = aQuestStats[sDate]
+
+					let aQuests := (Call SplitCommaStringToArrayUDF sQuestList)
+
+					Sv_Destruct sQuestList
+				endif
+			endif
+
+			let aDay["stats"] := aStats
+			let aDay["quests"] := aQuests
+			let aData[sDate] := aDay
+
+			Sv_Destruct sDate, sEncodedStats
+			let aStats := Ar_Null
+			let aQuests := Ar_Null
+			let aDay := Ar_Null
+		loop
+	endif
+
+	; Quest-only dates
+
+	if eval (Ar_Size aQuestStats) != -1
+		foreach array_var aElement <- aQuestStats
+			string_var sDate = aElement["key"]
+
+			if eval !(Ar_HasKey aData, sDate)
+				string_var sQuestList = aElement["value"]
+				array_var aDay = Ar_Construct "stringmap"
+				array_var aStats = Ar_Construct "stringmap"
+				array_var aQuests = (Call SplitCommaStringToArrayUDF sQuestList)
+
+				let aDay["stats"] := aStats
+				let aDay["quests"] := aQuests
+				let aData[sDate] := aDay
+
+				Sv_Destruct sQuestList
+				let aStats := Ar_Null
+				let aQuests := Ar_Null
+				let aDay := Ar_Null
+			endif
+
+			Sv_Destruct sDate
+		loop
+	endif
+
+	; Write
+
+	array_var aDocument = Ar_Construct "stringmap"
+
+	string_var sPlayerName = GetPlayerName
+	string_var sDateTimeGame = (Call GetCurrentDateTimeStringUDF)
+	string_var sDateTimeReal = (Call GetRealDateTimeStringUDF)
+	string_var sPath = (Call GetExchangePathUDF "PlayerStats")
+
+	if eval (Sv_Length sPlayerName) == 0
+		let sPlayerName := "Player"
+	endif
+
+	let aDocument["version"] := 1
+	let aDocument["kind"] := "PlayerStats"
+	let aDocument["playerName"] := sPlayerName
+	let aDocument["dateTimeGame"] := sDateTimeGame
+	let aDocument["dateTimeReal"] := sDateTimeReal
+	let aDocument["data"] := aData
+
+	short bDidWrite = WriteToJSON aDocument ($sPath) "" 0 0 1 0
+
+	if eval !bDidWrite
+		PrintC "Could not export player stats to '%z'." sPath
+	else
+		PrintC "Exported player stats for %g dates to '%z'." (Ar_Size aData) sPath
+	endif
+
+	SetFunctionValue bDidWrite
+
+	; Clean-Up
+
+	Sv_Destruct sPlayerName, sDateTimeGame, sDateTimeReal, sPath
+	let aAllStats := Ar_Null
+	let aQuestStats := Ar_Null
+	let aData := Ar_Null
+	let aDocument := Ar_Null
+
+end
