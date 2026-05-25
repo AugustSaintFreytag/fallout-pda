@@ -1,0 +1,16 @@
+<height>
+	<copy src="child(MM_ButtonA)" trait="height" />
+	<onlyif src="child(MM_ButtonA)" trait="visible" />
+	<add>
+		<copy src="child(MM_ButtonX)" trait="height" />
+		<onlyif src="child(MM_ButtonX)" trait="visible" />
+	</add>
+	<add>
+		<copy src="child(MM_ButtonY)" trait="height" />
+		<onlyif src="child(MM_ButtonY)" trait="visible" />
+	</add>
+	<add>
+		<copy src="CM_Button1" trait="height" />
+		<onlyif src="CM_Button1" trait="visible" />
+	</add>
+</height>
