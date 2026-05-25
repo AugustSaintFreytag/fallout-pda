@@ -19,7 +19,7 @@ begin function { short iDay, short iMonth, short iYear, string_var sEventName, s
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetRecurringDatePatternStringUDF = CompileScript "PipLog\DateTime\GetRecurringDatePatternString.gek"
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
-	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
+	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
 
 	; State
 
@@ -34,11 +34,17 @@ begin function { short iDay, short iMonth, short iYear, string_var sEventName, s
 	; Main
 
 	array_var aEvent = (Call CreateEventUDF sDate sEventName)
-	Call AddEventUDF aEvent 1
+
+	let aEvent["_isSystemEvent"] := 0
+	let aEvent["_isPlayerEvent"] := 1
+
+	array_var aEvents = Ar_List aEvent
+	Call AddEventsUDF aEvents 1
 
 	; Clean-Up
 
 	Sv_Destruct sDate
+	let aEvents := Ar_Null
 	let aEvent := Ar_Null
 
 end

@@ -6,6 +6,7 @@ begin function { string_var sEventId, string_var sEventName }
 
 	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
 	ref EncodeEventToStringUDF = CompileScript "PipLog\Event\EncodeEventToString.gek"
+	ref EncodeEventFlagsUDF = CompileScript "PipLog\Event\EncodeEventFlags.gek"
 
 	; State
 
@@ -32,10 +33,15 @@ begin function { string_var sEventId, string_var sEventName }
 		Sv_Destruct sEncodedEvent
 		let aEventsById := Ar_Null
 		let aEvent := Ar_Null
+
 		return
 	endif
 
+	; Assign Name
+
 	let aEvent["name"] := sEventName
+	
+	Call EncodeEventFlagsUDF aEvent
 
 	string_var sUpdatedEvent = (Call EncodeEventToStringUDF aEvent)
 	let aEventsById[sEventId] := sUpdatedEvent

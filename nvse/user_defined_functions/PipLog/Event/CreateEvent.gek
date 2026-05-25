@@ -2,15 +2,21 @@ begin function { string_var sDate, string_var sName }
 
 	; UDFs
 
-	ref GetRandomId = CompileScript "PipLog\Utils\GetRandomId.gek"
+	ref GetRandomIdUDF = CompileScript "PipLog\Utils\GetRandomId.gek"
+	ref EncodeEventFlagsUDF = CompileScript "PipLog\Event\EncodeEventFlags.gek"
 
 	; Main
 
 	array_var aEvent = Ar_Construct "stringmap"
 
-	let aEvent["id"] := (Call GetRandomId)
+	let aEvent["id"] := (Call GetRandomIdUDF)
 	let aEvent["date"] := sDate
 	let aEvent["name"] := sName
+
+	let aEvent["_isSystemEvent"] := 1
+	let aEvent["_isPlayerEvent"] := 0
+
+	Call EncodeEventFlagsUDF aEvent
 
 	SetFunctionValue aEvent
 
