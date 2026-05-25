@@ -1,31 +1,21 @@
-begin function { short iEntryIndex, float fEntryHeight }
+begin function { short iNumEntries }
 
-	; Positions a journal entry's UI row at the correct vertical offset by measuring
-	; the cumulative height of all preceding entries, then updates the scroll template height.
+	; Updates the journal list's scroll extent from the final XML-computed row bounds.
 
 	; Main
 
-	float fEntryY = 0
-
-	if iEntryIndex != 0
-		string_var sPreviousEntryYPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" (iEntryIndex - 1)
-		string_var sPreviousEntryHeightPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/height" (iEntryIndex - 1)
-
-		let fEntryY += GetUIFloatAlt ($sPreviousEntryYPath)
-		let fEntryY += GetUIFloatAlt ($sPreviousEntryHeightPath)
-
-		Sv_Destruct sPreviousEntryYPath, sPreviousEntryHeightPath
+	if iNumEntries <= 0
+		SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/_templateheight" 0
+		return
 	endif
 
-	string_var sEntryYPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/y" iEntryIndex
-	string_var sEntryHeightPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry/height" iEntryIndex
+	short iLastEntryIndex = iNumEntries - 1
+	string_var sEntryYPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/y" iLastEntryIndex
+	string_var sEntryHeightPath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/height" iLastEntryIndex
 
-	SetUIFloatAlt ($sEntryYPath) fEntryY
-	SetUIFloatAlt ($sEntryHeightPath) fEntryHeight
-
-	float fScrollTemplateHeight = fEntryHeight + fEntryY + 64
-
-	;PrintC "Journal entry %g: height %.2f, total scroll height %.2f." iEntryIndex fEntryHeight fScrollTemplateHeight
+	float fEntryY = GetUIFloatAlt ($sEntryYPath)
+	float fEntryHeight = GetUIFloatAlt ($sEntryHeightPath)
+	float fScrollTemplateHeight = fEntryY + fEntryHeight + 64
 
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/_templateheight" fScrollTemplateHeight
 

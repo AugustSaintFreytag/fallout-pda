@@ -5,6 +5,7 @@ begin function {}
 	; UDFs
 
 	ref AddJournalEntriesToListUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntriesToList.gek"
+	ref AddJournalEntryElementUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntryElement.gek"
 	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
 
 	; State
@@ -29,9 +30,11 @@ begin function {}
 
 	array_var aDisplayedJournalEntryIds = Ar_Construct "array"
 
-	Call AddJournalEntriesToListUDF aJournalEntries bSort aDisplayedJournalEntryIds
+	short iNumDisplayedJournalEntries = Call AddJournalEntriesToListUDF aJournalEntries bSort aDisplayedJournalEntryIds
 
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/visible" 1
+
+	Call AddJournalEntryElementUDF iNumDisplayedJournalEntries
 
 	; Store for Interaction
 

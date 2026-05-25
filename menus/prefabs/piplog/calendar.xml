@@ -1517,6 +1517,11 @@
 			<add>10</add>
 		</y>
 		<x>25</x>
+
+		<rect name="CM_JournalEntryAnchor">
+			<y>0</y>
+			<height>0</height>
+		</rect>
 	</rect>
 
 </template>
@@ -1524,7 +1529,16 @@
 <!-- Template that builds the Journal entries -->
 <template name="CM_Journal_Template">
 	<rect name="CM_Entry">
+		<locus>1</locus>
+		<y>
+			<copy src="sibling" trait="y"/>
+			<add src="sibling" trait="height"/>
+		</y>
+		<width><copy src="child(CM_JournalEntry)" trait="width"/></width>
+		<height><copy src="child(CM_JournalEntry)" trait="height"/></height>
+
 		<rect name="CM_JournalEntry">
+			<locus>1</locus>
 			<width>697</width>
 			<_entry></_entry>
 			<_location></_location>
@@ -1535,7 +1549,7 @@
 			</height>
 
 			<text name="timestamp">
-				<y><copy src="parent" trait="y"/></y>
+				<y>0</y>
 				<x>-6</x>
 				<clips>&true;</clips>
 				<font>1</font>
@@ -1647,7 +1661,7 @@
 			</hotrect>
 
 			<text name="location">
-				<y><copy src="parent" trait="y"/></y>
+				<y>0</y>
 				<x>
 					<copy src="sibling(verline)" trait="x"/>
 					<add>18</add>
@@ -1661,8 +1675,7 @@
 				<include src="line.xml"/>
 				<clips> &true; </clips>
 				<y>
-					<copy src="parent" trait="y"/>
-					<add src="sibling(timestamp)" trait="height"/>
+					<copy src="sibling(timestamp)" trait="height"/>
 					<sub>6</sub>
 				</y>
 				<x>
@@ -1676,8 +1689,7 @@
 
 			<text name="CM_JournalText">
 				<y>
-					<copy src="parent" trait="y"/>
-					<add>50</add>
+					<copy>50</copy>
 				</y>
 				<x>-4</x>
 				<width>

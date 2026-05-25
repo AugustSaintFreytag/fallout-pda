@@ -2,11 +2,6 @@ begin function { array_var aJournalEntry, short iTileIndex }
 
 	; Adds a single journal-list row for a decoded journal entry.
 
-	; UDFs
-
-	ref AddJournalEntryElementUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntryElement.gek"
-	ref GetApproximateTextHeightUDF = CompileScript "PipLog\Interface\GetApproximateTextHeight.gek"
-
 	; Main
 
 	if eval (aJournalEntry == Ar_Null) || ((Ar_Size aJournalEntry) == -1)
@@ -21,14 +16,6 @@ begin function { array_var aJournalEntry, short iTileIndex }
 	string_var sTileInsertCommand = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect|CM_Journal_Template|CM_Entry%g" iTileIndex
 	string_var sTileBasePath = Sv_Construct "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_Entry%g/CM_JournalEntry" iTileIndex
 	string_var sTilePropertyPath = ""
-
-	; Sizing
-
-	short iNumCharactersPerLine = 72
-	float fHeaderHeight = 60
-
-	float fTextHeight = (Call GetApproximateTextHeightUDF sJournalEntryText iNumCharactersPerLine)
-	float fEntryHeight = fHeaderHeight + fTextHeight
 
 	; Insertion
 
@@ -52,9 +39,6 @@ begin function { array_var aJournalEntry, short iTileIndex }
 	let sTilePropertyPath := Sv_Construct "%z/CM_JournalText/string" sTileBasePath
 	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryText)
 
-	let sTilePropertyPath := Sv_Construct "%z/CM_JournalText/height" sTileBasePath
-	SetUIFloatAlt ($sTilePropertyPath) fTextHeight
-
 	let sTilePropertyPath := Sv_Construct "%z/user0" sTileBasePath
 	SetUIFloatAlt ($sTilePropertyPath) iTileIndex
 
@@ -63,8 +47,6 @@ begin function { array_var aJournalEntry, short iTileIndex }
 
 	let sTilePropertyPath := Sv_Construct "%z/EntryDelete/user0" sTileBasePath
 	SetUIFloatAlt ($sTilePropertyPath) iTileIndex
-
-	Call AddJournalEntryElementUDF iTileIndex fEntryHeight
 
 	; Clean-Up
 
