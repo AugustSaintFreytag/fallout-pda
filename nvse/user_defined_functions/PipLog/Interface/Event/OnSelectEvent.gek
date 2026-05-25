@@ -55,6 +55,8 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 	string_var sSelectedEventId = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventId"
 	string_var sSelectedTileName = Player.AuxiliaryVariableGetString "*PLC_sSelectedEventTileName"
 
+	short bIsPlayerEvent = aEvent["_isPlayerEvent"]
+
 	; Main
 
 	Player.AuxiliaryVariableSetString "*PLC_sPreviousSelectedEventTileName" ($sSelectedTileName)
@@ -71,11 +73,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 		PrintC "Selected event '%z', id '%z' via selected event tile (%z)." (aEvent["name"]) sEventId sTileName
 		Player.AuxiliaryVariableSetString "*PLC_sSelectedEventId" ($sEventId)
 		Player.AuxiliaryVariableSetString "*PLC_sSelectedEventTileName" ($sTileName)
-		; Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" (iEventSourceKind == 1)
-
-		; Currently unknowable whether an event is system or player.
-		; Could store as flags with event and read as necessary.
-		; Could provide an interim "GetEventSourceById" where it is checked which aux var string maps contains the event.
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" bIsPlayerEvent
 	endif
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
