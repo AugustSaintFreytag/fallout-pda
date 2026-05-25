@@ -24,6 +24,8 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 	array_var aStoredEventsById = Player.AuxStringMapArrayGetAsArray ($sKeyById)
 
 	if eval (Ar_Size aStoredEventsById) == -1
+		PrintC "Cannot remove event '%z', by-id registry '%z' is unset." sEventId sKeyById
+		SetFunctionValue 0
 		Sv_Destruct sKeyById, sKeyByDate
 		return
 	endif
@@ -31,6 +33,8 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 	short bHasEvent = Ar_HasKey aStoredEventsById, sEventId
 
 	if eval !bHasEvent
+		PrintC "Cannot remove event '%z', id was not found in registry '%z'." sEventId sKeyById
+		SetFunctionValue 0
 		Sv_Destruct sKeyById, sKeyByDate
 		let aStoredEventsById := Ar_Null
 		return
@@ -42,6 +46,8 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 	array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
 
 	if eval (Ar_Size aEvent) == -1
+		PrintC "Cannot remove event '%z', stored event could not be decoded." sEventId
+		SetFunctionValue 0
 		Sv_Destruct sKeyById, sKeyByDate, sEncodedEvent
 		let aStoredEventsById := Ar_Null
 		return
@@ -56,7 +62,7 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 	if eval (Ar_Size aStoredEventsById) > 0
 		Player.AuxStringMapArraySetFromArray ($sKeyById) aStoredEventsById
 	else
-		Player.AuxiliaryVariableErase ($sKeyById)
+		Player.AuxStringMapArrayDestroy ($sKeyById)
 	endif
 
 	; Update the by-date index
@@ -80,12 +86,15 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 			if eval (Ar_Size aStoredEventIdsByDate) > 0
 				Player.AuxStringMapArraySetFromArray ($sKeyByDate) aStoredEventIdsByDate
 			else
-				Player.AuxiliaryVariableErase ($sKeyByDate)
+				Player.AuxStringMapArrayDestroy ($sKeyByDate)
 			endif
 
 			Sv_Destruct sCurrentIds, sUpdatedIds
 		endif
 	endif
+
+	PrintC "Removed event '%z' from registry '%z' and date index '%z'." sEventId sKeyById sKeyByDate
+	SetFunctionValue 1
 
 	; Clean-Up
 
