@@ -25,7 +25,6 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 
 	if eval (Ar_Size aStoredEventsById) == -1
 		PrintC "Cannot remove event '%z', by-id registry '%z' is unset." sEventId sKeyById
-		SetFunctionValue 0
 		Sv_Destruct sKeyById, sKeyByDate
 		return
 	endif
@@ -34,7 +33,6 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 
 	if eval !bHasEvent
 		PrintC "Cannot remove event '%z', id was not found in registry '%z'." sEventId sKeyById
-		SetFunctionValue 0
 		Sv_Destruct sKeyById, sKeyByDate
 		let aStoredEventsById := Ar_Null
 		return
@@ -47,7 +45,6 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 
 	if eval (Ar_Size aEvent) == -1
 		PrintC "Cannot remove event '%z', stored event could not be decoded." sEventId
-		SetFunctionValue 0
 		Sv_Destruct sKeyById, sKeyByDate, sEncodedEvent
 		let aStoredEventsById := Ar_Null
 		return
@@ -94,7 +91,6 @@ begin function { string_var sEventId, short bIsPlayerEvent }
 	endif
 
 	PrintC "Removed event '%z' from registry '%z' and date index '%z'." sEventId sKeyById sKeyByDate
-	SetFunctionValue 1
 
 	; Clean-Up
 

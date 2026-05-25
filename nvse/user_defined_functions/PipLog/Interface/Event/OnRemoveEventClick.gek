@@ -2,17 +2,22 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Removes the currently selected player event.
 
+	PrintC "Received click on event delete button, name '%z', id '%g'." sTileName iTileId
+
 	; Guards
 
 	if eval !(MenuMode 1023)
+		PrintC "Cannot delete event, incompatible menu mode %g (expected: 1023)." (GetActiveMenuMode)
 		return
 	endif
 
 	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 2
+		PrintC "Cannot delete event, incompatible view mode %g (expected: 2)." (Player.AuxiliaryVariableGetFloat "*PLC_iViewMode")
 		return
 	endif
 
 	if Player.AuxiliaryVariableGetFloat "*PLC_bIsSelectedEventPlayer" == 0
+		PrintC "Cannot delete event, selected event is not a player event."
 		return
 	endif
 
@@ -27,11 +32,14 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 	; Main
 
 	if eval (Sv_Length sSelectedEventId) == 0
+		PrintC "Cannot delete event, no selected event id is set."
 		Sv_Destruct sSelectedEventId
 		return
 	endif
 
 	Call RemoveEventUDF sSelectedEventId 1
+
+	PrintC "Deleted selected event '%z'." sSelectedEventId
 
 	Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
 	Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
