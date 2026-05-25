@@ -40,12 +40,14 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 		return
 	endif
 
-	ShowTextInputMenu OnEditEventConfirmUDF 500 160 "Event title:"
-	SetTextInputString "%z" aEvent["name"]
+	string_var sEventName = aEvent["name"]
+
+	ShowTextInputMenu OnEditEventConfirmUDF 500 100 "Event Name:"
+	SetTextInputString "%z" sEventName
 
 	; Clean-Up
 
-	Sv_Destruct sSelectedEventId
+	Sv_Destruct sSelectedEventId, sEventName
 	let aEvent := Ar_Null
 
 end
