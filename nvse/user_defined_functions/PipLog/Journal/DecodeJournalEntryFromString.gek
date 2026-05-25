@@ -15,9 +15,10 @@ begin function { string_var sData }
 	endif
 
 	array_var aJournalEntry = Ar_Construct "stringmap"
+	short iFlags = #(aComponents[1])
 
 	let aJournalEntry["id"] := aComponents[0]
-	let aJournalEntry["flags"] := aComponents[1]
+	let aJournalEntry["flags"] := iFlags
 	let aJournalEntry["datetime"] := aComponents[2]
 	let aJournalEntry["location"] := aComponents[3]
 	let aJournalEntry["text"] := aComponents[4]

@@ -1,18 +1,27 @@
 begin function { array_var aJournalEntry }
 
 	; Takes a stringmap with fields "id", "flags", "datetime", "location", and "text".
+	; "flags" is passed in as a short and stringified only for legacy storage.
 	; Returns the journal entry encoded as a "@@@"-delimited string.
 	; Caller is responsible for Sv_Destruct on the returned string.
 
 	; Main
 
-	array_var aComponents = Ar_List aJournalEntry["id"], aJournalEntry["flags"], aJournalEntry["datetime"], aJournalEntry["location"], aJournalEntry["text"]
+	short iFlags = 0
+
+	if eval (Ar_HasKey aJournalEntry, "flags")
+		let iFlags := #(aJournalEntry["flags"])
+	endif
+
+	string_var sFlags = $iFlags
+	array_var aComponents = Ar_List aJournalEntry["id"], sFlags, aJournalEntry["datetime"], aJournalEntry["location"], aJournalEntry["text"]
 	string_var sEncodedEntry = Sv_Join aComponents, "@@@"
 
 	SetFunctionValue sEncodedEntry
 
 	; Clean-Up
 
+	Sv_Destruct sFlags
 	let aComponents := Ar_Null
 
 end

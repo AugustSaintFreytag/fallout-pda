@@ -18,7 +18,7 @@ begin function { string_var sText }
 	array_var aJournalEntry = Ar_Construct "stringmap"
 
 	let aJournalEntry["id"] := sId
-	let aJournalEntry["flags"] := "0"
+	let aJournalEntry["flags"] := 0
 	let aJournalEntry["datetime"] := sDatetime
 	let aJournalEntry["location"] := sLocation
 	let aJournalEntry["text"] := sText
