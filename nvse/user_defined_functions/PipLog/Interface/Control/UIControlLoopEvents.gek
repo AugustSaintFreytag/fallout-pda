@@ -70,7 +70,7 @@ begin function {}
 				Sv_Destruct sNewEventTilePath
 			endif
 
-			array_var aSelectedEvent = (Call GetEventByIdUDF sSelectedEventId bIsSelectedEventPlayer)
+			array_var aSelectedEvent = (Call GetEventByIdUDF sSelectedEventId)
 
 			if eval aSelectedEvent == Ar_Null
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 0

@@ -1,51 +1,63 @@
-begin function { string_var sEventId, short bIsPlayerEvent }
+begin function { string_var sEventId }
 
-	; Returns the decoded event with sEventId from player or global event storage.
-	; Pass bIsPlayerEvent = 1 for player events, 0 for global events.
+	; Returns the decoded event with sEventId from global or player event storage.
+	; Checks global storage first, then player storage.
 	; Returns Ar_Null if the event does not exist.
 
 	; UDFs
 
 	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+	ref EncodeEventFlagsUDF = CompileScript "PipLog\Event\EncodeEventFlags.gek"
 
 	; State
 
-	string_var sKeyById = "*PLC_aGlobalEventsById"
+	string_var sEncodedEvent = ""
+	short bDidFindEvent = 0
 
-	if eval bIsPlayerEvent
-		let sKeyById := "PLC_aPlayerEventsById"
+	; Check Global Events
+
+	array_var aEventsById = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsById"
+
+	if eval (Ar_Size aEventsById) != -1
+		if eval (Ar_HasKey aEventsById, sEventId)
+			let sEncodedEvent := aEventsById[sEventId]
+			let bDidFindEvent := 1
+		endif
 	endif
 
-	; Main
+	; Check Player Events
 
-	array_var aEventsById = Player.AuxStringMapArrayGetAsArray ($sKeyById)
+	if eval !bDidFindEvent
+		let aEventsById := Ar_Null
+		let aEventsById := Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
 
-	if eval (Ar_Size aEventsById) == -1
+		if eval (Ar_Size aEventsById) != -1
+			if eval (Ar_HasKey aEventsById, sEventId)
+				let sEncodedEvent := aEventsById[sEventId]
+				let bDidFindEvent := 1
+			endif
+		endif
+	endif
+
+	; Verify Match
+
+	if eval !bDidFindEvent
 		SetFunctionValue Ar_Null
 
-		Sv_Destruct sKeyById
+		Sv_Destruct sEncodedEvent
 		let aEventsById := Ar_Null
 		return
 	endif
 
-	short bHasEvent = Ar_HasKey aEventsById, sEventId
+	; Return
 
-	if eval !bHasEvent
-		SetFunctionValue Ar_Null
-		
-		Sv_Destruct sKeyById
-		let aEventsById := Ar_Null
-		return
-	endif
-
-	string_var sEncodedEvent = aEventsById[sEventId]
 	array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
 
 	SetFunctionValue aEvent
 
 	; Clean-Up
 
-	Sv_Destruct sKeyById, sEncodedEvent
+	Sv_Destruct sEncodedEvent
 	let aEventsById := Ar_Null
 
 end
