@@ -23,6 +23,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Main
 
-	ShowTextInputMenu OnCreateJournalEntryConfirmUDF 700 500 "New Journal Entry:"
+	ShowTextInputMenu OnCreateJournalEntryConfirmUDF 700 500 "Journal Entry:"
 
 end
