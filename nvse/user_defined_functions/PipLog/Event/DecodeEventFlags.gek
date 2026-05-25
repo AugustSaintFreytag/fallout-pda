@@ -1,0 +1,33 @@
+begin function { array_var aEvent }
+
+	; Reads an event's flag bitmask and writes convenience fields.
+	; Bit 0 = system event, bit 1 = player event.
+	; Mutates aEvent in place.
+
+	; Guards
+
+	if eval (aEvent == Ar_Null) || (Ar_Size aEvent) == -1
+		return
+	endif
+
+	; Main
+
+	short iFlags = 0
+
+	if eval (Ar_HasKey aEvent, "flags")
+		let iFlags := #(aEvent["flags"])
+	endif
+
+	let aEvent["flags"] := iFlags
+	let aEvent["_isSystemEvent"] := 0
+	let aEvent["_isPlayerEvent"] := 0
+
+	if eval (iFlags & 1)
+		let aEvent["_isSystemEvent"] := 1
+	endif
+
+	if eval (iFlags & 2)
+		let aEvent["_isPlayerEvent"] := 1
+	endif
+
+end
