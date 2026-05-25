@@ -1,0 +1,27 @@
+begin function { short iKind }
+
+	; iKind -- 0 = head, 1 = tail
+
+	; UDFs (Local)
+
+	ref GetTemplateNameForKindUDF = (begin function { short iKind }
+		if iKind == 0
+			SetFunctionValue "CM_EventAnchor_Head_Template"
+		else
+			SetFunctionValue "CM_EventAnchor_Tail_Template"
+		endif
+	end)
+
+	; Main
+
+	string_var sParentPath = "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
+	string_var sTemplateName = Call GetTemplateNameForKindUDF iKind
+	string_var sTileInsertCommand = Sv_Construct "%z|%z" sParentPath sTemplateName
+
+	AddTileFromTemplate ($sTileInsertCommand)
+
+	; Clean-Up
+
+	Sv_Destruct sParentPath, sTemplateName, sTileInsertCommand
+
+end

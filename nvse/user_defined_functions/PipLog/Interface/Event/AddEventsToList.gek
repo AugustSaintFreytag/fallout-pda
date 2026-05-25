@@ -6,6 +6,7 @@ begin function { array_var aEvents }
 	; UDFs
 
 	ref AddEventToListUDF = CompileScript "PipLog\Interface\Event\AddEventToList.gek"
+	ref AddEventAnchorElementToListUDF = CompileScript "PipLog\Interface\Event\AddEventAnchorElementToList.gek"
 
 	; State
 
@@ -14,7 +15,10 @@ begin function { array_var aEvents }
 
 	; Main
 
+	Call AddEventAnchorElementToListUDF 0
+
 	if iNumEvents == -1
+		Call AddEventAnchorElementToListUDF 1
 		SetFunctionValue 0
 		return
 	endif
@@ -27,6 +31,8 @@ begin function { array_var aEvents }
 		let aEvent := Ar_Null
 		let iTileIndex += 1
 	loop
+
+	Call AddEventAnchorElementToListUDF 1
 
 	SetFunctionValue iTileIndex
 
