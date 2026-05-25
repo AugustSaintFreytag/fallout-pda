@@ -1,0 +1,18 @@
+begin function { short iStatCode, short iModifiedValue, short iNewValue }
+
+	; Handles ShowOff:OnPCMiscStatChange.
+	; The event provides the stat code, delta, and resulting total; Pip-Log stores the daily delta.
+
+	; UDFs
+
+	ref IncrementPlayerStatValueUDF = CompileScript "PipLog\Stats\IncrementPlayerStatValue.gek"
+
+	; Main
+
+	if iModifiedValue == 0
+		return
+	endif
+
+	Call IncrementPlayerStatValueUDF iStatCode iModifiedValue
+
+end
