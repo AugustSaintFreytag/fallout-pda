@@ -20,6 +20,7 @@ ref TickPlayerRemindersUDF = CompileScript "PipLog\Reminder\TickPlayerReminders.
 ref AddComputedEventsUDF = CompileScript "PipLog\Calendar\AddComputedEvents.gek"
 ref AddHolidayEventsUDF = CompileScript "PipLog\Calendar\AddHolidayEvents.gek"
 ref AppendJournalEntryUDF = CompileScript "PipLog\Journal\AppendJournalEntry.gek"
+ref OnPlayerMiscStatChangeUDF = CompileScript "PipLog\Stats\OnPlayerMiscStatChange.gek"
 
 ; Loops
 
@@ -47,6 +48,7 @@ SetOnMenuClickEventHandler OnToggleReminderClickUDF 1 "MapMenu#527"
 
 ;SetOnMouseoverChangeEventHandler OnCalendarHoverUDF 1 1023
 SetOnMenuCloseEventHandler OnMenuCloseUDF 1 1023
+SetEventHandler "ShowOff:OnPCMiscStatChange" OnPlayerMiscStatChangeUDF
 
 ; TODO: Re-introduce event handlers for API access.
 ; API: AddJournalEntry, AddDateReminder, AddEvent
