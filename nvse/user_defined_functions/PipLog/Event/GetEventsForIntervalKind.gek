@@ -17,8 +17,8 @@ begin function { short iIntervalKind }
 
 	; Collection
 
-	array_var aGlobalEvents = (Call GetFilteredEventsFromPropertiesUDF aGlobalEventsById aGlobalEventIdsByDate iIntervalKind 0)
-	array_var aPlayerEvents = (Call GetFilteredEventsFromPropertiesUDF aPlayerEventsById aPlayerEventIdsByDate iIntervalKind 1)
+	array_var aGlobalEvents = (Call GetFilteredEventsFromPropertiesUDF aGlobalEventsById aGlobalEventIdsByDate iIntervalKind)
+	array_var aPlayerEvents = (Call GetFilteredEventsFromPropertiesUDF aPlayerEventsById aPlayerEventIdsByDate iIntervalKind)
 
 	array_var aEvents = Ar_Construct "array"
 
