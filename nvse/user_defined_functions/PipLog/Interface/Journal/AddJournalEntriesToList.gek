@@ -1,45 +1,44 @@
-begin function { array_var aJournalEntries, short bSort, array_var aDisplayedJournalEntryIds }
+begin function { array_var aJournalEntries, array_var aDisplayedJournalEntryIds }
 
 	; Adds all journal-list rows and records their displayed IDs.
-	; bSort == 0 displays oldest-first; bSort == 1 displays newest-first.
-	; Returns the number of rows added.
 
 	; UDFs
 
 	ref AddJournalEntryToListUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntryToList.gek"
+	ref AddJournalEntryAnchorElementToListUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntryAnchorElementToList.gek"
 
 	; State
 
-	short iTileIndex = 0
 	short iNumJournalEntries = Ar_Size aJournalEntries
 
 	; Main
 
+	; Insert head anchor element for layout.
+	Call AddJournalEntryAnchorElementToListUDF 0
+
 	if iNumJournalEntries == -1
-		SetFunctionValue 0
+		; Cap off list early with tail element and bail.
+		Call AddJournalEntryAnchorElementToListUDF 1
 		return
 	endif
 
-	while iTileIndex < iNumJournalEntries
-		short iStorageIndex = iTileIndex
+	short iTileIndex = 0
 
-		if bSort == 1
-			let iStorageIndex := (iNumJournalEntries - 1) - iTileIndex
-		endif
+	foreach (array_var aElement) <- aJournalEntries
+		short iIndex = #(aElement["key"])
+		array_var aJournalEntry = aElement["value"]
 
-		array_var aJournalEntry = aJournalEntries[iStorageIndex]
-
-		Call AddJournalEntryToListUDF aJournalEntry iTileIndex
+		; Insert element to list.
+		Call AddJournalEntryToListUDF aJournalEntry iIndex
 
 		string_var sJournalEntryId = aJournalEntry["id"]
-
 		Ar_Append aDisplayedJournalEntryIds, sJournalEntryId
 
 		Sv_Destruct sJournalEntryId
 		let aJournalEntry := Ar_Null
-		let iTileIndex += 1
 	loop
 
-	SetFunctionValue iTileIndex
+	; Insert tail anchor element for layout.
+	Call AddJournalEntryAnchorElementToListUDF 1
 
 end

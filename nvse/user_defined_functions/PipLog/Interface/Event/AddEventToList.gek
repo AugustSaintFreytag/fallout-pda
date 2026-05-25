@@ -2,10 +2,6 @@ begin function { array_var aEvent, short iIndex }
 
 	; Adds a single event-list row for a decoded event.
 
-	; UDFs
-
-	; ref GetEventListRowHeightUDF = CompileScript "PipLog\Interface\Event\GetEventListRowHeight.gek"
-
 	; Main
 
 	if eval (aEvent == Ar_Null) || ((Ar_Size aEvent) == -1)
@@ -23,10 +19,6 @@ begin function { array_var aEvent, short iIndex }
 		let iEventSourceKind := aEvent["_source"]
 	endif
 
-	; float fEventHeight = (Call GetEventListRowHeightUDF sEventName)
-	float fEventHeight = 42 ; Fixed height for testing
-	float fEventY = iIndex * fEventHeight
-	
 	string_var sTileInsertCommand = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect|CM_Event_Template|CM_Event%g" iIndex
 	string_var sTileBasePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/CM_Event%g" iIndex
 	string_var sTilePropertyPath = ""
@@ -35,12 +27,6 @@ begin function { array_var aEvent, short iIndex }
 
 	let sTilePropertyPath := Sv_Construct "%z/string" sTileBasePath
 	SetUIStringAlt ($sTilePropertyPath) ($sEventName)
-
-	let sTilePropertyPath := Sv_Construct "%z/y" sTileBasePath
-	SetUIFloatAlt ($sTilePropertyPath) fEventY
-
-	let sTilePropertyPath := Sv_Construct "%z/height" sTileBasePath
-	SetUIFloatAlt ($sTilePropertyPath) fEventHeight
 
 	let sTilePropertyPath := Sv_Construct "%z/_selected" sTileBasePath
 	SetUIFloatAlt ($sTilePropertyPath) 0

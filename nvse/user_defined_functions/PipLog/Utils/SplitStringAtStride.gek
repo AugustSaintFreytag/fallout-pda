@@ -1,0 +1,44 @@
+begin function { string_var sText, short iNumCharacters }
+
+	; Splits sText into an array of string chunks with up to iNumCharacters each.
+
+	; State
+
+	array_var aChunks = Ar_Construct "array"
+
+	; Main
+
+	if iNumCharacters <= 0
+		PrintC "Cannot split string into chunks of %g characters." iNumCharacters
+		SetFunctionValue aChunks
+
+		let aChunks := Ar_Null
+
+		return
+	endif
+
+	short iTextLength = Sv_Length sText
+	short iStart = 0
+
+	while iStart < iTextLength
+		short iEnd = iStart + iNumCharacters
+
+		if iEnd > iTextLength
+			let iEnd := iTextLength
+		endif
+
+		string_var sChunk = sText[iStart:iEnd]
+
+		Ar_Append aChunks, sChunk
+		Sv_Destruct sChunk
+
+		let iStart := iEnd
+	loop
+
+	SetFunctionValue aChunks
+
+	; Clean-Up
+
+	let aChunks := Ar_Null
+
+end

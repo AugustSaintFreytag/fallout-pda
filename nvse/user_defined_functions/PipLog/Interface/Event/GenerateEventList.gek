@@ -7,6 +7,7 @@ begin function {}
 	ref MapStringArrayUDF = CompileScript "PipLog\Utils\MapStringArray.gek"
 	ref AddEventsToListUDF = CompileScript "PipLog\Interface\Event\AddEventsToList.gek"
 	ref GetEventsForIntervalKindUDF = CompileScript "PipLog\Event\GetEventsForIntervalKind.gek"
+	ref UpdateEventListHeightUDF = CompileScript "PipLog\Interface\Event\UpdateEventListHeight.gek"
 
 	; State
 
@@ -23,15 +24,11 @@ begin function {}
 
 	Call AddEventsToListUDF aEvents
 
-	; Set Content Dimensions
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/visible" 1
 
 	short iNumEvents = Ar_Size aEvents
 
-	float fEventHeight = 42
-	float fTotalEventHeight = iNumEvents * fEventHeight
-
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/_templateheight" fTotalEventHeight
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/visible" 1
+	CallAfterFrames 1.1 UpdateEventListHeightUDF 1
 
 	float fNumVisibleItems = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_visible_items")
 	float fNumItems = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_items")
@@ -49,7 +46,7 @@ begin function {}
 
 	; Conclude
 
-	PrintC "Event list scroll metrics: items=%g, template height=%g, visible items=%g, total items=%g, scroll delta=%g." iNumEvents fTotalEventHeight fNumVisibleItems fNumItems fScrollDelta
+	PrintC "Event list scroll metrics before delayed height update: items=%g, visible items=%g, total items=%g, scroll delta=%g." iNumEvents fNumVisibleItems fNumItems fScrollDelta
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 0
 

@@ -1,4 +1,6 @@
 piplog\calendar.xml::MapMenu
 true
+piplog\vanilla.xml::MapMenu::MM_ButtonRect
+true
 piplog\birthdaymenu.xml::MessageMenu
 true

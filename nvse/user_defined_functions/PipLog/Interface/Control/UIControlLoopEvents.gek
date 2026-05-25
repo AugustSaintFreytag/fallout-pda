@@ -41,7 +41,7 @@ begin function {}
 		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Event_Daily.dds"
 	else
 		SetUIStringAlt "MapMenu/CM_MainRect/CM_HeadlineRect/CM_Headline_LocationInfo/string" "Daily Events"
-		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Show Unique"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Show One-Off"
 		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Event_OneOff.dds"
 	endif
 
