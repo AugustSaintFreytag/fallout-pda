@@ -1,15 +1,18 @@
 begin function { string_var sData }
 
 	; Splits a "@@@"-delimited string and reconstructs an event stringmap.
-	; Returns a stringmap with fields "id", "date", "name".
 	; Returns Ar_Null if the encoded string is malformed (wrong field count).
-	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref DecodeEventFlagsUDF = CompileScript "PipLog\Event\DecodeEventFlags.gek"
 
 	; Main
 
 	array_var aComponents = Sv_Split sData, "@@@"
+	short iNumComponents = Ar_Size aComponents
 
-	if eval (Ar_Size aComponents) != 3
+	if eval (iNumComponents != 3) && (iNumComponents != 4)
 		PrintC "Could not decode event from string '%z', invalid format." sData
 
 		SetFunctionValue Ar_Null
@@ -22,6 +25,15 @@ begin function { string_var sData }
 	let aEvent["id"] := aComponents[0]
 	let aEvent["date"] := aComponents[1]
 	let aEvent["name"] := aComponents[2]
+
+	short iFlags = 0
+
+	if iNumComponents == 4
+		let iFlags := #(aComponents[3])
+	endif
+
+	let aEvent["flags"] := iFlags
+	Call DecodeEventFlagsUDF aEvent
 
 	SetFunctionValue aEvent
 

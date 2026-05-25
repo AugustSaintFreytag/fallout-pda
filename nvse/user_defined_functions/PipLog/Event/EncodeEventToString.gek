@@ -1,23 +1,32 @@
 begin function { array_var aEvent }
 
-	; Takes a stringmap with fields "id", "date", "name".
 	; Returns the event encoded as a "@@@"-delimited string.
 	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; UDFs
+
+	ref EncodeEventFlagsUDF = CompileScript "PipLog\Event\EncodeEventFlags.gek"
 
 	; Main
 
 	if eval (aEvent == Ar_Null) || (Ar_Size aEvent) == -1
-		PrintC "Cannot encode event to string, event is null."
+		PrintC "Cannot encode event to string, event is null or malformed."
 		return
 	endif
 
-	array_var aComponents = Ar_List aEvent["id"], aEvent["date"], aEvent["name"]
+	Call EncodeEventFlagsUDF aEvent
+
+	short iFlags = aEvent["flags"]
+	string_var sFlags = $iFlags
+
+	array_var aComponents = Ar_List aEvent["id"], aEvent["date"], aEvent["name"], sFlags
 	string_var sEncodedEvent = Sv_Join aComponents, "@@@"
 
 	SetFunctionValue sEncodedEvent
 
 	; Clean-Up
 
+	Sv_Destruct sFlags
 	let aComponents := Ar_Null
 
 end
