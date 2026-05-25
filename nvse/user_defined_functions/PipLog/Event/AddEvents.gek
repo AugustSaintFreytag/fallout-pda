@@ -11,6 +11,7 @@ begin function { array_var aEvents, short bIsPlayerEvent }
 	; UDFs
 
 	ref EncodeEventToStringUDF = CompileScript "PipLog\Event\EncodeEventToString.gek"
+	ref EncodeEventFlagsUDF = CompileScript "PipLog\Event\EncodeEventFlags.gek"
 	ref AppendEventIdToListUDF = CompileScript "PipLog\Event\AppendEventIdToList.gek"
 
 	; State
@@ -49,6 +50,16 @@ begin function { array_var aEvents, short bIsPlayerEvent }
 			let aEvent := Ar_Null
 			continue
 		endif
+
+		if eval bIsPlayerEvent
+			let aEvent["_isSystemEvent"] := 0
+			let aEvent["_isPlayerEvent"] := 1
+		else
+			let aEvent["_isSystemEvent"] := 1
+			let aEvent["_isPlayerEvent"] := 0
+		endif
+
+		Call EncodeEventFlagsUDF aEvent
 
 		string_var sEventId = aEvent["id"]
 		string_var sEventDate = aEvent["date"]
