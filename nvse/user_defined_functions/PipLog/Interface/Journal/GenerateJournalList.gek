@@ -5,21 +5,22 @@ begin function {}
 	; UDFs
 
 	ref AddJournalEntriesToListUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntriesToList.gek"
-	ref AddJournalEntryElementUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntryElement.gek"
 	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
+	ref UpdateJournalEntryListHeightUDF = CompileScript "PipLog\Interface\Journal\UpdateJournalEntryListHeight.gek"
 
 	; State
 
-	short bSort = Player.AuxiliaryVariableGetFloat "PLC_bSort"
+	; TODO: Implement sorting journal entries and toggle functionality in UI.
+	; short bSort = Player.AuxiliaryVariableGetFloat "PLC_bSort"
 
 	; Add Tile
 
 	UnloadUIComponent "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect"
 	AddTileFromTemplate "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect|CM_JournalEntryRect_Template|CM_JournalEntryRect"
 	
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/_templateheight" 0
+	; SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/_templateheight" 0
 
-	; Add Entries
+	; Prepare Entries
 
 	array_var aJournalEntries = Call GetJournalEntriesUDF
 	short iNumJournalEntries = Ar_Size aJournalEntries
@@ -28,15 +29,18 @@ begin function {}
 		let iNumJournalEntries := 0
 	endif
 
-	array_var aDisplayedJournalEntryIds = Ar_Construct "array"
+	; Insert Entries
 
-	short iNumDisplayedJournalEntries = Call AddJournalEntriesToListUDF aJournalEntries bSort aDisplayedJournalEntryIds
+	array_var aDisplayedJournalEntryIds = Ar_Construct "array"
+	Call AddJournalEntriesToListUDF aJournalEntries aDisplayedJournalEntryIds
 
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/visible" 1
 
-	Call AddJournalEntryElementUDF iNumDisplayedJournalEntries
+	; Scroll View
 
-	; Store for Interaction
+	CallAfterFrames 1.1 UpdateJournalEntryListHeightUDF 1
+
+	; Store View
 
 	Player.AuxiliaryVariableSetFloat "PLC_iNumJournalEntries" iNumJournalEntries
 

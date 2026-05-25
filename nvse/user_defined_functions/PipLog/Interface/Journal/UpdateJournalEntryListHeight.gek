@@ -1,0 +1,20 @@
+begin function {}
+
+	; Updates the journal list scrollbar from the XML-computed tail anchor position.
+
+	; Main
+
+	float fTailY = GetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_JournalEntryAnchor_Tail/y"
+	float fTailHeight = GetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/CM_JournalEntryAnchor_Tail/height"
+	float fScrollDelta = GetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalScrollbar/_ScrollDelta"
+	
+	float fMeasuredContentHeight = fTailY + fTailHeight
+	float fMeasuredItems = 0
+
+	if fScrollDelta > 0
+		let fMeasuredItems := fMeasuredContentHeight / fScrollDelta
+	endif
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalScrollbar/_number_of_items" fMeasuredItems
+
+end

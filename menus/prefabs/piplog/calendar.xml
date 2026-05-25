@@ -242,7 +242,7 @@
 	<rect name="CM_CalendarRect">
 		<x>-10</x>
 		<y>115</y>
-		<locus>1</locus>
+		<locus>&true;</locus>
 		<visible>
 			<copy src="sibling(CM_HeadlineRect)" trait="visible"/>
 			<and>
@@ -428,7 +428,7 @@
 		</visible>
 
 		<rect name="CM_EventSide">
-			<locus>1</locus>
+			<locus>&true;</locus>
 			<visible>1</visible><!-- Set in code-->
 			<x>525</x>
 			<y>355</y>
@@ -506,7 +506,7 @@
 				</x>
 				<y><copy src="sibling(CM_Event_Delete)" trait="y"/></y>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<mouseoversound>UIMenuFocus</mouseoversound>
 				<clicksound>UIMenuFocus</clicksound>
 				<image name="EntryEdit_ico">
@@ -552,7 +552,7 @@
 					<add>19</add>
 				</y>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<mouseoversound>UIMenuFocus</mouseoversound>
 				<clickSound>UIMenuCancel</clickSound>
 				<image name="EntryDelete_ico">
@@ -581,7 +581,7 @@
 
 		<!--Larger section for holding event list rows-->
 		<hotrect name="CM_EventTextRect">
-			<locus>1</locus>
+			<locus>&true;</locus>
 			<wheelable>&true;</wheelable>
 			<clipwindow> &true; </clipwindow>
 			<target> <copy src="me()" trait="visible"/> </target>
@@ -637,7 +637,7 @@
 
 		<!--Tiny section to the right for adding new journal entries-->
 		<rect name="CM_JournalSide">
-			<locus>1</locus>
+			<locus>&true;</locus>
 			<x>697</x>
 			<y>450</y>
 			<width>
@@ -693,10 +693,12 @@
 		<!--Larger section for holding all of the written journal entries-->
 		<hotrect name="CM_JournalTextRect">
 			<id>517</id>
-			<locus>1</locus>
+			<locus>&true;</locus>
 			<wheelable>&true;</wheelable>
-			<clipwindow> &true; </clipwindow>
-			<target> <copy src="me()" trait="visible"/> </target>
+			<clipwindow>&true;</clipwindow>
+			<target>
+				<copy src="me()" trait="visible"/>
+			</target>
 			<visible>
 				<copy>1</copy>
 				<onlyifnot src="parent" trait="_editing"/>
@@ -706,7 +708,6 @@
 			<y>100</y>
 			<width>687</width>
 			<height>470</height>
-			<_templateheight></_templateheight>
 
 			<!--Scroll bar for the Journal, might need some refinement-->
 			<hotrect name="CM_JournalScrollbar">
@@ -720,11 +721,10 @@
 					<div src="me" trait="_ScrollDelta" />
 				</_number_of_visible_items>
 				<_number_of_items>
-					<copy src="parent" trait="_templateheight"/>
-					<div src="me" trait="_ScrollDelta" />
+					0
 				</_number_of_items>
 				
-				<_ScrollDelta> 16 </_ScrollDelta>
+				<_ScrollDelta>16</_ScrollDelta>
 			</hotrect>
 
 			<!--Rect for holding entries would go in here,
@@ -791,7 +791,7 @@
 			<y>-65</y>
 			<x>-3</x>
 			<width><copy src="parent" trait="width"/></width>
-			<locus>1</locus>
+			<locus>&true;</locus>
 		
 			<!-- Shared Values -->
 			<_xverbuf>5</_xverbuf>
@@ -961,7 +961,7 @@
 				<eq>1</eq>
 				<and src="CM_CustomButton" trait="visible"/>
 			</visible>	
-			<locus>1</locus>
+			<locus>&true;</locus>
 			<width><copy src="parent" trait="width"/></width>
 			<height>320</height>
 
@@ -1037,7 +1037,7 @@
 				<width><copy src="parent" trait="_arrowWidth"/></width>
 				<height><copy src="parent" trait="_arrowHeight"/></height>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
 				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
 				<image name="CM_MonthLeftArrow_t">
@@ -1068,7 +1068,7 @@
 				<width><copy src="parent" trait="_arrowWidth"/></width>
 				<height><copy src="parent" trait="_arrowHeight"/></height>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
 				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
 				<image name="CM_MonthRightArrow_t">
@@ -1125,7 +1125,7 @@
 				<width><copy src="parent" trait="_arrowWidth"/></width>
 				<height><copy src="parent" trait="_arrowHeight"/></height>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
 				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
 				<image name="CM_DayLeftArrow_t">
@@ -1152,7 +1152,7 @@
 				<width><copy src="parent" trait="_arrowWidth"/></width>
 				<height><copy src="parent" trait="_arrowHeight"/></height>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
 				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
 				<image name="CM_DayRightArrow_t">
@@ -1207,7 +1207,7 @@
 				<width><copy src="parent" trait="_arrowWidth"/></width>
 				<height><copy src="parent" trait="_arrowHeight"/></height>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
 				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
 				<image name="CM_YearLeftArrow_t">
@@ -1235,7 +1235,7 @@
 				<width><copy src="parent" trait="_arrowWidth"/></width>
 				<height><copy src="parent" trait="_arrowHeight"/></height>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
 				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
 				<image name="CM_YearRightArrow_t">
@@ -1303,7 +1303,7 @@
 					<mul>1.5</mul>
 				</height>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
 				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
 				<image name="CM_RepeatLeftArrow_t">
@@ -1331,7 +1331,7 @@
 				<width><copy src="parent" trait="_arrowWidth"/></width>
 				<height><copy src="sibling(CM_RepeatLeftArrow)" trait="height"/></height>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<clicksound><copy src="parent" trait="_arrowClickSound"/></clicksound>
 				<mouseoversound><copy src="parent" trait="_arrowMouseOverSound"/></mouseoversound>
 				<image name="CM_RepeatRightArrow_t">
@@ -1447,7 +1447,7 @@
 
 		<_alpha1><_alpha1> <!-- Set in code | Handles the alpha of the date text -->
 		<_alpha2><_alpha2> <!-- Set in code | Handles the alpha of the box -->
-		<locus>1</locus>
+		<locus>&true;</locus>
 		<_line_alpha>255</_line_alpha>
 		<_selected></_selected> <!-- Set in code-->
 		<_day_state></_day_state>
@@ -1518,18 +1518,32 @@
 		</y>
 		<x>25</x>
 
-		<rect name="CM_JournalEntryAnchor">
-			<y>0</y>
-			<height>0</height>
-		</rect>
+		<!-- Children go here. -->
 	</rect>
 
+</template>
+
+<template name="CM_JournalEntryAnchor_Head_Template">
+	<rect name="CM_JournalEntryAnchor_Head">
+		<y>0</y>
+		<height>0</height>
+	</rect>
+</template>
+
+<template name="CM_JournalEntryAnchor_Tail_Template">
+	<rect name="CM_JournalEntryAnchor_Tail">
+		<y>
+			<copy src="sibling" trait="y" />
+			<add src="sibling" trait="height" />
+		</y>
+		<height>10</height>
+	</rect>
 </template>
 
 <!-- Template that builds the Journal entries -->
 <template name="CM_Journal_Template">
 	<rect name="CM_Entry">
-		<locus>1</locus>
+		<locus>&true;</locus>
 		<y>
 			<copy src="sibling" trait="y"/>
 			<add src="sibling" trait="height"/>
@@ -1538,7 +1552,7 @@
 		<height><copy src="child(CM_JournalEntry)" trait="height"/></height>
 
 		<rect name="CM_JournalEntry">
-			<locus>1</locus>
+			<locus>&true;</locus>
 			<width>697</width>
 			<_entry></_entry>
 			<_location></_location>
@@ -1592,7 +1606,7 @@
 					</sub>
 				</x>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<mouseoversound>UIMenuFocus</mouseoversound>
 				<clicksound>UIMenuFocus</clicksound>
 				<image name="EntryEdit_ico">
@@ -1635,7 +1649,7 @@
 					<sub>6</sub>
 				</y>
 				<target>1</target>
-				<locus>1</locus>
+				<locus>&true;</locus>
 				<mouseoversound>UIMenuFocus</mouseoversound>
 				<clickSound>UIMenuCancel</clickSound>
 				<image name="EntryDelete_ico">
