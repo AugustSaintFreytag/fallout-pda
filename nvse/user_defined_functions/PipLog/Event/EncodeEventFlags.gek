@@ -1,0 +1,40 @@
+begin function { array_var aEvent }
+
+	; Reads an event's underscored metadata fields and writes the flag bitmask.
+	; Bit 0 = system event, bit 1 = player event.
+	; Returns the encoded flag bitmask.
+
+	; Guards
+
+	if eval (aEvent == Ar_Null) || (Ar_Size aEvent) == -1
+		SetFunctionValue 0
+		return
+	endif
+
+	; Main
+
+	short iFlags = 0
+	short bIsSystemEvent = 0
+	short bIsPlayerEvent = 0
+
+	if eval (Ar_HasKey aEvent, "_isSystemEvent")
+		let bIsSystemEvent := aEvent["_isSystemEvent"]
+	endif
+
+	if eval (Ar_HasKey aEvent, "_isPlayerEvent")
+		let bIsPlayerEvent := aEvent["_isPlayerEvent"]
+	endif
+
+	if eval bIsSystemEvent
+		let iFlags |= 1
+	endif
+
+	if eval bIsPlayerEvent
+		let iFlags |= 2
+	endif
+
+	let aEvent["flags"] := iFlags
+
+	SetFunctionValue iFlags
+
+end

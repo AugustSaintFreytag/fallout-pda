@@ -32,7 +32,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 		return
 	endif
 
-	array_var aEvent = (Call GetEventByIdUDF sSelectedEventId 1)
+	array_var aEvent = (Call GetEventByIdUDF sSelectedEventId)
 
 	if eval aEvent == Ar_Null
 		Sv_Destruct sSelectedEventId
