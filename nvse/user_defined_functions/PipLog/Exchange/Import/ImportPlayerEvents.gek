@@ -1,0 +1,133 @@
+begin function {}
+
+	; Imports player-created events from Export\<Player Name>-PlayerEvents.json.
+	; Merges by id, replacing matching player events and appending new events.
+	; Returns the number of imported events.
+
+	; UDFs
+
+	ref GetExchangePathUDF = CompileScript "PipLog\Exchange\Utils\GetExchangePath.gek"
+	ref GetRandomIdUDF = CompileScript "PipLog\Utils\GetRandomId.gek"
+	ref RemoveEventUDF = CompileScript "PipLog\Event\RemoveEvent.gek"
+	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+
+	; Read
+
+	string_var sPath = (Call GetExchangePathUDF "PlayerEvents")
+	array_var aDocument = ReadFromJSON ($sPath) "" 0 0
+
+	if eval (aDocument == Ar_Null) || ((Ar_Size aDocument) == -1) || !(Ar_HasKey aDocument, "data")
+		PrintC "Could not import player events from '%z', invalid exchange document." sPath
+		SetFunctionValue 0
+
+		Sv_Destruct sPath
+		let aDocument := Ar_Null
+		return
+	endif
+
+	string_var sKind = ""
+
+	if eval (Ar_HasKey aDocument, "kind")
+		let sKind := aDocument["kind"]
+	endif
+
+	if eval sKind != "PlayerEvents"
+		PrintC "Could not import player events from '%z', kind was '%z'." sPath sKind
+		SetFunctionValue 0
+
+		Sv_Destruct sPath, sKind
+		let aDocument := Ar_Null
+		return
+	endif
+
+	array_var aData = aDocument["data"]
+
+	if eval (Ar_Size aData) == -1
+		PrintC "Could not import player events from '%z', data is not an array." sPath
+		SetFunctionValue 0
+
+		Sv_Destruct sPath, sKind
+		let aDocument := Ar_Null
+		let aData := Ar_Null
+		return
+	endif
+
+	; Import
+
+	array_var aExistingEventsById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
+	array_var aEventsToAdd = Ar_Construct "array"
+	short iImportedCount = 0
+
+	foreach array_var aElement <- aData
+		array_var aInputEvent = aElement["value"]
+
+		if eval (aInputEvent == Ar_Null) || ((Ar_Size aInputEvent) == -1) || !(Ar_HasKey aInputEvent, "date") || !(Ar_HasKey aInputEvent, "name")
+			PrintC "Skipping invalid player event during import from '%z'." sPath
+			let aInputEvent := Ar_Null
+			continue
+		endif
+
+		string_var sId = ""
+
+		if eval (Ar_HasKey aInputEvent, "id")
+			let sId := aInputEvent["id"]
+		endif
+
+		if eval (Sv_Length sId) == 0
+			let sId := (Call GetRandomIdUDF)
+		endif
+
+		string_var sDate = aInputEvent["date"]
+		string_var sName = aInputEvent["name"]
+
+		if eval ((Sv_Length sDate) == 0) || ((Sv_Length sName) == 0)
+			PrintC "Skipping player event with missing date or name during import from '%z'." sPath
+			Sv_Destruct sId, sDate, sName
+			let aInputEvent := Ar_Null
+			continue
+		endif
+
+		if eval ((Ar_Size aExistingEventsById) != -1) && (Ar_HasKey aExistingEventsById, sId)
+			Call RemoveEventUDF sId 1
+		endif
+
+		array_var aEvent = Ar_Construct "stringmap"
+
+		let aEvent["id"] := sId
+		let aEvent["date"] := sDate
+		let aEvent["name"] := sName
+		let aEvent["_isSystemEvent"] := 0
+		let aEvent["_isPlayerEvent"] := 1
+
+		if eval (Ar_HasKey aInputEvent, "flags")
+			let aEvent["flags"] := #(aInputEvent["flags"])
+		endif
+
+		Ar_Append aEventsToAdd, aEvent
+
+		let iImportedCount += 1
+
+		Sv_Destruct sId, sDate, sName
+		let aEvent := Ar_Null
+		let aInputEvent := Ar_Null
+	loop
+
+	if eval (Ar_Size aEventsToAdd) > 0
+		Call AddEventsUDF aEventsToAdd 1
+	endif
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+
+	PrintC "Imported %g player events from '%z'." iImportedCount sPath
+	SetFunctionValue iImportedCount
+
+	; Clean-Up
+
+	Sv_Destruct sPath, sKind
+	let aExistingEventsById := Ar_Null
+	let aEventsToAdd := Ar_Null
+	let aDocument := Ar_Null
+	let aData := Ar_Null
+
+end
