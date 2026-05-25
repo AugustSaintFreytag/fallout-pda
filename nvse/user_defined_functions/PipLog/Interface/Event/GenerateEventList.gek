@@ -23,16 +23,9 @@ begin function {}
 	array_var aEvents = Call GetEventsForIntervalKindUDF iIntervalKind
 
 	Call AddEventsToListUDF aEvents
-
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/visible" 1
-
-	short iNumEvents = Ar_Size aEvents
-
 	CallAfterFrames 1.1 UpdateEventListHeightUDF 1
 
-	float fNumVisibleItems = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_visible_items")
-	float fNumItems = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_items")
-	float fScrollDelta = (GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_ScrollDelta")
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/visible" 1
 
 	; Store for Interaction
 
@@ -45,8 +38,6 @@ begin function {}
 	endif
 
 	; Conclude
-
-	PrintC "Event list scroll metrics before delayed height update: items=%g, visible items=%g, total items=%g, scroll delta=%g." iNumEvents fNumVisibleItems fNumItems fScrollDelta
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 0
 
