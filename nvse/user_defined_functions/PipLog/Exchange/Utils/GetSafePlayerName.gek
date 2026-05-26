@@ -5,7 +5,7 @@ begin function {}
 
 	; Main
 
-	string_var sPlayerName = GetPlayerName
+	string_var sPlayerName = (GetName Player)
 
 	if eval (Sv_Length sPlayerName) == 0
 		let sPlayerName := "Player"

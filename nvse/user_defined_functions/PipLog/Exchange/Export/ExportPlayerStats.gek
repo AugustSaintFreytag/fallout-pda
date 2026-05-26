@@ -78,7 +78,7 @@ begin function {}
 
 	array_var aDocument = Ar_Construct "stringmap"
 
-	string_var sPlayerName = GetPlayerName
+	string_var sPlayerName = (GetName Player)
 	string_var sDateTimeGame = (Call GetCurrentDateTimeStringUDF)
 	string_var sDateTimeReal = (Call GetRealDateTimeStringUDF)
 	string_var sPath = (Call GetExchangePathUDF "PlayerStats")
