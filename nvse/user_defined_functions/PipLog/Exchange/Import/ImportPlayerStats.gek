@@ -97,7 +97,7 @@ begin function {}
 					short iValue = aStatElement["value"]
 
 					if eval (Sv_Length sCode) > 0
-						let aMergedStats[sCode] := iValue
+						let aMergedStats[sCode] := #iValue
 					endif
 
 					Sv_Destruct sCode
