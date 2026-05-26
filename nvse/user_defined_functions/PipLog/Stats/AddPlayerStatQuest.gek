@@ -15,11 +15,10 @@ begin function { ref rQuest }
 
 	; State
 
-	short iYear = GameYear
 	short iMonth = GameMonth - 1
-	short iDay = GameDay
+	array_var aDate = Ar_List GameYear, iMonth, GameDay
 
-	string_var sDate = (Call GetStorageDateStringUDF iYear iMonth iDay)
+	string_var sDate = (Call GetStorageDateStringUDF aDate)
 	string_var sQuestId = GetEditorId rQuest
 	array_var aQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
 
@@ -50,6 +49,7 @@ begin function { ref rQuest }
 	; Clean-Up
 
 	Sv_Destruct sDate, sQuestId
+	let aDate := Ar_Null
 	let aQuestStats := Ar_Null
 
 end

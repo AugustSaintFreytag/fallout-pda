@@ -14,8 +14,11 @@ begin function {}
 	short iMinute = fMinute
 	short iSecond = (fMinute - iMinute) * 60
 
-	string_var sDateTime = (Call GetStorageDateTimeStringUDF GameYear GameMonth GameDay iHour iMinute iSecond)
+	array_var aDate = Ar_List GameYear, GameMonth, GameDay
+	string_var sDateTime = (Call GetStorageDateTimeStringUDF aDate iHour iMinute iSecond)
 
 	SetFunctionValue sDateTime
+
+	let aDate := Ar_Null
 
 end

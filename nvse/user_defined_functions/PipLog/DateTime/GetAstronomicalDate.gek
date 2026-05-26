@@ -2,7 +2,7 @@ begin function { short iYear, short iPhase }
 
 	; Returns the calendar date of the requested astronomical event for the given year.
 	; iPhase: 1 = Vernal Equinox, 2 = Summer Solstice, 3 = Autumnal Equinox, 4 = Winter Solstice.
-	; Returns a positional array [month, day, year] where month is 0-indexed.
+	; Returns a positional date array [year, 0-indexed month, day].
 	; Returns nothing (caller gets 0) on invalid input.
 	;
 	; Uses Meeus-style Julian Day number approximations. Hand-tuned day offsets are
@@ -77,12 +77,6 @@ begin function { short iYear, short iPhase }
 		let iDay += 2
 	endif
 
-	array_var aDate = Ar_Construct "array"
-	
-	Ar_Append aDate, iMonth
-	Ar_Append aDate, iDay
-	Ar_Append aDate, iYear
-
-	SetFunctionValue aDate
+	SetFunctionValue (Ar_List iYear, iMonth, iDay)
 
 end

@@ -1,4 +1,4 @@
-begin function { short iDay, short iMonth, short iYear }
+begin function { array_var aDate }
 
 	; Returns the day of the week for the given date as a 0-indexed integer.
 	; 0 = Sunday, 1 = Monday, ..., 6 = Saturday.
@@ -7,9 +7,13 @@ begin function { short iDay, short iMonth, short iYear }
 	; New Vegas begins on Monday, 19 October 2281 — in reality that date was a Wednesday.
 	; This function produces game-consistent weekdays, not astronomically correct ones.
 	;
-	; iMonth is 0-indexed, matching Fallout's GameMonth.
+	; aDate is [year, 0-indexed month, day].
 
 	; Main — adjust month and year for the Zeller algorithm
+
+	short iYear = aDate[0]
+	short iMonth = aDate[1]
+	short iDay = aDate[2]
 
 	if iMonth < 2
 		; January and February are treated as months 12 and 13 of the prior year

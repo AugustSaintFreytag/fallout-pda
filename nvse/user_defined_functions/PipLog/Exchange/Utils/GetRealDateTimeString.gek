@@ -18,12 +18,15 @@ begin function {}
 	short iMinute = aUserTime["Minute"]
 	short iSecond = aUserTime["Second"]
 
-	string_var sDateTime = (Call GetStorageDateTimeStringUDF iYear (iMonth - 1) iDay iHour iMinute iSecond)
+	short iMonthZeroIndexed = iMonth - 1
+	array_var aDate = Ar_List iYear, iMonthZeroIndexed, iDay
+	string_var sDateTime = (Call GetStorageDateTimeStringUDF aDate iHour iMinute iSecond)
 
 	SetFunctionValue sDateTime
 
 	; Clean-Up
 
+	let aDate := Ar_Null
 	let aUserTime := Ar_Null
 
 end

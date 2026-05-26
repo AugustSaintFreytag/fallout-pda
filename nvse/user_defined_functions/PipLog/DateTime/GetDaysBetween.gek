@@ -1,4 +1,4 @@
-begin function { short iRecentDay, short iRecentMonth, short iRecentYear, short iPastDay, short iPastMonth, short iPastYear, short iSigned }
+begin function { array_var aRecentDate, array_var aPastDate, short iSigned }
 
 	; Returns the number of days between two dates.
 	;
@@ -6,7 +6,7 @@ begin function { short iRecentDay, short iRecentMonth, short iRecentYear, short 
 	; iSigned == 1: result is signed — positive if the recent date is after the past date,
 	;               negative if it is before, zero if identical.
 	;
-	; iMonth parameters are 0-indexed, matching Fallout's GameMonth.
+	; Date arrays are [year, 0-indexed month, day].
 
 	; UDFs
 
@@ -15,10 +15,17 @@ begin function { short iRecentDay, short iRecentMonth, short iRecentYear, short 
 
 	; Main
 
+	short iRecentYear = aRecentDate[0]
+	short iRecentMonth = aRecentDate[1]
+	short iRecentDay = aRecentDate[2]
+	short iPastYear = aPastDate[0]
+	short iPastMonth = aPastDate[1]
+	short iPastDay = aPastDate[2]
+
 	if iSigned
 		; If the "recent" date is actually earlier, recurse with dates swapped and negate
 		if eval iRecentYear < iPastYear || (iRecentYear == iPastYear && iRecentMonth < iPastMonth) || (iRecentYear == iPastYear && iRecentMonth == iPastMonth && iRecentDay < iPastDay)
-			SetFunctionValue (-(Call GetDaysBetweenUDF iPastDay iPastMonth iPastYear iRecentDay iRecentMonth iRecentYear 1))
+			SetFunctionValue (-(Call GetDaysBetweenUDF aPastDate aRecentDate 1))
 			return
 		endif
 	else

@@ -9,7 +9,8 @@ begin function {}
 	ref GetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\GetPlayerDateReminder.gek"
 	ref SetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\SetPlayerDateReminder.gek"
 
-	string_var sCurrentDate = (Call GetStorageDateStringUDF GameYear GameMonth GameDay)
+	array_var aCurrentDate = Ar_List GameYear, GameMonth, GameDay
+	string_var sCurrentDate = (Call GetStorageDateStringUDF aCurrentDate)
 
 	; Main
 
@@ -21,5 +22,6 @@ begin function {}
 	; Clean-Up
 
 	Sv_Destruct sCurrentDate
+	let aCurrentDate := Ar_Null
 
 end

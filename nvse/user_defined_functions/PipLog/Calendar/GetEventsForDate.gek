@@ -1,8 +1,9 @@
-begin function { short iDay, short iMonth, short iYear }
+begin function { array_var aDate }
 
 	; Returns a positional array of decoded event stringmaps for the given date.
 	; Checks both global (transient) and player (persistent) event storage.
 	; Date patterns checked: YYYY-MM-DD (year-specific), *-MM-DD (yearly recurring), *-*-DD (monthly recurring).
+	; aDate is [year, 0-indexed month, day].
 	; Caller is responsible for Ar_Null on the returned array.
 
 	; UDFs
@@ -13,7 +14,10 @@ begin function { short iDay, short iMonth, short iYear }
 
 	; State
 
-	string_var sDateSpecific = (Call GetStorageDateStringUDF iYear iMonth iDay)
+	short iMonth = aDate[1]
+	short iDay = aDate[2]
+
+	string_var sDateSpecific = (Call GetStorageDateStringUDF aDate)
 	string_var sDateYearly = (Call GetRecurringDatePatternStringUDF 1 iMonth iDay)
 	string_var sDateMonthly = (Call GetRecurringDatePatternStringUDF 2 iMonth iDay)
 

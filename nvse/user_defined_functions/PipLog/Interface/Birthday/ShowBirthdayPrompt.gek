@@ -42,7 +42,8 @@ begin function {}
 		let iDefaultDay := 13
 	endif
 
-	string_var sDefault = (Call GetDisplayDateStringUDF iDefaultYear iDefaultMonth iDefaultDay)
+	array_var aDefaultDate = Ar_List iDefaultYear, iDefaultMonth, iDefaultDay
+	string_var sDefault = (Call GetDisplayDateStringUDF aDefaultDate)
 
 	; Prompt
 

@@ -17,7 +17,7 @@ begin function { short iYear }
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
 	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
-	ref GetDayOfWeekAltUDF = CompileScript "PipLog\DateTime\GetDayOfWeekAlt.gek"
+	ref GetDayOfWeekUDF = CompileScript "PipLog\DateTime\GetDayOfWeek.gek"
 
 	; Config
 
@@ -36,7 +36,8 @@ begin function { short iYear }
 	endif
 
 	; Estimate the moon phase at the equinox by projecting forward from today
-	short iDaysToVernal = (Call GetDaysBetweenUDF GameDay GameMonth GameYear aVernalEquinox[1] aVernalEquinox[0] aVernalEquinox[2] 0)
+	array_var aCurrentDate = Ar_List GameYear, GameMonth, GameDay
+	short iDaysToVernal = (Call GetDaysBetweenUDF aCurrentDate aVernalEquinox 0)
 	short iVernalMoonPhase = (GetMoonPhase + (iDaysToVernal / 3)) % 8
 	
 	if iVernalMoonPhase < 0
@@ -50,9 +51,9 @@ begin function { short iYear }
 		let iDaysToFullMoon := (8 - iVernalMoonPhase) * 3
 	endif
 
-	short iFullMoonDay = aVernalEquinox[1] + iDaysToFullMoon
-	short iFullMoonMonth = aVernalEquinox[0]
-	short iFullMoonYear = aVernalEquinox[2]
+	short iFullMoonDay = aVernalEquinox[2] + iDaysToFullMoon
+	short iFullMoonMonth = aVernalEquinox[1]
+	short iFullMoonYear = aVernalEquinox[0]
 
 	while iFullMoonDay > (Call GetDaysInMonthUDF iFullMoonYear iFullMoonMonth)
 		let iFullMoonDay -= (Call GetDaysInMonthUDF iFullMoonYear iFullMoonMonth)
@@ -66,7 +67,8 @@ begin function { short iYear }
 
 	; Advance to the next Sunday after the full moon
 	; If the full moon itself is a Sunday, Easter is the following Sunday
-	short iFullMoonWeekday = (Call GetDayOfWeekAltUDF iFullMoonDay iFullMoonMonth iFullMoonYear)
+	array_var aFullMoonDate = Ar_List iFullMoonYear, iFullMoonMonth, iFullMoonDay
+	short iFullMoonWeekday = (Call GetDayOfWeekUDF aFullMoonDate)
 	short iDaysToSunday = (7 - iFullMoonWeekday) % 7
 	
 	if iDaysToSunday == 0
@@ -87,11 +89,15 @@ begin function { short iYear }
 		endif
 	loop
 
-	string_var sEasterDate = (Call GetStorageDateStringUDF iEasterYear iEasterMonth iEasterDay)
+	array_var aEasterDate = Ar_List iEasterYear, iEasterMonth, iEasterDay
+	string_var sEasterDate = (Call GetStorageDateStringUDF aEasterDate)
 	SetFunctionValue sEasterDate
 
 	; Clean-Up
 
+	let aCurrentDate := Ar_Null
+	let aEasterDate := Ar_Null
+	let aFullMoonDate := Ar_Null
 	let aVernalEquinox := Ar_Null
 
 end

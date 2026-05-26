@@ -30,13 +30,7 @@ begin function { string_var sEventTitle }
 		return
 	endif
 
-	short iYear = aDate[0]
-	short iMonth = aDate[1]
-	short iDay = aDate[2]
-
-	let aDate := Ar_Null
-
-	Call AddPlayerEventUDF iDay iMonth iYear sEventTitle 0
+	Call AddPlayerEventUDF aDate sEventTitle 0
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
@@ -46,5 +40,6 @@ begin function { string_var sEventTitle }
 	; Clean-Up
 
 	Sv_Destruct sSelectedDate
+	let aDate := Ar_Null
 
 end

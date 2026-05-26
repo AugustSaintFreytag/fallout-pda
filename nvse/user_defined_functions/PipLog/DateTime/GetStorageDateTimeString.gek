@@ -1,8 +1,8 @@
-begin function { short iYear, short iMonth, short iDay, short iHour, short iMinute, short iSecond }
+begin function { array_var aDate, short iHour, short iMinute, short iSecond }
 
 	; Returns a zero-padded datetime string intended for storage.
-	; iMonth is 0-indexed; output month is 1-indexed.
-	; Example: GetStorageDateTimeString 2281 0 20 9 5 0 -> "2281-01-20 09:05:00"
+	; aDate is [year, 0-indexed month, day]; output month is 1-indexed.
+	; Example: GetStorageDateTimeString (Ar_List 2281 0 20) 9 5 0 -> "2281-01-20 09:05:00"
 
 	; UDFs
 
@@ -11,7 +11,7 @@ begin function { short iYear, short iMonth, short iDay, short iHour, short iMinu
 
 	; Formatting
 
-	string_var sDate = (Call GetStorageDateStringUDF iYear iMonth iDay)
+	string_var sDate = (Call GetStorageDateStringUDF aDate)
 	string_var sHour = (Call GetPaddedIntUDF iHour 2)
 	string_var sMinute = (Call GetPaddedIntUDF iMinute 2)
 	string_var sSecond = (Call GetPaddedIntUDF iSecond 2)
