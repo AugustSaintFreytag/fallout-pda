@@ -24,7 +24,7 @@ ref OnPlayerMiscStatChangeUDF = CompileScript "PipLog\Stats\OnPlayerMiscStatChan
 
 ; Loops
 
-;SetGameMainLoopCallback ShowBirthdayPromptUDF 1 1 2
+SetGameMainLoopCallback ShowBirthdayPromptUDF 1 60 2
 SetGameMainLoopCallback UIControlLoopUDF 1 1 2
 SetGameMainLoopCallback TickPlayerRemindersUDF 1 240 1
 

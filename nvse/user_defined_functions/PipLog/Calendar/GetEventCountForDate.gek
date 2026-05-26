@@ -1,0 +1,21 @@
+begin function { array_var aDate }
+
+	; Returns the total number of events (all patterns) on the given date.
+	; aDate is [year, 0-indexed month, day].
+
+	; UDFs
+
+	ref GetEventsForDateUDF = CompileScript "PipLog\Calendar\GetEventsForDate.gek"
+
+	; Main
+
+	array_var aEvents = (Call GetEventsForDateUDF aDate)
+	short iCount = Ar_Size aEvents
+
+	SetFunctionValue iCount
+
+	; Clean-Up
+
+	let aEvents := Ar_Null
+
+end

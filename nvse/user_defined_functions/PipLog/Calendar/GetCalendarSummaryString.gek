@@ -8,11 +8,10 @@ begin function { string_var sDate }
 	; UDFs
 
 	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
-	ref GetEventsForDayUDF = CompileScript "PipLog\Calendar\GetEventsForDay.gek"
-	ref GetPlayerStatValuesUDF = CompileScript "PipLog\Stats\GetPlayerStatValues.gek"
+	ref GetEventsForDateUDF = CompileScript "PipLog\Calendar\GetEventsForDate.gek"
+	ref GetPlayerStatValuesForDateUDF = CompileScript "PipLog\Stats\GetPlayerStatValuesForDate.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref GetMonthNameUDF = CompileScript "PipLog\DateTime\GetMonthName.gek"
-	ref GetOrdinalSuffixUDF = CompileScript "PipLog\DateTime\GetOrdinalSuffix.gek"
+	ref GetVerbalDateStringUDF = CompileScript "PipLog\DateTime\GetVerbalDateString.gek"
 
 	; State
 
@@ -27,23 +26,20 @@ begin function { string_var sDate }
 	short iMonth = aDate[1]
 	short iDay = aDate[2]
 
-	let aDate := Ar_Null
-
 	short bHasEvents = 0
 	short bHasQuests = 0
 	short bHasStats = 0
 
 	; Main
 
-	string_var sSuffix = (Call GetOrdinalSuffixUDF iDay)
-	string_var sMonthName = (Call GetMonthNameUDF iMonth 0)
-	string_var sResult = Sv_Construct "%g%z %z, %g%r" iDay sSuffix sMonthName iYear
+	string_var sDateHeader = (Call GetVerbalDateStringUDF aDate)
+	string_var sResult = Sv_Construct "%z%r" sDateHeader
 
-	Sv_Destruct sSuffix, sMonthName
+	Sv_Destruct sDateHeader
 
 	; Events
 
-	array_var aEvents = (Call GetEventsForDayUDF iDay iMonth iYear)
+	array_var aEvents = (Call GetEventsForDateUDF aDate)
 
 	if eval (Ar_Size aEvents) > 0
 		let bHasEvents := 1
@@ -67,7 +63,7 @@ begin function { string_var sDate }
 	array_var aQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
 
 	if eval (Ar_Size aQuestStats) != -1
-		string_var sDate = (Call GetStorageDateStringUDF iYear iMonth iDay)
+		string_var sDate = (Call GetStorageDateStringUDF aDate)
 
 		if eval (Ar_HasKey aQuestStats, sDate)
 			string_var sQuestList = aQuestStats[sDate]
@@ -105,26 +101,26 @@ begin function { string_var sDate }
 
 	; Misc Stats
 
-	array_var aStats = (Call GetPlayerStatValuesUDF iDay iMonth iYear)
+	array_var aStats = (Call GetPlayerStatValuesForDateUDF aDate)
 
 	foreach array_var aElement <- aStats
-		string_var sCode = aElement["key"]
-		short iCount = aElement["value"]
+		string_var sStatCode = aElement["key"]
+		short iNumStatEvents = aElement["value"]
 
 		if eval !bHasStats
-			let sResult += "%rMisc:%r"
+			;let sResult += "%rMisc:%r"
 			let bHasStats := 1
 		endif
 
-		string_var sIniKey = Sv_Construct "STATS:%z" sCode
-		string_var sStatName = GetINIString_Cached ($sIniKey) "PipLog\stats\stats.ini" ($sCode)
+		string_var sIniKey = Sv_Construct "STATS:%z" sStatCode
+		string_var sStatName = GetINIString_Cached ($sIniKey) "PipLog\stats\stats.ini" ($sStatCode)
 
 		let sResult += $sStatName
 		let sResult += ": "
-		let sResult += $iCount
+		let sResult += $iNumStatEvents
 		let sResult += "%r"
 
-		Sv_Destruct sCode, sIniKey, sStatName
+		Sv_Destruct sStatCode, sIniKey, sStatName
 	loop
 
 	; Return
@@ -137,6 +133,7 @@ begin function { string_var sDate }
 
 	; Clean-Up
 
+	let aDate := Ar_Null
 	let aStats := Ar_Null
 
 end

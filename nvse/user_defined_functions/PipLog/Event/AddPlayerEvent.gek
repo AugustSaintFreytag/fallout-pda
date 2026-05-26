@@ -1,7 +1,7 @@
-begin function { short iDay, short iMonth, short iYear, string_var sEventName, short iIntervalKind }
+begin function { array_var aDate, string_var sEventName, short iIntervalKind }
 
 	; Adds a player-defined custom event to the persistent event registry.
-	; iMonth is 0-indexed.
+	; aDate is [year, 0-indexed month, day].
 	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = weekly, 4 = daily.
 	; Supported storage patterns: date-specific = YYYY-MM-DD, yearly = *-MM-DD, monthly = *-*-DD.
 	; Events are stored as player events (bIsPlayerEvent = 1).
@@ -23,10 +23,12 @@ begin function { short iDay, short iMonth, short iYear, string_var sEventName, s
 
 	; State
 
+	short iMonth = aDate[1]
+	short iDay = aDate[2]
 	string_var sDate = ""
 
 	if iIntervalKind == 0
-		let sDate := (Call GetStorageDateStringUDF iYear iMonth iDay)
+		let sDate := (Call GetStorageDateStringUDF aDate)
 	else
 		let sDate := (Call GetRecurringDatePatternStringUDF iIntervalKind iMonth iDay)
 	endif

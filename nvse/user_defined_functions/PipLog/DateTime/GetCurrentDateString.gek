@@ -6,7 +6,10 @@ begin function { short bIncludeTime }
 
 	; Main
 
-	string_var sDate = (Call GetStorageDateStringUDF GameYear GameMonth GameDay)
+	array_var aDate = Ar_List GameYear, GameMonth, GameDay
+	string_var sDate = (Call GetStorageDateStringUDF aDate)
 	SetFunctionValue sDate
+
+	let aDate := Ar_Null
 
 end

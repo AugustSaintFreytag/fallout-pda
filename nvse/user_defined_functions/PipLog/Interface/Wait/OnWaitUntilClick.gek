@@ -70,13 +70,17 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 	short iSelectedDay = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedDay"
 	short iSelectedMonth = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedMonth"
 	short iSelectedYear = Player.AuxiliaryVariableGetFloat "*PLC_iSelectedYear"
+	array_var aSelectedDate = Ar_List iSelectedYear, iSelectedMonth, iSelectedDay
+	array_var aCurrentDate = Ar_List GameYear, GameMonth, GameDay
 
 	; Main
 
-	short iDaysUntil = (Call GetDaysBetweenUDF iSelectedDay iSelectedMonth iSelectedYear GameDay GameMonth GameYear 0)
+	short iDaysUntil = (Call GetDaysBetweenUDF aSelectedDate aCurrentDate 0)
 	short iHoursUntil = (iDaysUntil * 24)
 
 	if iHoursUntil <= 0
+		let aSelectedDate := Ar_Null
+		let aCurrentDate := Ar_Null
 		return
 	endif
 
@@ -84,5 +88,8 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 	
 	CallWhen ({} => ShowSleepWaitMenu 0 1) ({} => GetPipboyMode == 0)
 	CallWhen ApplyWaitUntilMenuUDF ({} => GetActiveMenuMode == 1012) 1 iHoursUntil
+
+	let aSelectedDate := Ar_Null
+	let aCurrentDate := Ar_Null
 
 end

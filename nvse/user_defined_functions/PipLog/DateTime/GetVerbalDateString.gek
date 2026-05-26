@@ -1,0 +1,28 @@
+begin function { array_var aDate }
+
+	; Returns a verbal player-facing date string.
+	; aDate is [year, 0-indexed month, day].
+	; Example: GetVerbalDateString (Ar_List 2277 8 15) -> "15th September, 2277"
+
+	; UDFs
+
+	ref GetMonthNameUDF = CompileScript "PipLog\DateTime\GetMonthName.gek"
+	ref GetOrdinalSuffixUDF = CompileScript "PipLog\DateTime\GetOrdinalSuffix.gek"
+
+	; Main
+
+	short iYear = aDate[0]
+	short iMonth = aDate[1]
+	short iDay = aDate[2]
+
+	string_var sSuffix = (Call GetOrdinalSuffixUDF iDay)
+	string_var sMonthName = (Call GetMonthNameUDF iMonth 0)
+	string_var sResult = Sv_Construct "%g%z %z, %g" iDay sSuffix sMonthName iYear
+
+	SetFunctionValue sResult
+
+	; Clean-Up
+
+	Sv_Destruct sSuffix, sMonthName
+
+end
