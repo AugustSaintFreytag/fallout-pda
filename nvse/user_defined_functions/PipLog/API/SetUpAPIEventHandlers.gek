@@ -8,6 +8,9 @@ begin function {}
 	ref ImportJournalEntriesUDF = CompileScript "PipLog\Exchange\Import\ImportJournalEntries.gek"
 	ref ImportPlayerEventsUDF = CompileScript "PipLog\Exchange\Import\ImportPlayerEvents.gek"
 	ref ImportPlayerStatsUDF = CompileScript "PipLog\Exchange\Import\ImportPlayerStats.gek"
+	ref AddPlayerEventUDF = CompileScript "PipLog\Event\AddPlayerEvent.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref ParseStorageDateStringUDF = CompileScript "PipLog\DateTime\ParseStorageDateString.gek"
 
 	; Clear All
 
@@ -35,6 +38,26 @@ begin function {}
 
 	SetEventHandler "PLC_ExportDailyStats" (begin function {}
 		Call ExportPlayerStatsUDF
+	end)
+
+	; Add Event
+
+	SetEventHandler "PLC_AddPlayerEvent" (begin function { array_var aParams }
+		if eval (aParams == Ar_Null) || !(Ar_HasKey aParams["date"]) || !(Ar_HasKey aParams["name"])
+			PrintC "Cannot add player event via API call, missing or invalid params."
+			return
+		endif
+
+		string_var sEventDate = aParams["date"] ; YYYY-MM-DD
+		string_var sEventName = aParams["name"]
+
+		PrintC "Adding player event '%z' for date %z via API call." sEventName sEventDate
+
+		array_var aEventDate = (Call ParseStorageDateStringUDF sEventDate)
+		Call AddPlayerEventUDF aEventDate sEventName 0
+
+		Sv_Destruct sEventDate, sEventName
+		let aEventDate := Ar_Null
 	end)
 
 end
