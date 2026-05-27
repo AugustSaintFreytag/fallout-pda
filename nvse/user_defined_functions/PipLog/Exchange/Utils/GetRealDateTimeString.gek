@@ -1,0 +1,32 @@
+begin function {}
+
+	; Returns the player's real-world system datetime as yyyy-mm-dd hh:mm:ss.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; UDFs
+
+	ref GetStorageDateTimeStringUDF = CompileScript "PipLog\DateTime\GetStorageDateTimeString.gek"
+
+	; Main
+
+	array_var aUserTime = GetUserTime
+
+	short iYear = aUserTime["Year"]
+	short iMonth = aUserTime["Month"]
+	short iDay = aUserTime["Day"]
+	short iHour = aUserTime["Hour"]
+	short iMinute = aUserTime["Minute"]
+	short iSecond = aUserTime["Second"]
+
+	short iMonthZeroIndexed = iMonth - 1
+	array_var aDate = Ar_List iYear, iMonthZeroIndexed, iDay
+	string_var sDateTime = (Call GetStorageDateTimeStringUDF aDate iHour iMinute iSecond)
+
+	SetFunctionValue sDateTime
+
+	; Clean-Up
+
+	let aDate := Ar_Null
+	let aUserTime := Ar_Null
+
+end

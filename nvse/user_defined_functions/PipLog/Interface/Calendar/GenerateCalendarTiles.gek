@@ -62,7 +62,8 @@ begin function {}
 
 	; Grid start position
 
-	short iFirstDayOfWeek = (Call GetDayOfWeekUDF 1 iCalendarMonth iCalendarYear)
+	array_var aFirstDate = Ar_List iCalendarYear, iCalendarMonth, 1
+	short iFirstDayOfWeek = (Call GetDayOfWeekUDF aFirstDate)
 	short iTileDay = 1
 	short iMonthOffset = 0
 
@@ -109,7 +110,9 @@ begin function {}
 			let iTileYear := iNextYear
 		endif
 
-		let sTileDate := (Call GetStorageDateStringUDF iTileYear iTileMonth iTileDay)
+		array_var aTileDate = Ar_List iTileYear, iTileMonth, iTileDay
+		let sTileDate := (Call GetStorageDateStringUDF aTileDate)
+		let aTileDate := Ar_Null
 		let sTileInsertCommand := (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids|CM_Box_Template|%z" sTileDate)
 
 		AddTileFromTemplate ($sTileInsertCommand)
@@ -175,5 +178,6 @@ begin function {}
 	; Clean-Up
 
 	Sv_Destruct sTileDate, sTileInsertCommand, sTileBasePath, sTilePropertyPath
+	let aFirstDate := Ar_Null
 
 end

@@ -1,7 +1,7 @@
 begin function { short iYear, short iPhase }
 
-	; Returns the astronomical boundary date for the given season phase as a positional array [month, day, year].
-	; Month is 0-indexed. Phases: 1 = Vernal Equinox, 2 = Summer Solstice, 3 = Autumnal Equinox, 4 = Winter Solstice.
+	; Returns the astronomical boundary date for the given season phase as [year, 0-indexed month, day].
+	; Phases: 1 = Vernal Equinox, 2 = Summer Solstice, 3 = Autumnal Equinox, 4 = Winter Solstice.
 	;
 	; Reads from aux var cache when the cached year matches iYear.
 	; If iYear is the current game year, a freshly computed result is written back to cache.
@@ -31,7 +31,7 @@ begin function { short iYear, short iPhase }
 	short iBoundarySize = Ar_Size aBoundary
 
 	if iBoundarySize != -1
-		short iBoundaryYear = aBoundary[2]
+		short iBoundaryYear = aBoundary[0]
 
 		if iBoundaryYear == iYear
 			SetFunctionValue aBoundary

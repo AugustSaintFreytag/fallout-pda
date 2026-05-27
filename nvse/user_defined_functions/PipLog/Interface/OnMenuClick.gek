@@ -45,7 +45,8 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 				string_var sSelectedDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
 
 				if eval (Sv_Length sSelectedDate) == 0
-					string_var sToday = (Call GetStorageDateStringUDF GameYear GameMonth GameDay)
+					array_var aToday = Ar_List GameYear, GameMonth, GameDay
+					string_var sToday = (Call GetStorageDateStringUDF aToday)
 					
 					Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedCalendarDate"
 					
@@ -61,6 +62,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 					Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 					
 					Sv_Destruct sToday
+					let aToday := Ar_Null
 				endif
 
 				Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedCalendarDate"

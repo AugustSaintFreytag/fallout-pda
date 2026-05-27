@@ -1,0 +1,174 @@
+begin function {}
+
+	; Imports tracked player stats from Export\<Player Name>-PlayerStats.json.
+	; Merges by date and stat code; quest IDs are unioned and deduped.
+	; Returns the number of imported dates.
+
+	; UDFs
+
+	ref GetExchangePathUDF = CompileScript "PipLog\Exchange\Utils\GetExchangePath.gek"
+	ref DecodeStatsStringToMapUDF = CompileScript "PipLog\Exchange\Utils\DecodeStatsStringToMap.gek"
+	ref EncodeStatsMapToStringUDF = CompileScript "PipLog\Exchange\Utils\EncodeStatsMapToString.gek"
+	ref SplitCommaStringToArrayUDF = CompileScript "PipLog\Exchange\Utils\SplitCommaStringToArray.gek"
+
+	; Read
+
+	string_var sPath = (Call GetExchangePathUDF "PlayerStats")
+	array_var aDocument = ReadFromJSON ($sPath) "" 0 0
+
+	if eval (aDocument == Ar_Null) || ((Ar_Size aDocument) == -1) || !(Ar_HasKey aDocument, "data")
+		PrintC "Could not import player stats from '%z', invalid exchange document." sPath
+		SetFunctionValue 0
+
+		Sv_Destruct sPath
+		let aDocument := Ar_Null
+		return
+	endif
+
+	string_var sKind = ""
+
+	if eval (Ar_HasKey aDocument, "kind")
+		let sKind := aDocument["kind"]
+	endif
+
+	if eval sKind != "PlayerStats"
+		PrintC "Could not import player stats from '%z', kind was '%z'." sPath sKind
+		SetFunctionValue 0
+
+		Sv_Destruct sPath, sKind
+		let aDocument := Ar_Null
+		return
+	endif
+
+	array_var aData = aDocument["data"]
+
+	if eval (Ar_Size aData) == -1
+		PrintC "Could not import player stats from '%z', data is not a date map." sPath
+		SetFunctionValue 0
+
+		Sv_Destruct sPath, sKind
+		let aDocument := Ar_Null
+		let aData := Ar_Null
+		return
+	endif
+
+	; State
+
+	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
+	array_var aQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
+
+	if eval (Ar_Size aAllStats) == -1
+		let aAllStats := Ar_Construct "stringmap"
+	endif
+
+	if eval (Ar_Size aQuestStats) == -1
+		let aQuestStats := Ar_Construct "stringmap"
+	endif
+
+	; Import
+
+	short iImportedDates = 0
+
+	foreach array_var aDateElement <- aData
+		string_var sDate = aDateElement["key"]
+		array_var aDay = aDateElement["value"]
+
+		if eval ((Sv_Length sDate) == 0) || (aDay == Ar_Null) || ((Ar_Size aDay) == -1)
+			PrintC "Skipping invalid player stats date during import from '%z'." sPath
+			Sv_Destruct sDate
+			let aDay := Ar_Null
+			continue
+		endif
+
+		if eval (Ar_HasKey aDay, "stats")
+			array_var aImportedStats = aDay["stats"]
+
+			if eval (Ar_Size aImportedStats) != -1
+				string_var sExistingStats = ""
+
+				if eval (Ar_HasKey aAllStats, sDate)
+					let sExistingStats := aAllStats[sDate]
+				endif
+
+				array_var aMergedStats = (Call DecodeStatsStringToMapUDF sExistingStats)
+
+				foreach array_var aStatElement <- aImportedStats
+					string_var sCode = aStatElement["key"]
+					short iValue = aStatElement["value"]
+
+					if eval (Sv_Length sCode) > 0
+						let aMergedStats[sCode] := #iValue
+					endif
+
+					Sv_Destruct sCode
+				loop
+
+				string_var sEncodedStats = (Call EncodeStatsMapToStringUDF aMergedStats)
+
+				if eval (Sv_Length sEncodedStats) > 0
+					let aAllStats[sDate] := sEncodedStats
+				endif
+
+				Sv_Destruct sExistingStats, sEncodedStats
+				let aMergedStats := Ar_Null
+			endif
+
+			let aImportedStats := Ar_Null
+		endif
+
+		if eval (Ar_HasKey aDay, "quests")
+			array_var aImportedQuests = aDay["quests"]
+
+			if eval (Ar_Size aImportedQuests) != -1
+				string_var sExistingQuests = ""
+
+				if eval (Ar_HasKey aQuestStats, sDate)
+					let sExistingQuests := aQuestStats[sDate]
+				endif
+
+				array_var aMergedQuests = (Call SplitCommaStringToArrayUDF sExistingQuests)
+
+				foreach array_var aQuestElement <- aImportedQuests
+					string_var sQuestId = aQuestElement["value"]
+
+					if eval ((Sv_Length sQuestId) > 0) && ((Ar_Find sQuestId, aMergedQuests) == Ar_BadNumericIndex)
+						Ar_Append aMergedQuests, sQuestId
+					endif
+
+					Sv_Destruct sQuestId
+				loop
+
+				string_var sEncodedQuests = Sv_Join aMergedQuests, ","
+
+				if eval (Sv_Length sEncodedQuests) > 0
+					let aQuestStats[sDate] := sEncodedQuests
+				endif
+
+				Sv_Destruct sExistingQuests, sEncodedQuests
+				let aMergedQuests := Ar_Null
+			endif
+
+			let aImportedQuests := Ar_Null
+		endif
+
+		let iImportedDates += 1
+
+		Sv_Destruct sDate
+		let aDay := Ar_Null
+	loop
+
+	Player.AuxStringMapArraySetFromArray "PLC_aPlayerStats" aAllStats
+	Player.AuxStringMapArraySetFromArray "PLC_aPlayerQuestStats" aQuestStats
+
+	PrintC "Imported player stats for %g dates from '%z'." iImportedDates sPath
+	SetFunctionValue iImportedDates
+
+	; Clean-Up
+
+	Sv_Destruct sPath, sKind
+	let aDocument := Ar_Null
+	let aData := Ar_Null
+	let aAllStats := Ar_Null
+	let aQuestStats := Ar_Null
+
+end

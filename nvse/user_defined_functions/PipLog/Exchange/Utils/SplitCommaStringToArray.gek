@@ -1,0 +1,19 @@
+begin function { string_var sValue }
+
+	; Expands a comma-separated storage string into a positional array.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; Main
+
+	array_var aValues = Ar_Construct "array"
+
+	if eval (Sv_Length sValue) == 0
+		SetFunctionValue aValues
+		return
+	endif
+
+	let aValues := (Sv_Split sValue, ",")
+
+	SetFunctionValue aValues
+
+end

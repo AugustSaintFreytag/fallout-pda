@@ -7,7 +7,12 @@ begin function {}
 	; Guards against re-showing within the same session via a transient flag.
 	; Currently still uses the internal storage ISO format.
 
-	
+	; Pre-Check
+
+	if eval !(MenuMode 1023)
+		return
+	endif
+
 	; UDFs
 
 	ref OnBirthdayInputConfirmUDF = CompileScript "PipLog\Interface\Birthday\OnBirthdayInputConfirm.gek"
@@ -15,18 +20,10 @@ begin function {}
 
 	; Main
 
-	if eval !(MenuMode 1023)
-		return
-	endif
-
 	short bDidSetBirthday = Player.AuxiliaryVariableGetFloat "PLC_bDidSetBirthday"
 	short bDidShowBirthdayPrompt = Player.AuxiliaryVariableGetFloat "*PLC_bDidShowBirthdayPrompt"
 
-	if eval (bDidSetBirthday)
-		return
-	endif
-
-	if eval (bDidShowBirthdayPrompt)
+	if eval (bDidSetBirthday) || (bDidShowBirthdayPrompt)
 		return
 	endif
 
@@ -42,9 +39,12 @@ begin function {}
 		let iDefaultDay := 13
 	endif
 
-	string_var sDefault = (Call GetDisplayDateStringUDF iDefaultYear iDefaultMonth iDefaultDay)
+	array_var aDefaultDate = Ar_List iDefaultYear, iDefaultMonth, iDefaultDay
+	string_var sDefault = (Call GetDisplayDateStringUDF aDefaultDate)
 
 	; Prompt
+
+	Print "Now showing birthday prompt for calendar events."
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bDidShowBirthdayPrompt" 1
 
@@ -56,5 +56,6 @@ begin function {}
 	; Clean-Up
 
 	Sv_Destruct sDefault
+	let aDefaultDate := Ar_Null
 
 end

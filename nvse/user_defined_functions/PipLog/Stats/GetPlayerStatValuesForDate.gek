@@ -1,7 +1,8 @@
-begin function { short iDay, short iMonth, short iYear }
+begin function { array_var aDate }
 
 	; Returns a StringMap { statCodeStr: count } for the given date.
 	; Returns an empty StringMap if no stats have been recorded for that day.
+	; aDate is [year, 0-indexed month, day].
 	; Caller is responsible for Ar_Null on the returned array.
 
 	; UDFs
@@ -10,7 +11,7 @@ begin function { short iDay, short iMonth, short iYear }
 
 	; State
 
-	string_var sDate = (Call GetStorageDateStringUDF iYear iMonth iDay)
+	string_var sDate = (Call GetStorageDateStringUDF aDate)
 	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
 	array_var aResult = Ar_Construct "stringmap"
 
@@ -32,8 +33,13 @@ begin function { short iDay, short iMonth, short iYear }
 		array_var aComponents = Sv_Split sPair, ":"
 		
 		if eval (Ar_Size aComponents) == 2
-			short iCount = aComponents[1]
-			let aResult[aComponents[0]] := iCount
+			string_var iStatCode = aComponents[0]
+			short iStatValue = #(aComponents[1])
+
+			PrintC "Returning player stat for date key '%z', stat code %g, value %g." sDate iStatCode iStatValue
+
+			let aResult[iStatCode] := iStatValue
+			Sv_Destruct iStatCode
 		endif
 		
 		let aComponents := Ar_Null

@@ -21,7 +21,8 @@ begin function {}
 
 	short bPulseAscending = Player.AuxiliaryVariableGetFloat "*PLC_bPulseAscending"
 
-	string_var sCurrentTileName = (Call GetStorageDateStringUDF GameYear GameMonth GameDay)
+	array_var aCurrentDate = Ar_List GameYear, GameMonth, GameDay
+	string_var sCurrentTileName = (Call GetStorageDateStringUDF aCurrentDate)
 	string_var sAlphaPath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_alpha1" sCurrentTileName
 
 	float fAlpha = GetUIFloatAlt ($sAlphaPath)
@@ -45,5 +46,6 @@ begin function {}
 	; Clean-Up
 
 	Sv_Destruct sCurrentTileName, sAlphaPath
+	let aCurrentDate := Ar_Null
 
 end

@@ -1,0 +1,143 @@
+begin function {}
+
+	; Imports journal entries from Export\<Player Name>-JournalEntries.json.
+	; Merges by id, replacing matching entries and appending new entries.
+	; Returns the number of imported entries.
+
+	; UDFs
+
+	ref GetExchangePathUDF = CompileScript "PipLog\Exchange\Utils\GetExchangePath.gek"
+	ref GetRandomIdUDF = CompileScript "PipLog\Utils\GetRandomId.gek"
+	ref GetCurrentDateTimeStringUDF = CompileScript "PipLog\DateTime\GetCurrentDateTimeString.gek"
+	ref UpdateJournalEntryIndexUDF = CompileScript "PipLog\Journal\UpdateJournalEntryIndex.gek"
+	ref GetJournalEntryIndexUDF = CompileScript "PipLog\Journal\GetJournalEntryIndex.gek"
+	ref SetJournalEntryUDF = CompileScript "PipLog\Journal\SetJournalEntry.gek"
+
+	; Read
+
+	string_var sPath = (Call GetExchangePathUDF "JournalEntries")
+	array_var aDocument = ReadFromJSON ($sPath) "" 0 0
+
+	if eval (aDocument == Ar_Null) || ((Ar_Size aDocument) == -1) || !(Ar_HasKey aDocument, "data")
+		PrintC "Could not import journal entries from '%z', invalid exchange document." sPath
+		SetFunctionValue 0
+
+		Sv_Destruct sPath
+		let aDocument := Ar_Null
+		return
+	endif
+
+	string_var sKind = ""
+
+	if eval (Ar_HasKey aDocument, "kind")
+		let sKind := aDocument["kind"]
+	endif
+
+	if eval sKind != "JournalEntries"
+		PrintC "Could not import journal entries from '%z', kind was '%z'." sPath sKind
+		SetFunctionValue 0
+
+		Sv_Destruct sPath, sKind
+		let aDocument := Ar_Null
+		return
+	endif
+
+	array_var aData = aDocument["data"]
+
+	if eval (Ar_Size aData) == -1
+		PrintC "Could not import journal entries from '%z', data is not an array." sPath
+		SetFunctionValue 0
+
+		Sv_Destruct sPath, sKind
+		let aDocument := Ar_Null
+		let aData := Ar_Null
+		return
+	endif
+
+	Call UpdateJournalEntryIndexUDF
+
+	; Import
+
+	short iImportedCount = 0
+
+	foreach array_var aElement <- aData
+		array_var aInputEntry = aElement["value"]
+
+		if eval (aInputEntry == Ar_Null) || ((Ar_Size aInputEntry) == -1) || !(Ar_HasKey aInputEntry, "text")
+			PrintC "Skipping invalid journal entry during import from '%z'." sPath
+			let aInputEntry := Ar_Null
+			continue
+		endif
+
+		string_var sId = ""
+
+		if eval (Ar_HasKey aInputEntry, "id")
+			let sId := aInputEntry["id"]
+		endif
+
+		if eval (Sv_Length sId) == 0
+			let sId := (Call GetRandomIdUDF)
+		endif
+
+		short iFlags = 0
+
+		if eval (Ar_HasKey aInputEntry, "flags")
+			let iFlags := #(aInputEntry["flags"])
+		endif
+
+		string_var sDatetime = ""
+
+		if eval (Ar_HasKey aInputEntry, "datetime")
+			let sDatetime := aInputEntry["datetime"]
+		endif
+
+		if eval (Sv_Length sDatetime) == 0
+			let sDatetime := (Call GetCurrentDateTimeStringUDF)
+		endif
+
+		string_var sLocation = ""
+
+		if eval (Ar_HasKey aInputEntry, "location")
+			let sLocation := aInputEntry["location"]
+		endif
+
+		if eval (Sv_Length sLocation) == 0
+			let sLocation := Player.GetLocationName
+		endif
+
+		string_var sText = aInputEntry["text"]
+		array_var aJournalEntry = Ar_Construct "stringmap"
+
+		let aJournalEntry["id"] := sId
+		let aJournalEntry["flags"] := iFlags
+		let aJournalEntry["datetime"] := sDatetime
+		let aJournalEntry["location"] := sLocation
+		let aJournalEntry["text"] := sText
+
+		short iEntryIndex = (Call GetJournalEntryIndexUDF sId)
+
+		if eval iEntryIndex == Ar_BadNumericIndex
+			Call SetJournalEntryUDF aJournalEntry (-1)
+		else
+			Call SetJournalEntryUDF aJournalEntry iEntryIndex
+		endif
+
+		let iImportedCount += 1
+
+		Sv_Destruct sId, sDatetime, sLocation, sText
+		let aJournalEntry := Ar_Null
+		let aInputEntry := Ar_Null
+	loop
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
+
+	PrintC "Imported %g journal entries from '%z'." iImportedCount sPath
+	SetFunctionValue iImportedCount
+
+	; Clean-Up
+
+	Sv_Destruct sPath, sKind
+	let aDocument := Ar_Null
+	let aData := Ar_Null
+
+end

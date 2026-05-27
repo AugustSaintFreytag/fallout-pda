@@ -19,7 +19,9 @@ begin function {}
 
 	if eval (Sv_Length sSelectedDate) == 0
 		if iSelectedDay >= 1
-			let sSelectedDate := (Call GetStorageDateStringUDF iSelectedYear iSelectedMonth iSelectedDay)
+			array_var aSelectedDate = Ar_List iSelectedYear, iSelectedMonth, iSelectedDay
+			let sSelectedDate := (Call GetStorageDateStringUDF aSelectedDate)
+			let aSelectedDate := Ar_Null
 		endif
 	endif
 

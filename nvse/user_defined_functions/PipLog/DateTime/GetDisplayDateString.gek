@@ -1,13 +1,18 @@
-begin function { short iYear, short iMonth, short iDay }
+begin function { array_var aDate }
 
 	; Returns a zero-padded date string intended for display to the player.
-	; Example: GetDateString 2277 0 20 "-" -> "20.01.2077"
+	; aDate is [year, 0-indexed month, day].
+	; Example: GetDisplayDateString (Ar_List 2277 0 20) -> "20.01.2277"
 
 	; UDFs
 
 	ref GetPaddedIntUDF = CompileScript "PipLog\Utils\GetPaddedInt.gek"
 
 	; Formatting
+
+	short iYear = aDate[0]
+	short iMonth = aDate[1]
+	short iDay = aDate[2]
 
 	string_var sYear = Call GetPaddedIntUDF iYear 2
 	string_var sMonth = Call GetPaddedIntUDF (iMonth + 1) 2

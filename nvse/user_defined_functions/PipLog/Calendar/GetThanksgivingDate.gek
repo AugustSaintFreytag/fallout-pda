@@ -10,7 +10,7 @@ begin function { short iYear }
 
 	; UDFs
 
-	ref GetDayOfWeekAltUDF = CompileScript "PipLog\DateTime\GetDayOfWeekAlt.gek"
+	ref GetDayOfWeekUDF = CompileScript "PipLog\DateTime\GetDayOfWeek.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 
 	; Config
@@ -22,7 +22,8 @@ begin function { short iYear }
 
 	; Main — find the weekday of November 1st to locate the first Thursday
 
-	short iNovemberFirstWeekday = (Call GetDayOfWeekAltUDF 1 10 iYear)
+	array_var aNovemberFirst = Ar_List iYear, 10, 1
+	short iNovemberFirstWeekday = (Call GetDayOfWeekUDF aNovemberFirst)
 
 	; Thursday = weekday 4
 	short iFirstThursday
@@ -37,6 +38,10 @@ begin function { short iYear }
 	; Fourth Thursday is always 21 days after the first
 	short iThanksgivingDay = iFirstThursday + 21
 
-	SetFunctionValue (Call GetStorageDateStringUDF iYear 10 iThanksgivingDay)
+	array_var aThanksgivingDate = Ar_List iYear, 10, iThanksgivingDay
+	SetFunctionValue (Call GetStorageDateStringUDF aThanksgivingDate)
+
+	let aNovemberFirst := Ar_Null
+	let aThanksgivingDate := Ar_Null
 
 end

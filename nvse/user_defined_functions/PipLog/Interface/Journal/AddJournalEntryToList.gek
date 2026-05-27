@@ -9,10 +9,31 @@ begin function { array_var aJournalEntry, short iIndex }
 		return
 	endif
 
+	; UDFs
+
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
+	ref GetVerbalDateStringUDF = CompileScript "PipLog\DateTime\GetVerbalDateString.gek"
+
 	string_var sJournalEntryId = aJournalEntry["id"]
 	string_var sJournalEntryText = aJournalEntry["text"]
 	string_var sJournalEntryLocation = aJournalEntry["location"]
 	string_var sJournalEntryDatetime = aJournalEntry["datetime"]
+	string_var sJournalEntryDisplayDate = Sv_Construct "%z" sJournalEntryDatetime
+	array_var aDateTimeParts = Sv_Split sJournalEntryDatetime, " "
+
+	if eval (Ar_Size aDateTimeParts) > 0
+		string_var sJournalEntryDate = aDateTimeParts[0]
+		array_var aDateComponents = (Call ParseStorageDateToComponentsUDF sJournalEntryDate)
+
+		if eval aDateComponents != Ar_Null
+			let sJournalEntryDisplayDate := (Call GetVerbalDateStringUDF aDateComponents)
+		endif
+
+		Sv_Destruct sJournalEntryDate
+		let aDateComponents := Ar_Null
+	endif
+
+	let aDateTimeParts := Ar_Null
 
 	string_var sParentPath = "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect"
 	string_var sTileInsertCommand = Sv_Construct "%z|CM_Journal_Template|CM_Entry%g" sParentPath iIndex
@@ -31,10 +52,10 @@ begin function { array_var aJournalEntry, short iIndex }
 	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryLocation)
 
 	let sTilePropertyPath := Sv_Construct "%z/_time" sTileInnerPath
-	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryDatetime)
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryDisplayDate)
 
 	let sTilePropertyPath := Sv_Construct "%z/timestamp/string" sTileInnerPath
-	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryDatetime)
+	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryDisplayDate)
 
 	let sTilePropertyPath := Sv_Construct "%z/location/string" sTileInnerPath
 	SetUIStringAlt ($sTilePropertyPath) ($sJournalEntryLocation)
@@ -55,6 +76,6 @@ begin function { array_var aJournalEntry, short iIndex }
 
 	; Clean-Up
 
-	Sv_Destruct sJournalEntryId, sJournalEntryText, sJournalEntryLocation, sJournalEntryDatetime, sTileInsertCommand, sParentPath, sTileInnerPath, sTilePropertyPath
+	Sv_Destruct sJournalEntryId, sJournalEntryText, sJournalEntryLocation, sJournalEntryDatetime, sJournalEntryDisplayDate, sTileInsertCommand, sParentPath, sTileInnerPath, sTilePropertyPath
 
 end

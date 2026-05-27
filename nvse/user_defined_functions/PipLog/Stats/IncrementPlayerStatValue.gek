@@ -5,18 +5,17 @@ begin function { short iStatCode, short iUpdatedValue }
 
 	; UDFs
 
-	ref GetPlayerStatValuesUDF = CompileScript "PipLog\Stats\GetPlayerStatValues.gek"
+	ref GetPlayerStatValuesForDateUDF = CompileScript "PipLog\Stats\GetPlayerStatValuesForDate.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 
 	; State
 
 	string_var sStatCode = $iStatCode
 
-	short iYear = GameYear
 	short iMonth = GameMonth - 1
-	short iDay = GameDay
+	array_var aDate = Ar_List GameYear, iMonth, GameDay
 
-	array_var aStats = (Call GetPlayerStatValuesUDF iDay iMonth iYear)
+	array_var aStats = (Call GetPlayerStatValuesForDateUDF aDate)
 
 	; Main
 
@@ -45,7 +44,7 @@ begin function { short iStatCode, short iUpdatedValue }
 
 	; Write back
 
-	string_var sDate = Call GetStorageDateStringUDF iYear iMonth iDay
+	string_var sDate = (Call GetStorageDateStringUDF aDate)
 	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
 
 	if eval (Ar_Size aAllStats) == -1
@@ -59,6 +58,7 @@ begin function { short iStatCode, short iUpdatedValue }
 
 	Sv_Destruct sStatCode, sEncoded, sDate
 
+	let aDate := Ar_Null
 	let aStats := Ar_Null
 	let aAllStats := Ar_Null
 

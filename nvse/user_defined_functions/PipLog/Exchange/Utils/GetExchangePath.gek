@@ -1,0 +1,21 @@
+begin function { string_var sKind }
+
+	; Returns the game-directory-relative JSON exchange path for sKind.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; UDFs
+
+	ref GetSafePlayerNameUDF = CompileScript "PipLog\Exchange\Utils\GetSafePlayerName.gek"
+
+	; Main
+
+	string_var sSafePlayerName = (Call GetSafePlayerNameUDF)
+	string_var sPath = Sv_Construct "Export\%z-%z.json" sSafePlayerName sKind
+
+	SetFunctionValue sPath
+
+	; Clean-Up
+
+	Sv_Destruct sSafePlayerName
+
+end
