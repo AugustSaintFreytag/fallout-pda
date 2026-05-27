@@ -1,4 +1,4 @@
-begin function { array_var aDate, string_var sEventName, short iIntervalKind }
+begin function { array_var aDate, string_var sName, short iIntervalKind }
 
 	; Adds a player-defined custom event to the persistent event registry.
 	; aDate is [year, 0-indexed month, day].
@@ -35,7 +35,7 @@ begin function { array_var aDate, string_var sEventName, short iIntervalKind }
 
 	; Main
 
-	array_var aEvent = (Call CreateEventUDF sDate sEventName)
+	array_var aEvent = (Call CreateEventUDF sDate sName)
 
 	let aEvent["_isSystemEvent"] := 0
 	let aEvent["_isPlayerEvent"] := 1
