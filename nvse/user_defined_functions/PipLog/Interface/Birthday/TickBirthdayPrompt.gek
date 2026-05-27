@@ -1,0 +1,24 @@
+begin function {}
+
+	; Pre-Check
+
+	if eval !(MenuMode 1023)
+		return
+	endif
+
+	; UDFs
+
+	ref ShowBirthdayPromptUDF = CompileScript "PipLog\Interface\Birthday\ShowBirthdayPrompt.gek"
+
+	; Main
+
+	short bDidSetBirthday = Player.AuxiliaryVariableGetFloat "PLC_bDidSetBirthday"
+	short bDidShowBirthdayPrompt = Player.AuxiliaryVariableGetFloat "*PLC_bDidShowBirthdayPrompt"
+
+	if eval (bDidSetBirthday) || (bDidShowBirthdayPrompt)
+		return
+	endif
+
+	CallAfterSeconds 1.0 ShowBirthdayPromptUDF 2
+
+end

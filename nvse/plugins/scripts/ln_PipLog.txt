@@ -1,6 +1,6 @@
 ; UDFs
 
-ref ShowBirthdayPromptUDF = CompileScript "PipLog\Interface\Birthday\ShowBirthdayPrompt.gek"
+ref TickBirthdayPromptUDF = CompileScript "PipLog\Interface\Birthday\TickBirthdayPrompt.gek"
 ref UIControlLoopUDF = CompileScript "PipLog\Interface\Control\UIControlLoop.gek"
 ref MarkCalendarModifiedUDF = CompileScript "PipLog\Interface\Calendar\MarkCalendarModified.gek"
 ref OnTileSelectUDF = CompileScript "PipLog\Interface\Calendar\OnTileSelect.gek"
@@ -25,8 +25,8 @@ ref SetUpAPIEventHandlersUDF = CompileScript "PipLog\API\SetUpAPIEventHandlers.g
 
 ; Loops
 
-SetGameMainLoopCallback ShowBirthdayPromptUDF 1 60 2
 SetGameMainLoopCallback UIControlLoopUDF 1 1 2
+SetGameMainLoopCallback TickBirthdayPromptUDF 1 60 2
 SetGameMainLoopCallback TickPlayerRemindersUDF 1 240 1
 
 ; Event Handlers

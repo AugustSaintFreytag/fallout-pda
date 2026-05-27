@@ -7,25 +7,10 @@ begin function {}
 	; Guards against re-showing within the same session via a transient flag.
 	; Currently still uses the internal storage ISO format.
 
-	; Pre-Check
-
-	if eval !(MenuMode 1023)
-		return
-	endif
-
 	; UDFs
 
 	ref OnBirthdayInputConfirmUDF = CompileScript "PipLog\Interface\Birthday\OnBirthdayInputConfirm.gek"
 	ref GetDisplayDateStringUDF = CompileScript "PipLog\DateTime\GetDisplayDateString.gek"
-
-	; Main
-
-	short bDidSetBirthday = Player.AuxiliaryVariableGetFloat "PLC_bDidSetBirthday"
-	short bDidShowBirthdayPrompt = Player.AuxiliaryVariableGetFloat "*PLC_bDidShowBirthdayPrompt"
-
-	if eval (bDidSetBirthday) || (bDidShowBirthdayPrompt)
-		return
-	endif
 
 	; State
 
@@ -48,7 +33,7 @@ begin function {}
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bDidShowBirthdayPrompt" 1
 
-	ShowTextInputMenu OnBirthdayInputConfirmUDF 400 150 "Enter your character's birthday (YYYY.MM.DD):"
+	ShowTextInputMenu OnBirthdayInputConfirmUDF 400 150 "Set Birthday"
 	
 	SetTextInputString "%z" sDefault
 	SetTextInputExtendedProps 0 0 10 10 3
