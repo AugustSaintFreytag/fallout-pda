@@ -1,0 +1,40 @@
+begin function {}
+
+	; UDFs
+
+	ref ExportJournalEntriesUDF = CompileScript "PipLog\Exchange\Export\ExportJournalEntries.gek"
+	ref ExportPlayerEventsUDF = CompileScript "PipLog\Exchange\Export\ExportPlayerEvents.gek"
+	ref ExportPlayerStatsUDF = CompileScript "PipLog\Exchange\Export\ExportPlayerStats.gek"
+	ref ImportJournalEntriesUDF = CompileScript "PipLog\Exchange\Import\ImportJournalEntries.gek"
+	ref ImportPlayerEventsUDF = CompileScript "PipLog\Exchange\Import\ImportPlayerEvents.gek"
+	ref ImportPlayerStatsUDF = CompileScript "PipLog\Exchange\Import\ImportPlayerStats.gek"
+
+	; Clear All
+
+	SetEventHandler "PLC_ClearAllData" (begin function {} 
+		Player.AuxStringMapArrayDestroy "PLC_aPlayerEventsByDate"
+		Player.AuxStringMapArrayDestroy "PLC_aPlayerEventsById"
+		Player.AuxiliaryVariableErase "PLC_aPlayerJournal"
+	end)
+
+	; Import/Export Journal
+
+	SetEventHandler "PLC_ImportJournalEntries" (begin function {} 
+		Call ImportJournalEntriesUDF
+	end)
+
+	SetEventHandler "PLC_ExportJournalEntries" (begin function {} 
+		Call ExportJournalEntriesUDF
+	end)
+
+	; Import/Export Stats
+
+	SetEventHandler "PLC_ImportDailyStats" (begin function {}
+		Call ImportPlayerStatsUDF
+	end)
+
+	SetEventHandler "PLC_ExportDailyStats" (begin function {}
+		Call ExportPlayerStatsUDF
+	end)
+
+end

@@ -20,13 +20,8 @@ ref TickPlayerRemindersUDF = CompileScript "PipLog\Reminder\TickPlayerReminders.
 ref AddComputedEventsUDF = CompileScript "PipLog\Calendar\AddComputedEvents.gek"
 ref AddHolidayEventsUDF = CompileScript "PipLog\Calendar\AddHolidayEvents.gek"
 ref AppendJournalEntryUDF = CompileScript "PipLog\Journal\AppendJournalEntry.gek"
-ref ExportJournalEntriesUDF = CompileScript "PipLog\Exchange\Export\ExportJournalEntries.gek"
-ref ExportPlayerEventsUDF = CompileScript "PipLog\Exchange\Export\ExportPlayerEvents.gek"
-ref ExportPlayerStatsUDF = CompileScript "PipLog\Exchange\Export\ExportPlayerStats.gek"
-ref ImportJournalEntriesUDF = CompileScript "PipLog\Exchange\Import\ImportJournalEntries.gek"
-ref ImportPlayerEventsUDF = CompileScript "PipLog\Exchange\Import\ImportPlayerEvents.gek"
-ref ImportPlayerStatsUDF = CompileScript "PipLog\Exchange\Import\ImportPlayerStats.gek"
 ref OnPlayerMiscStatChangeUDF = CompileScript "PipLog\Stats\OnPlayerMiscStatChange.gek"
+ref SetUpAPIEventHandlersUDF = CompileScript "PipLog\API\SetUpAPIEventHandlers.gek"
 
 ; Loops
 
@@ -56,32 +51,11 @@ SetOnMenuClickEventHandler OnToggleReminderClickUDF 1 "MapMenu#527"
 SetOnMenuCloseEventHandler OnMenuCloseUDF 1 1023
 SetEventHandler "ShowOff:OnPCMiscStatChange" OnPlayerMiscStatChangeUDF
 
-; TODO: Re-introduce event handlers for API access.
-; API: AddJournalEntry, AddDateReminder, AddEvent
-
-SetEventHandler "PLC_ClearAllData" (begin function {} 
-	Player.AuxStringMapArrayDestroy "PLC_aPlayerEventsByDate"
-	Player.AuxStringMapArrayDestroy "PLC_aPlayerEventsById"
-	Player.AuxiliaryVariableErase "PLC_aPlayerJournal"
-end)
-
-SetEventHandler "PLC_ImportJournalEntries" (begin function {} 
-	Call ImportJournalEntriesUDF
-end)
-
-SetEventHandler "PLC_ExportJournalEntries" (begin function {} 
-	Call ExportJournalEntriesUDF
-end)
-
-SetEventHandler "PLC_ImportDailyStats" (begin function {}
-	Call ImportPlayerStatsUDF
-end)
-
-SetEventHandler "PLC_ExportDailyStats" (begin function {}
-	Call ExportPlayerStatsUDF
-end)
-
-; Set-Up
+; Data Initialization
 
 Call AddComputedEventsUDF GameYear
 Call AddHolidayEventsUDF
+
+; API
+
+Call SetUpAPIEventHandlersUDF
