@@ -722,7 +722,7 @@
 					0
 				</_number_of_items>
 				
-				<_ScrollDelta>16</_ScrollDelta>
+				<_ScrollDelta>32</_ScrollDelta>
 			</hotrect>
 
 			<!--Rect for holding entries would go in here,
@@ -760,9 +760,13 @@
 				<height>219</height>	<!--The placement of the bottom arrow-->
 				<_x> <copy src="parent()" trait="width"/> </_x>
 				<_wheelmoved> <copy src="parent()" trait="wheelmoved"/> </_wheelmoved>
-				<_number_of_visible_items> 1 </_number_of_visible_items>
-				
-				<_ScrollDelta> </_ScrollDelta> <!--Set in code-->
+				<_number_of_items>0</_number_of_items>
+				<_number_of_visible_items>
+					<copy src="parent" trait="height"/>
+					<div src="me" trait="_ScrollDelta" />
+				</_number_of_visible_items>
+				<_VUI+SmoothScrolling>1</_VUI+SmoothScrolling>
+				<_ScrollDelta>20</_ScrollDelta>
 			</hotrect>
 				
 			<text name="CM_DataText">

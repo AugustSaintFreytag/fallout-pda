@@ -7,6 +7,7 @@ begin function {}
 	ref GenerateCalendarTilesUDF = CompileScript "PipLog\Interface\Calendar\GenerateCalendarTiles.gek"
 	ref PulseSelectedDateTileUDF = CompileScript "PipLog\Interface\Calendar\PulseSelectedDateTile.gek"
 	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
+	ref UpdateCalendarSummaryScrollUDF = CompileScript "PipLog\Interface\Calendar\UpdateCalendarSummaryScroll.gek"
 
 	; State
 
@@ -69,21 +70,10 @@ begin function {}
 	if bIsCalendarSummaryModified
 		PrintC "Updating calendar summary text. Summary modified: %g" bIsCalendarSummaryModified
 
-		SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_current_value" 0
-
-		short iNumLines = (Sv_Count, "%r" sCalendarDateSummary)
-		short iNumLinesFromChars = ((Sv_Length sCalendarDateSummary) / 32)
-		float fScrollDelta = ((iNumLinesFromChars + iNumLines) + 8)
-
-		if fScrollDelta < 10
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/visible" 0
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_ScrollDelta" 0
-		else
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/visible" 1
-			SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_ScrollDelta" fScrollDelta
-		endif
-
+		;SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_current_value" 0
 		SetUIStringAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_DataText/string" ($sCalendarDateSummary)
+		CallAfterFrames 1.1 UpdateCalendarSummaryScrollUDF 1
+
 		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 0
 	endif
 
