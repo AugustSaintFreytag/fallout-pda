@@ -22,27 +22,31 @@ begin function { short iYear }
 
 	; Easter Event
 
-	string_var sEasterDate = (Call GetEasterDateUDF iYear)
+	if GetINIFloat_Cached "Events:bEaster" "Config\PipLog\PipLog.ini" != 0
+		string_var sEasterDate = (Call GetEasterDateUDF iYear)
 
-	if eval sEasterDate != ""
-		array_var aEasterEvent = (Call CreateEventUDF sEasterDate "Easter")
-		Ar_Append aEvents, aEasterEvent
-		let aEasterEvent := Ar_Null
+		if eval sEasterDate != ""
+			array_var aEasterEvent = (Call CreateEventUDF sEasterDate "Easter")
+			Ar_Append aEvents, aEasterEvent
+			let aEasterEvent := Ar_Null
+		endif
+
+		Sv_Destruct sEasterDate
 	endif
-
-	Sv_Destruct sEasterDate
 
 	; Thanksgiving Event
 
-	string_var sThanksgivingDate = (Call GetThanksgivingDateUDF iYear)
+	if GetINIFloat_Cached "Events:bThanksgiving" "Config\PipLog\PipLog.ini" != 0
+		string_var sThanksgivingDate = (Call GetThanksgivingDateUDF iYear)
 
-	if eval sThanksgivingDate != ""
-		array_var aThanksgivingEvent = (Call CreateEventUDF sThanksgivingDate "Thanksgiving")
-		Ar_Append aEvents, aThanksgivingEvent
-		let aThanksgivingEvent := Ar_Null
+		if eval sThanksgivingDate != ""
+			array_var aThanksgivingEvent = (Call CreateEventUDF sThanksgivingDate "Thanksgiving")
+			Ar_Append aEvents, aThanksgivingEvent
+			let aThanksgivingEvent := Ar_Null
+		endif
+
+		Sv_Destruct sThanksgivingDate
 	endif
-
-	Sv_Destruct sThanksgivingDate
 
 	; Birthday Event
 
