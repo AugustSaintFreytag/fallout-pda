@@ -23,10 +23,10 @@ begin function { string_var sDate }
 	Ar_Append aResult, (#aComponents[1] - 1)
 	Ar_Append aResult, (#aComponents[2])
 
-	if eval (Sv_Length $(aComponents[0]) == 2)
-		string_var sPaddedYear = Sv_Construct "22%g" (aComponents[0])
-		PrintC "Correcting incorrect two-digit year input %g to %z." (aComponents[0]) sPaddedYear
-		let aComponents[0] := #sPaddedYear
+	if eval aResult[0] <= 99
+		string_var sPaddedYear = Sv_Construct "22%g" (aResult[0])
+		PrintC "Correcting incorrect two-digit year input %g to %z." (aResult[0]) sPaddedYear
+		let aResult[0] := #sPaddedYear
 		Sv_Destruct sPaddedYear
 	endif
 
