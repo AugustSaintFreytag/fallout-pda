@@ -1,7 +1,6 @@
 begin function { short iYear }
 
-	; Returns the date of Thanksgiving for the given year as a string,
-	; or "" if Thanksgiving is disabled in the INI (Events:bThanksgiving = 0).
+	; Returns the date of Thanksgiving for the given year as a string.
 	;
 	; Thanksgiving falls on the fourth Thursday of November (month index 10, 0-indexed).
 	;
@@ -12,13 +11,6 @@ begin function { short iYear }
 
 	ref GetDayOfWeekUDF = CompileScript "PipLog\DateTime\GetDayOfWeek.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-
-	; Config
-
-	if GetINIFloat_Cached "Events:bThanksgiving" "Config\SD_Calendar\SD_Calendar.ini" == 0
-		SetFunctionValue ""
-		return
-	endif
 
 	; Main — find the weekday of November 1st to locate the first Thursday
 
