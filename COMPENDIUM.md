@@ -246,14 +246,60 @@ Or use `let` for assignment after initialization:
 ```gek
 let fTimeChanceFactor := (Call SomeUDF someArg)
 ```
+#### Expressions
+
+Condensed from the GECK NVSE Expressions operator table. ([geckwiki.com][1])
+
+| Symbol    | Precedence | Function                               | Description |
+|-----------|-----------|----------------------------------------|--------------|
+| `:=`      |          0 | Assignment                             | Assigns right expression to the left variable/array element; right-associative and supports chained assignment.     |
+| `\|\|`    |          1 | Logical Or                             | True if either side is true; in assignment context returns the first useful numeric value rather than only boolean. |
+| `&&`      |          2 | Logical And                            | True if both sides are true; in assignment context returns `0` if left is false, otherwise the right numeric value. |
+| `+=`      |          2 | Add and Assign                         | Adds right expression into the left variable/array element.                                                         |
+| `-=`      |          2 | Subtract and Assign                    | Subtracts right expression from the left variable/array element.                                                    |
+| `*=`      |          2 | Multiply and Assign                    | Multiplies the left variable/array element by the right expression.                                                 |
+| `/=`      |          2 | Divide and Assign                      | Divides the left variable/array element by the right expression.                                                    |
+| `^=`      |          2 | Exponent and Assign                    | Raises the left variable/array element to the right expression’s power.                                             |
+| `\|=`     |          2 | Bitwise Or and Assign                  | Integer-demotes operands, bitwise-ORs them, and assigns the result left.                                            |
+| `&=`      |          2 | Bitwise And and Assign                 | Integer-demotes operands, bitwise-ANDs them, and assigns the result left.                                           |
+| `%=`      |          2 | Modulo and Assign                      | Computes integer remainder and assigns it left.                                                                     |
+| `:`       |          3 | Slice/Range                            | Selects an inclusive string/array range; strings support negative indices.                                          |
+| `::`      |          3 | Make Pair                              | Creates a key-value pair.                                                                                           |
+| `==`      |          4 | Equality                               | True if comparable operands are equal; arrays compare shallow surface contents in modern xNVSE.                     |
+| `!=`      |          4 | Inequality                             | True if operands are not equal.                                                                                     |
+| `>`       |          5 | Greater Than                           | True if left is greater than right; string comparison is case-insensitive.                                          |
+| `<`       |          5 | Less Than                              | True if left is less than right; string comparison is case-insensitive.                                             |
+| `>=`      |          5 | Greater or Equal                       | True if left is greater than or equal to right; string comparison is case-insensitive.                              |
+| `<=`      |          5 | Less or Equal                          | True if left is less than or equal to right; string comparison is case-insensitive.                                 |
+| `\|`      |          6 | Bitwise Or                             | Integer-demotes operands and performs bitwise OR.                                                                   |
+| `&`       |          7 | Bitwise And                            | Integer-demotes operands and performs bitwise AND.                                                                  |
+| `<<`      |          8 | Binary Left Shift                      | Integer-demotes operands and shifts left by the right operand’s bit count.                                          |
+| `>>`      |          8 | Binary Right Shift                     | Integer-demotes operands and shifts right by the right operand’s bit count.                                         |
+| `+`       |          9 | Addition/Concatenation                 | Adds numbers or concatenates strings.                                                                               |
+| `-`       |          9 | Subtraction                            | Subtracts right operand from left.                                                                                  |
+| `*`       |         10 | Multiplication                         | Multiplies operands.                                                                                                |
+| `/`       |         10 | Division                               | Divides left operand by right.                                                                                      |
+| `%`       |         10 | Modulo                                 | Returns integer division remainder.                                                                                 |
+| `^`       |         11 | Exponentiation                         | Raises left operand to the right operand’s power.                                                                   |
+| unary `-` |         12 | Negation                               | Returns the numeric opposite.                                                                                       |
+| `$`       |         12 | Stringize                              | Converts expression to string, shorthand for `ToString`.                                                            |
+| `#`       |         12 | Numericize                             | Converts string to number, shorthand for `ToNumber`.                                                                |
+| unary `*` |         12 | Dereference/Unbox                      | Unboxes an array, preferring StringMap `"value"` or otherwise the first element.                                    |
+| unary `&` |         12 | Box                                    | Wraps any value in a one-element array.                                                                             |
+| `!`       |         13 | Logical Not                            | Returns the boolean inverse.                                                                                        |
+| `( )`     |         14 | Parentheses                            | Groups expressions and overrides precedence.                                                                        |
+| `[ ]`     |         15 | Subscript                              | Accesses an array key or single string character; bracket contents are treated as parenthesized.                    |
+| `->`      |         15 | Member Access                          | Reads a StringMap value by key; `dict->key` equals `dict["key"]`.                                                   |
+| `.`       |         15 | Quest Variable Access / Reference Call | Calls a function on a reference or accesses a quest script variable; supports chained dot syntax.                   |
+| `{ }`     |         16 | Function Args                          | Declares accepted argument variables for a UDF or lambda.                                                           |
+
 
 #### Limitations
 
 A single line cannot exceed a maximum of 512 characters. Inline functions (like lambdas and callbacks) are squashed by a precompile step and count as a single line. It is advised to split logic into smaller chunks.
 
----
 
-## Engine APIs
+## APIs
 
 ### Auxiliary Variables
 
@@ -376,8 +422,10 @@ The third argument is the default value if the key is missing. The fallback is o
 array_var aMessageMap = GetINISection "Messages" "ModName.ini"
 
 foreach array_var aEntry <- aMessageMap
+    string_var sKey = aEntry["key"]
     string_var sValue = aEntry["value"]
-    ; aEntry["key"] gives the key name (e.g. "sRecoveryMessage0")
+    ; or
+    string_var sValue = *aEntry
 loop
 ```
 
