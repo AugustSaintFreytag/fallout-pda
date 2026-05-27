@@ -1,0 +1,22 @@
+begin function {}
+
+	; Updates the calendar summary scrollbar from the XML-computed text height.
+
+	; Main
+
+	float fTextHeight = GetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_DataText/height"
+	float fViewportHeight = GetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/height"
+	float fScrollDelta = GetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_ScrollDelta"
+	float fMeasuredItems = 0
+	float fVisibleItems = 0
+
+	if fScrollDelta > 0
+		let fMeasuredItems := fTextHeight / fScrollDelta
+		let fVisibleItems := fViewportHeight / fScrollDelta
+	endif
+
+	; SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_current_value" 0
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_number_of_items" fMeasuredItems
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_DataTextRect/CM_TextScrollbar/_number_of_visible_items" fVisibleItems
+
+end

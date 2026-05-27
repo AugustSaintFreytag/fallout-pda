@@ -108,7 +108,7 @@ begin function { string_var sDate }
 		short iNumStatEvents = aElement["value"]
 
 		if eval !bHasStats
-			;let sResult += "%rMisc:%r"
+			let sResult += "%rStats:%r"
 			let bHasStats := 1
 		endif
 
