@@ -17,8 +17,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	string_var sComponent = GetActiveUIComponentFullName
 
-	PrintC "Clicked on tile '%z'." sComponent
-
 	Sv_Replace "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/|" sComponent
 	Sv_Replace "/CM_Box_Main|" sComponent
 
