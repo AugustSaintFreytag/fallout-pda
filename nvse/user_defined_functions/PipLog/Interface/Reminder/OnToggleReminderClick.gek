@@ -23,6 +23,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; UDFs
 
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 	ref GetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\GetPlayerDateReminder.gek"
 	ref SetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\SetPlayerDateReminder.gek"
 
@@ -37,16 +38,28 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Main
 
-	short bHasPlayerDateReminder = (Call GetPlayerDateReminderUDF sSelectedCalendarDate)
+	array_var aSelectedDate = (Call ParseStorageDateToComponentsUDF sSelectedCalendarDate)
+
+	if eval aSelectedDate == Ar_Null
+		PrintC "Could not toggle reminder, selected date string '%z' is invalid." sSelectedCalendarDate
+
+		let aSelectedDate := Ar_Null
+		Sv_Destruct sSelectedCalendarDate
+
+		return
+	endif
+
+	short bHasPlayerDateReminder = (Call GetPlayerDateReminderUDF aSelectedDate)
 	short bIsSelectedCalendarDateTracked = (1 - bHasPlayerDateReminder)
 
-	Call SetPlayerDateReminderUDF sSelectedCalendarDate bIsSelectedCalendarDateTracked
+	Call SetPlayerDateReminderUDF aSelectedDate bIsSelectedCalendarDateTracked
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" bIsSelectedCalendarDateTracked
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
 
 	; Clean-Up
 
+	let aSelectedDate := Ar_Null
 	Sv_Destruct sSelectedCalendarDate
 
 end
