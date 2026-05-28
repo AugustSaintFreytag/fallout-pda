@@ -28,7 +28,7 @@ begin function {}
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
 
 	if iIntervalKind == 0
-		SetUIStringAlt "MapMenu/CM_MainRect/CM_HeadlineRect/CM_Headline_LocationInfo/string" "One-Time Events"
+		SetUIStringAlt "MapMenu/CM_MainRect/CM_HeadlineRect/CM_Headline_LocationInfo/string" "One-Off Events"
 		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/string" "Show Yearly"
 		SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/ySIImage/filename" "interface\icons\Misc_Event_Yearly.dds"
 	elseif iIntervalKind == 1
