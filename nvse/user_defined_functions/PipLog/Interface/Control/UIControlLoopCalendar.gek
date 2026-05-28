@@ -5,7 +5,6 @@ begin function {}
 	; UDFs
 
 	ref GenerateCalendarTilesUDF = CompileScript "PipLog\Interface\Calendar\GenerateCalendarTiles.gek"
-	ref PulseSelectedDateTileUDF = CompileScript "PipLog\Interface\Calendar\PulseSelectedDateTile.gek"
 	ref UpdateSelectedDaySummaryUDF = CompileScript "PipLog\Interface\Calendar\UpdateSelectedDaySummary.gek"
 	ref UpdateCalendarSummaryScrollUDF = CompileScript "PipLog\Interface\Calendar\UpdateCalendarSummaryScroll.gek"
 
@@ -45,8 +44,6 @@ begin function {}
 		PrintC "Generating calendar tiles. Did generate: %g, view modified: %g" bDidGenerateCalendar bIsCalendarViewModified
 		Call GenerateCalendarTilesUDF
 		let bDidGenerateCalendar := 1
-	else
-		;Call PulseSelectedDateTileUDF
 	endif
 
 	; Summary Text
