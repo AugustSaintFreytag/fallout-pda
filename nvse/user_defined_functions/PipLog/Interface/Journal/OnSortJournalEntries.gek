@@ -1,0 +1,34 @@
+begin function { short iMenuId, short iTileId, string_var sTileName }
+
+	; Toggles the journal entry sort direction and marks the displayed list dirty.
+
+	; Guards
+
+	if eval !(MenuMode 1023)
+		return
+	endif
+
+	if eval (GetUIFloat "MapMenu/GLOW_BRANCH/MM_Tabline/_CurrentTab") != 3
+		return
+	endif
+
+	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 3
+		return
+	endif
+
+	; Main
+
+	short bSortJournalEntriesDescending = Player.AuxiliaryVariableGetFloat "PLC_bSortJournalEntriesDescending"
+
+	if bSortJournalEntriesDescending
+		let bSortJournalEntriesDescending := 0
+	else
+		let bSortJournalEntriesDescending := 1
+	endif
+
+	Player.AuxiliaryVariableSetFloat "PLC_bSortJournalEntriesDescending" bSortJournalEntriesDescending
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
+
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalSide/CM_JournalSort/_value" bSortJournalEntriesDescending
+
+end
