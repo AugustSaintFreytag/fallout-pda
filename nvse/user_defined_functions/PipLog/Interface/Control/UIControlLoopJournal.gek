@@ -8,7 +8,12 @@ begin function {}
 
 	; State
 
+	short bSortJournalEntriesDescending = Player.AuxiliaryVariableGetFloat "PLC_bSortJournalEntriesDescending"
 	short bIsJournalListModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsJournalListModified"
+
+	if bSortJournalEntriesDescending != 1
+		let bSortJournalEntriesDescending := 0
+	endif
 
 	; View Controls
 
@@ -20,6 +25,7 @@ begin function {}
 	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/string" "Events"
 	SetUIStringAlt "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/ySIImage/filename" "interface\icons\Misc_Events.dds"
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_DataRect/CM_ToolsRect/CM_CustomButton/target" 0
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalSide/CM_JournalSort/_value" bSortJournalEntriesDescending
 
 	; List
 
