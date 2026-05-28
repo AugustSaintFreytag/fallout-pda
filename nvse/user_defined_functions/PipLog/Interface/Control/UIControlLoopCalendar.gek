@@ -41,7 +41,6 @@ begin function {}
 	; Tiles
 
 	if eval (!bDidGenerateCalendar) || (bIsCalendarViewModified)
-		PrintC "Generating calendar tiles. Did generate: %g, view modified: %g" bDidGenerateCalendar bIsCalendarViewModified
 		Call GenerateCalendarTilesUDF
 		let bDidGenerateCalendar := 1
 	endif

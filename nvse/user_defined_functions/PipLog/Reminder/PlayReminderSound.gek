@@ -1,0 +1,18 @@
+; Plays a calendar notification sound.
+; Kind: 0 = Notify, 1 = Alarm
+
+begin function { short iKind }
+
+	ref rSound = TempCloneForm UIMenuFocus 1
+
+	if iKind == 0
+		SetSoundTraitNumeric rSound 3 -12.0
+		SetSoundSourceFile rSound "fx\ui\menu\ui_menu_calendar_notify.wav"
+	else
+		SetSoundTraitNumeric rSound 3 -10.0
+		SetSoundSourceFile rSound "fx\ui\menu\ui_menu_calendar_alarm.wav"
+	endif
+	
+	Player.PlaySound rSound 1
+
+end

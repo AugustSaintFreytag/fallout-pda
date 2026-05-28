@@ -1,11 +1,17 @@
-begin function { string_var sDate, short iState }
+begin function { array_var aDate, short iState }
 
-	; Sets or clears the player's one-shot reminder for sDate.
+	; Sets or clears the player's one-shot reminder for aDate.
+	; aDate is [year, 0-indexed month, day].
 	; iState: 1 = set, 0 = clear.
+
+	; UDFs
+
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 
 	; State
 
 	array_var aPlayerReminders = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerReminders"
+	string_var sDate = (Call GetStorageDateStringUDF aDate)
 
 	if eval (Ar_Size aPlayerReminders) == -1
 		let aPlayerReminders := Ar_Construct "stringmap"
@@ -29,6 +35,7 @@ begin function { string_var sDate, short iState }
 
 	; Clean-Up
 
+	Sv_Destruct sDate
 	let aPlayerReminders := Ar_Null
 
 end

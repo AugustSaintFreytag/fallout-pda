@@ -1,0 +1,43 @@
+begin function { array_var aDate }
+
+	; Shows one-shot reminder messages for manually tracked dates.
+
+	; Config
+
+	short bPlayerDateReminders = GetINIFloat "Reminders:bPlayerDateReminders" "PipLog\PipLog.ini"
+	short iDailyEventReminderDuration = GetINIFloat "Reminders:iDailyEventReminderDuration" "PipLog\PipLog.ini"
+
+	; Pre-Check
+
+	if eval !bPlayerDateReminders
+		return
+	endif
+
+	; UDFs
+
+	ref GetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\GetPlayerDateReminder.gek"
+	ref SetPlayerDateReminderUDF = CompileScript "PipLog\Reminder\SetPlayerDateReminder.gek"
+	ref GetVerbalDateStringUDF = CompileScript "PipLog\DateTime\GetVerbalDateString.gek"
+	ref PlayReminderSoundUDF = CompileScript "PipLog\Reminder\PlayReminderSound.gek"
+
+	; Main
+
+	short bPlayerHasSetReminder = Call GetPlayerDateReminderUDF aDate
+
+	if eval !bPlayerHasSetReminder
+		return
+	endif
+
+	string_var sDate = Call GetVerbalDateStringUDF aDate
+	string_var sMessage = Sv_Construct "You have a reminder for today, %z!" sDate
+
+	MessageExAlt iDailyEventReminderDuration "Interface\Icons\Message Icons\glow_message_reminder.dds|%z" sMessage
+
+	Call PlayReminderSoundUDF 1
+	Call SetPlayerDateReminderUDF aDate 0
+
+	; Clean-Up
+
+	Sv_Destruct sDate, sMessage
+
+end
