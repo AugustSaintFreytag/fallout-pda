@@ -1,0 +1,28 @@
+begin function { array_var aParams }
+
+	; UDFs
+
+	ref AddPlayerEventUDF = CompileScript "PipLog\Event\AddPlayerEvent.gek"
+	ref ParseStorageDateStringUDF = CompileScript "PipLog\DateTime\ParseStorageDateString.gek"
+
+	; Main
+
+	if eval (aParams == Ar_Null) || !(Ar_HasKey aParams "date") || !(Ar_HasKey aParams "name")
+		PrintC "Cannot add player event via API call, missing or invalid params."
+		return
+	endif
+
+	string_var sEventDate = aParams["date"] ; YYYY-MM-DD
+	string_var sEventName = aParams["name"]
+
+	PrintC "Adding player event '%z' for date %z via API call." sEventName sEventDate
+
+	array_var aEventDate = (Call ParseStorageDateStringUDF sEventDate)
+	Call AddPlayerEventUDF aEventDate sEventName 0
+	
+	; Clean-Up
+
+	Sv_Destruct sEventDate, sEventName
+	let aEventDate := Ar_Null
+
+end

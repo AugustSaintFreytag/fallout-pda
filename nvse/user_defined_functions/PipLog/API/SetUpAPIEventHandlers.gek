@@ -8,9 +8,7 @@ begin function {}
 	ref ImportJournalEntriesUDF = CompileScript "PipLog\Exchange\Import\ImportJournalEntries.gek"
 	ref ImportPlayerEventsUDF = CompileScript "PipLog\Exchange\Import\ImportPlayerEvents.gek"
 	ref ImportPlayerStatsUDF = CompileScript "PipLog\Exchange\Import\ImportPlayerStats.gek"
-	ref AddPlayerEventUDF = CompileScript "PipLog\Event\AddPlayerEvent.gek"
-	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref ParseStorageDateStringUDF = CompileScript "PipLog\DateTime\ParseStorageDateString.gek"
+	ref OnAPIAddPlayerEventUDF = CompileScript "PipLog\API\Event\OnAPIAddPlayerEvent.gek"
 
 	; Clear All
 
@@ -22,42 +20,18 @@ begin function {}
 
 	; Import/Export Journal
 
-	SetEventHandler "PLC_ImportJournalEntries" (begin function {} 
-		Call ImportJournalEntriesUDF
-	end)
+	SetEventHandler "PLC_ImportJournalEntries" ImportJournalEntriesUDF
 
-	SetEventHandler "PLC_ExportJournalEntries" (begin function {} 
-		Call ExportJournalEntriesUDF
-	end)
+	SetEventHandler "PLC_ExportJournalEntries" ExportJournalEntriesUDF
 
 	; Import/Export Stats
 
-	SetEventHandler "PLC_ImportDailyStats" (begin function {}
-		Call ImportPlayerStatsUDF
-	end)
+	SetEventHandler "PLC_ImportDailyStats" ImportPlayerStatsUDF
 
-	SetEventHandler "PLC_ExportDailyStats" (begin function {}
-		Call ExportPlayerStatsUDF
-	end)
+	SetEventHandler "PLC_ExportDailyStats" ExportPlayerStatsUDF
 
 	; Add Event
 
-	SetEventHandler "PLC_AddPlayerEvent" (begin function { array_var aParams }
-		if eval (aParams == Ar_Null) || !(Ar_HasKey aParams["date"]) || !(Ar_HasKey aParams["name"])
-			PrintC "Cannot add player event via API call, missing or invalid params."
-			return
-		endif
-
-		string_var sEventDate = aParams["date"] ; YYYY-MM-DD
-		string_var sEventName = aParams["name"]
-
-		PrintC "Adding player event '%z' for date %z via API call." sEventName sEventDate
-
-		array_var aEventDate = (Call ParseStorageDateStringUDF sEventDate)
-		Call AddPlayerEventUDF aEventDate sEventName 0
-
-		Sv_Destruct sEventDate, sEventName
-		let aEventDate := Ar_Null
-	end)
+	SetEventHandler "PLC_AddPlayerEvent" OnAPIAddPlayerEventUDF
 
 end
