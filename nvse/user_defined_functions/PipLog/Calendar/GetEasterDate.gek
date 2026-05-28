@@ -1,95 +1,44 @@
 begin function { short iYear }
 
-	; Returns the date of Easter Sunday for the given year as a string,
-	; or "" if the Vernal Equinox cannot be computed.
-	;
-	; Easter falls on the first Sunday after the first full moon on or after
-	; the Vernal Equinox. Moon phase is estimated from the current NVSE moon
-	; phase value extrapolated forward to the equinox at one phase step per 3 days.
-	;
+	; Returns the Gregorian date of Easter Sunday for the given year as a string.
 	; Return format: string "YYYY-MM-DD" (zero-padded, 1-indexed month)
 	; Caller is responsible for Sv_Destruct on the returned string.
 
 	; UDFs
 
-	ref GetAstronomicalDateUDF = CompileScript "PipLog\DateTime\GetAstronomicalDate.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref GetDaysBetweenUDF = CompileScript "PipLog\DateTime\GetDaysBetween.gek"
-	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
-	ref GetDayOfWeekUDF = CompileScript "PipLog\DateTime\GetDayOfWeek.gek"
 
-	; Compute Vernal Equinox for current year
+	; Main
 
-	array_var aVernalEquinox = (Call GetAstronomicalDateUDF iYear 1)
-	if eval !aVernalEquinox || (Ar_Size aVernalEquinox) < 3
+	if iYear < 1
 		SetFunctionValue ""
-		let aVernalEquinox := Ar_Null
 		return
 	endif
 
-	; Estimate the moon phase at the equinox by projecting forward from today
-	array_var aCurrentDate = Ar_List GameYear, GameMonth, GameDay
-	short iDaysToVernal = (Call GetDaysBetweenUDF aCurrentDate aVernalEquinox 0)
-	short iVernalMoonPhase = (GetMoonPhase + (iDaysToVernal / 3)) % 8
-	
-	if iVernalMoonPhase < 0
-		let iVernalMoonPhase += 8
-	endif
+	; Meeus/Jones/Butcher Gregorian computus.
+	short iGoldenNumber = iYear % 19
+	short iCentury = iYear / 100
+	short iYearOfCentury = iYear % 100
+	short iLeapCentury = iCentury / 4
+	short iCenturyRemainder = iCentury % 4
+	short iCorrection = (iCentury + 8) / 25
+	short iMoonCorrection = (iCentury - iCorrection + 1) / 3
+	short iEpact = (19 * iGoldenNumber + iCentury - iLeapCentury - iMoonCorrection + 15) % 30
+	short iLeapYearOfCentury = iYearOfCentury / 4
+	short iYearRemainder = iYearOfCentury % 4
+	short iWeekdayOffset = (32 + 2 * iCenturyRemainder + 2 * iLeapYearOfCentury - iEpact - iYearRemainder) % 7
+	short iPaschalCorrection = (iGoldenNumber + 11 * iEpact + 22 * iWeekdayOffset) / 451
+	short iDateIndex = iEpact + iWeekdayOffset - 7 * iPaschalCorrection + 114
 
-	; Days until the next full moon on or after the equinox (phase 0 = full moon in NVSE)
-	short iDaysToFullMoon = 0
-	
-	if iVernalMoonPhase != 0
-		let iDaysToFullMoon := (8 - iVernalMoonPhase) * 3
-	endif
+	short iEasterMonth = (iDateIndex / 31) - 1
+	short iEasterDay = (iDateIndex % 31) + 1
 
-	short iFullMoonDay = aVernalEquinox[2] + iDaysToFullMoon
-	short iFullMoonMonth = aVernalEquinox[1]
-	short iFullMoonYear = aVernalEquinox[0]
-
-	while iFullMoonDay > (Call GetDaysInMonthUDF iFullMoonYear iFullMoonMonth)
-		let iFullMoonDay -= (Call GetDaysInMonthUDF iFullMoonYear iFullMoonMonth)
-		let iFullMoonMonth += 1
-		
-		if iFullMoonMonth > 11
-			let iFullMoonMonth := 0
-			let iFullMoonYear += 1
-		endif
-	loop
-
-	; Advance to the next Sunday after the full moon
-	; If the full moon itself is a Sunday, Easter is the following Sunday
-	array_var aFullMoonDate = Ar_List iFullMoonYear, iFullMoonMonth, iFullMoonDay
-	short iFullMoonWeekday = (Call GetDayOfWeekUDF aFullMoonDate)
-	short iDaysToSunday = (7 - iFullMoonWeekday) % 7
-	
-	if iDaysToSunday == 0
-		let iDaysToSunday := 7
-	endif
-
-	short iEasterDay = iFullMoonDay + iDaysToSunday
-	short iEasterMonth = iFullMoonMonth
-	short iEasterYear = iFullMoonYear
-
-	while iEasterDay > (Call GetDaysInMonthUDF iEasterYear iEasterMonth)
-		let iEasterDay -= (Call GetDaysInMonthUDF iEasterYear iEasterMonth)
-		let iEasterMonth += 1
-		
-		if iEasterMonth > 11
-			let iEasterMonth := 0
-			let iEasterYear += 1
-		endif
-	loop
-
-	array_var aEasterDate = Ar_List iEasterYear, iEasterMonth, iEasterDay
+	array_var aEasterDate = Ar_List iYear, iEasterMonth, iEasterDay
 	string_var sEasterDate = (Call GetStorageDateStringUDF aEasterDate)
 	SetFunctionValue sEasterDate
 
 	; Clean-Up
 
-	let aCurrentDate := Ar_Null
 	let aEasterDate := Ar_Null
-	let aFullMoonDate := Ar_Null
-	let aVernalEquinox := Ar_Null
 
 end
