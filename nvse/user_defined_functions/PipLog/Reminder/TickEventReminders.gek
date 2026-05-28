@@ -1,0 +1,80 @@
+begin function { array_var aCurrentDate }
+
+	; Shows delayed daily event messages once per current date.
+
+	; UDFs
+
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref GetEventsForDateUDF = CompileScript "PipLog\Event\GetEventsForDate.gek"
+	ref PlayReminderSoundUDF = CompileScript "PipLog\Reminder\PlayReminderSound.gek"
+
+	; Config
+
+	short bSystemEventReminders = GetINIFloat "Reminders:bSystemEventReminders" "PipLog\PipLog.ini"
+	short bPlayerEventReminders = GetINIFloat "Reminders:bPlayerEventReminders" "PipLog\PipLog.ini"
+	short iDailyEventReminderDuration = GetINIFloat "Reminders:iDailyEventReminderDuration" "PipLog\PipLog.ini"
+
+	if eval (!bSystemEventReminders) && (!bPlayerEventReminders)
+		return
+	endif
+
+	; Main
+
+	string_var sCurrentDate = (Call GetStorageDateStringUDF aCurrentDate)
+	string_var sLastReminderCheckDate = Player.AuxiliaryVariableGetString "*PLC_sLastReminderCheckDate"
+
+	if eval sLastReminderCheckDate == sCurrentDate
+		Sv_Destruct sCurrentDate, sLastReminderCheckDate
+		return
+	endif
+
+	Player.AuxiliaryVariableSetString "*PLC_sLastReminderCheckDate" ($sCurrentDate)
+
+	array_var aEvents = (Call GetEventsForDateUDF aCurrentDate)
+
+	if eval (Ar_Size aEvents) <= 0
+		Sv_Destruct sCurrentDate, sLastReminderCheckDate
+		let aEvents := Ar_Null
+		return
+	endif
+
+	array_var aEventNames = Ar_Construct "array"
+
+	foreach (array_var aElement) <- aEvents
+		array_var aEvent = *aElement
+		short bIsSystemEvent = aEvent["_isSystemEvent"]
+		short bIsPlayerEvent = aEvent["_isPlayerEvent"]
+
+		; PrintC "Checking event '%z' for date '%z' for reminder inclusion." (aEvent["name"]) sCurrentDate
+
+		if eval (bIsSystemEvent && !bSystemEventReminders)
+			continue
+		endif
+
+		if eval (bIsPlayerEvent && !bPlayerEventReminders)
+			continue
+		endif
+
+		Ar_Append aEventNames, (aEvent["name"])
+	loop
+
+	if eval (Ar_Size aEventNames) > 0
+		string_var sEventNames = (Sv_Join aEventNames, ", ")
+
+		; PrintC "Preparing player event reminder for events: %z." sEventNames
+
+		CallAfterSeconds 1.0 (begin function {}
+			MessageExAlt iDailyEventReminderDuration "Interface\Icons\Message Icons\glow_message_calendar.dds|Today is: %z" sEventNames
+			Call PlayReminderSoundUDF 0
+			Sv_Destruct sEventNames
+		end)
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sCurrentDate, sLastReminderCheckDate
+
+	let aEvents := Ar_Null
+	let aEventNames := Ar_Null
+
+end

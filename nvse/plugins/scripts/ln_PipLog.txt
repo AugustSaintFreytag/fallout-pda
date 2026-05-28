@@ -16,7 +16,7 @@ ref OnEditJournalEntryUDF = CompileScript "PipLog\Interface\Journal\OnEditJourna
 ref OnRemoveJournalEntryUDF = CompileScript "PipLog\Interface\Journal\OnRemoveJournalEntry.gek"
 ref OnToggleReminderClickUDF = CompileScript "PipLog\Interface\Reminder\OnToggleReminderClick.gek"
 ref OnWaitUntilClickUDF = CompileScript "PipLog\Interface\Wait\OnWaitUntilClick.gek"
-ref TickPlayerRemindersUDF = CompileScript "PipLog\Reminder\TickPlayerReminders.gek"
+ref TickRemindersUDF = CompileScript "PipLog\Reminder\TickReminders.gek"
 ref AddComputedEventsUDF = CompileScript "PipLog\Calendar\AddComputedEvents.gek"
 ref AddHolidayEventsUDF = CompileScript "PipLog\Calendar\AddHolidayEvents.gek"
 ref AppendJournalEntryUDF = CompileScript "PipLog\Journal\AppendJournalEntry.gek"
@@ -27,7 +27,7 @@ ref SetUpAPIEventHandlersUDF = CompileScript "PipLog\API\SetUpAPIEventHandlers.g
 
 SetGameMainLoopCallback UIControlLoopUDF 1 1 2
 SetGameMainLoopCallback TickBirthdayPromptUDF 1 60 2
-SetGameMainLoopCallback TickPlayerRemindersUDF 1 240 1
+SetGameMainLoopCallback TickRemindersUDF 1 120 1
 
 ; Event Handlers
 

@@ -15,13 +15,21 @@ Original script files have been dumped to `reference/` directory.
 - [x] Test journal layouting with various line numbers
 - [x] Ensure output formatted dates are dd.mm.yyyy
 - [x] Establish interactivity for player events
-- [ ] Fix computed events not being added
-- [ ] Implement journal entry import from JSON file (invoked via event handler)
-- [ ] Implement player stats import from JSON file (invoked via event handler)
+- [x] Fix computed events not being added
+- [x] Implement journal entry import from JSON file (invoked via event handler)
+- [x] Implement player stats import from JSON file (invoked via event handler)
 - [x] Add player stat change tracking (see reference, uses `ShowOff:OnPCMiscStatChange`, increment per call)
+- [x] Use same textual date for journal entries (a la 12th September, 2277)
+- [x] Check whether tracked player stats are stored/read correctly
+- [x] Fix selected date text view not being scrollable (likely an XML layout constraints issue)
+- [ ] Fix date format import for journal entries
+- [ ] Implement journal entry sorting (button functionality)
 
+- [ ] Display messages to the player with custom icon for daily events
+- [ ] Add indicator to date tiles that have events
 - [ ] Event handler API to allow adding events and journal entries
 - [x] Push vanilla content rect for notes text further down
 - [ ] Enhance event listing (include system/player, improve formatting)
+- [ ] Restyle selected event details to use same font size as calendar view
 - [x] Add YSI icon support for all mod buttons
 - [ ] Add content placeholders ("No events." and "No journal entries.")

@@ -1,0 +1,34 @@
+begin function {}
+
+	; Coordinates daily reminder ticks once gameplay is active and safe for messages.
+	; Runs from ln_PipLog as a game-mode loop callback.
+
+	; Pre-Check
+
+	if eval (GetActiveMenuMode) != 0
+		return
+	endif
+
+	if eval Player.IsInCombat
+		return
+	endif
+
+	; UDFs
+	
+	ref TickDateRemindersUDF = CompileScript "PipLog\Reminder\TickDateReminders.gek"
+	ref TickEventRemindersUDF = CompileScript "PipLog\Reminder\TickEventReminders.gek"
+
+	; State
+
+	array_var aCurrentDate = Ar_List GameYear, GameMonth, GameDay
+
+	; Main
+
+	Call TickDateRemindersUDF aCurrentDate
+	Call TickEventRemindersUDF aCurrentDate
+
+	; Clean-Up
+
+	let aCurrentDate := Ar_Null
+
+end

@@ -73,7 +73,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 		PrintC "Selected event '%z', id '%z' via selected event tile (%z)." (aEvent["name"]) sEventId sTileName
 		Player.AuxiliaryVariableSetString "*PLC_sSelectedEventId" ($sEventId)
 		Player.AuxiliaryVariableSetString "*PLC_sSelectedEventTileName" ($sTileName)
-		Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" bIsPlayerEvent
+		Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" (#bIsPlayerEvent)
 	endif
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
