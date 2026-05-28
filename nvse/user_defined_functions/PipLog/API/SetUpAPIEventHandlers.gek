@@ -34,4 +34,10 @@ begin function {}
 
 	SetEventHandler "PLC_AddPlayerEvent" OnAPIAddPlayerEventUDF
 
+	; Debug
+
+	SetEventHandler "PLC_RearmEventReminders" (begin function {} 
+		Player.AuxiliaryVariableErase "*PLC_sLastReminderCheckDate"
+	end)
+
 end
