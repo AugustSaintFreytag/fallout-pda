@@ -1,7 +1,7 @@
 begin function { short iMenuId }
 
-	; Resets all calendar session state when the Pip-Boy is closed.
-	; View month is reset to current so the calendar reopens on today's month.
+	; Updates state variables and marks rendered content as modified to be redrawn on next menu open.
+	; Maintain navigational positions and selections for continuity.
 
 	if iMenuId != 1023
 		return
@@ -9,38 +9,24 @@ begin function { short iMenuId }
 
 	; Main
 
-	if Player.AuxiliaryVariableGetFloat "*PLC_bDidGenerateCalendar" == 1
-		Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
-		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarYear" 0
-		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarMonth" 0
-	endif
-
-	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
+	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect"
 	UnloadUIComponent "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect"
 	
-	; Player.AuxiliaryVariableSetFloat "*PLC_iViewMode" 0
-	; Player.AuxiliaryVariableSetFloat "*PLC_iSelectedDay" -1
-	; Player.AuxiliaryVariableSetFloat "*PLC_iSelectedMonth" -1
-	; Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" -1
-	; Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
-	; Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
-	; Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
-	; Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 0
-	; Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" 0
-	; Player.AuxiliaryVariableSetFloat "*PLC_iIntervalKind" 0
-	; Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
-	; Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
-	; Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedEventPlayer" 0
-	; Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsLogOpen" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsJournalListModified" 1
 	
 	Player.AuxiliaryVariableErase "*PLC_sHoveredCalendarDate"
-	Player.AuxiliaryVariableErase "*PLC_sSelectedCalendarDate"
 	Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedCalendarDate"
 	Player.AuxiliaryVariableErase "*PLC_sCalendarDateSummary"
-	Player.AuxiliaryVariableErase "*PLC_sSelectedEventId"
-	Player.AuxiliaryVariableErase "*PLC_sSelectedEventTileName"
 	Player.AuxiliaryVariableErase "*PLC_sPreviousSelectedEventTileName"
 	Player.AuxiliaryVariableErase "*PLC_sEditJournalEntryId"
+	Player.AuxiliaryVariableErase "*PLC_aDisplayedEventIds"
 	Player.AuxiliaryVariableErase "*PLC_aDisplayedJournalEntryIds"
 
 end
