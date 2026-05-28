@@ -33,7 +33,7 @@ begin function {}
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bDidShowBirthdayPrompt" 1
 
-	ShowTextInputMenu OnBirthdayInputConfirmUDF 400 150 "Set Birthday"
+	ShowTextInputMenu OnBirthdayInputConfirmUDF 300 100 "Set Birthday"
 	
 	SetTextInputString "%z" sDefault
 	SetTextInputExtendedProps 0 0 10 10 3
