@@ -6,12 +6,16 @@ begin function {}
 
 	ref AddJournalEntriesToListUDF = CompileScript "PipLog\Interface\Journal\AddJournalEntriesToList.gek"
 	ref GetJournalEntriesUDF = CompileScript "PipLog\Journal\GetJournalEntries.gek"
+	ref SortJournalEntriesUDF = CompileScript "PipLog\Journal\SortJournalEntries.gek"
 	ref UpdateJournalEntryListHeightUDF = CompileScript "PipLog\Interface\Journal\UpdateJournalEntryListHeight.gek"
 
 	; State
 
-	; TODO: Implement sorting journal entries and toggle functionality in UI.
-	; short bSort = Player.AuxiliaryVariableGetFloat "PLC_bSort"
+	short bSortJournalEntriesDescending = Player.AuxiliaryVariableGetFloat "PLC_bSortJournalEntriesDescending"
+
+	if bSortJournalEntriesDescending != 1
+		let bSortJournalEntriesDescending := 0
+	endif
 
 	; Add Tile
 
@@ -23,6 +27,7 @@ begin function {}
 	; Prepare Entries
 
 	array_var aJournalEntries = Call GetJournalEntriesUDF
+	array_var aSortedJournalEntries = (Call SortJournalEntriesUDF aJournalEntries bSortJournalEntriesDescending)
 	short iNumJournalEntries = Ar_Size aJournalEntries
 
 	if iNumJournalEntries == -1
@@ -32,9 +37,10 @@ begin function {}
 	; Insert Entries
 
 	array_var aDisplayedJournalEntryIds = Ar_Construct "array"
-	Call AddJournalEntriesToListUDF aJournalEntries aDisplayedJournalEntryIds
+	Call AddJournalEntriesToListUDF aSortedJournalEntries aDisplayedJournalEntryIds
 
 	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect/visible" 1
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalSide/CM_JournalSort/_value" bSortJournalEntriesDescending
 
 	; Scroll View
 
@@ -57,6 +63,7 @@ begin function {}
 	; Clean-Up
 
 	let aJournalEntries := Ar_Null
+	let aSortedJournalEntries := Ar_Null
 	let aDisplayedJournalEntryIds := Ar_Null
 
 end

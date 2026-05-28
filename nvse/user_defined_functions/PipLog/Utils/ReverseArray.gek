@@ -1,0 +1,25 @@
+begin function { array_var aInput }
+
+	; Returns a reversed positional copy of the input array.
+
+	array_var aOutput = Ar_Construct "array"
+	short iNumItems = Ar_Size aInput
+
+	if iNumItems == -1
+		SetFunctionValue aOutput
+		let aOutput := Ar_Null
+		return
+	endif
+
+	short iIndex = iNumItems - 1
+
+	while iIndex >= 0
+		Ar_Append aOutput, aInput[iIndex]
+		let iIndex -= 1
+	loop
+
+	SetFunctionValue aOutput
+
+	let aOutput := Ar_Null
+
+end

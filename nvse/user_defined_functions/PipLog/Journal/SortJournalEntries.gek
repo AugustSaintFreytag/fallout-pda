@@ -1,0 +1,21 @@
+begin function { array_var aJournalEntries, short bSortDescending }
+
+	; Returns journal entries in display order.
+	; Stored journal entries are already ascending, so only descending needs work.
+
+	; UDFs
+
+	ref ReverseArrayUDF = CompileScript "PipLog\Utils\ReverseArray.gek"
+
+	if bSortDescending == 0
+		SetFunctionValue aJournalEntries
+		return
+	endif
+
+	array_var aSortedJournalEntries = (Call ReverseArrayUDF aJournalEntries)
+
+	SetFunctionValue aSortedJournalEntries
+
+	let aSortedJournalEntries := Ar_Null
+
+end
