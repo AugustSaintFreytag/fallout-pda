@@ -11,6 +11,7 @@ begin function {}
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetDayOfWeekUDF = CompileScript "PipLog\DateTime\GetDayOfWeek.gek"
 	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
+	ref GetEventCountForDate = CompileScript "PipLog\Event\GetEventCountForDate.gek"
 
 	; State
 
@@ -111,8 +112,8 @@ begin function {}
 		endif
 
 		array_var aTileDate = Ar_List iTileYear, iTileMonth, iTileDay
+
 		let sTileDate := (Call GetStorageDateStringUDF aTileDate)
-		let aTileDate := Ar_Null
 		let sTileInsertCommand := (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids|CM_Box_Template|%z" sTileDate)
 
 		AddTileFromTemplate ($sTileInsertCommand)
@@ -120,10 +121,6 @@ begin function {}
 		let sTileBasePath := Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z" sTileDate
 
 		let iTilesInCurrentRow += 1
-
-		if iBuiltTileCount == 0
-			PrintC "PipLog: first tile name=%z, x_readback=%g" sTileDate (GetUIFloat (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/x" sTileDate))
-		endif
 
 		let sTilePropertyPath := Sv_Construct "%z/_string1" sTileBasePath
 		SetUIStringAlt ($sTilePropertyPath) ($iTileDay)
@@ -134,26 +131,27 @@ begin function {}
 		let sTilePropertyPath := Sv_Construct "%z/y" sTileBasePath
 		SetUIFloatAlt ($sTilePropertyPath) iTileRowY
 
-		if iMonthOffset == -1
-			let sTilePropertyPath := Sv_Construct "%z/_alpha1" sTileBasePath
-			SetUIFloatAlt ($sTilePropertyPath) 128
-		elseif iMonthOffset == 0
-			let sTilePropertyPath := Sv_Construct "%z/_alpha1" sTileBasePath
-			SetUIFloatAlt ($sTilePropertyPath) 255
+		let sTilePropertyPath := Sv_Construct "%z/_month_offset" sTileBasePath
+		SetUIFloatAlt ($sTilePropertyPath) iMonthOffset
 
+		if iMonthOffset == 0
 			if eval (iCalendarMonth == iTodayMonth) && (iCalendarYear == iTodayYear)
 				if iTileDay == iTodayDay
 					let sTilePropertyPath := Sv_Construct "%z/_day_state" sTileBasePath
 					SetUIFloatAlt ($sTilePropertyPath) GameHour
-					Player.AuxiliaryVariableSetFloat "*PLC_bPulseAscending" 0
+
+					let sTilePropertyPath := Sv_Construct "%z/_is_today" sTileBasePath
+					SetUIFloatAlt ($sTilePropertyPath) 1
 				elseif iTileDay < iTodayDay
 					let sTilePropertyPath := Sv_Construct "%z/_day_state" sTileBasePath
 					SetUIFloatAlt ($sTilePropertyPath) 24
 				endif
 			endif
-		else
-			let sTilePropertyPath := Sv_Construct "%z/_alpha1" sTileBasePath
-			SetUIFloatAlt ($sTilePropertyPath) 150
+
+			short iNumDateEvents = Call GetEventCountForDate aTileDate
+			let sTilePropertyPath := Sv_Construct "%z/_has_events" sTileBasePath
+
+			SetUIFloatAlt ($sTilePropertyPath) iNumDateEvents
 		endif
 
 		let iTileDay += 1
@@ -178,6 +176,8 @@ begin function {}
 	; Clean-Up
 
 	Sv_Destruct sTileDate, sTileInsertCommand, sTileBasePath, sTilePropertyPath
+
 	let aFirstDate := Ar_Null
+	let aTileDate := Ar_Null
 
 end

@@ -8,7 +8,7 @@ begin function { string_var sDate }
 	; UDFs
 
 	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
-	ref GetEventsForDateUDF = CompileScript "PipLog\Calendar\GetEventsForDate.gek"
+	ref GetEventsForDateUDF = CompileScript "PipLog\Event\GetEventsForDate.gek"
 	ref GetPlayerStatValuesForDateUDF = CompileScript "PipLog\Stats\GetPlayerStatValuesForDate.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetVerbalDateStringUDF = CompileScript "PipLog\DateTime\GetVerbalDateString.gek"

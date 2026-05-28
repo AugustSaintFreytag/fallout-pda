@@ -36,8 +36,6 @@ begin function { array_var aDate }
 			string_var iStatCode = aComponents[0]
 			short iStatValue = #(aComponents[1])
 
-			PrintC "Returning player stat for date key '%z', stat code %g, value %g." sDate iStatCode iStatValue
-
 			let aResult[iStatCode] := iStatValue
 			Sv_Destruct iStatCode
 		endif

@@ -240,7 +240,7 @@
 	<!--== CALENDAR RECT ==-->
 	<!--For the information displayed in the calendar section-->
 	<rect name="CM_CalendarRect">
-		<x>-10</x>
+		<x>-15</x>
 		<y>115</y>
 		<locus>&true;</locus>
 		<visible>
@@ -1270,7 +1270,7 @@
 			</text>
 
 			<text name="CM_RepeatText">
-				<_Title_1>One-Time</_Title_1>
+				<_Title_1>One-Off</_Title_1>
 				<_Title_2>Weekly</_Title_2>
 				<_Title_3>Monthly</_Title_3>
 				<_Title_4>Yearly</_Title_4>
@@ -1437,52 +1437,99 @@
 <template name="CM_Box_Template">
 	<rect name="CM_Box_Rect">
 		<!-- Local variables for the children to copy -->
-		<depth> 5 </depth>
-		<width> 52 </width>
-		<height> 52 </height>
-		<x> 0 </x>
-		<y> 0 </y>
+		<clips>&true;</clips>
+		<depth>5</depth>
+		<width>52</width>
+		<height>52</height>
+		<x>0</x>
+		<y>0</y>
+
+		<locus>&true;</locus>
 
 		<_string1></_string1> <!-- Set in code | Handles the date text -->
-
-		<_clips>1</clips>
-
-		<_alpha1><_alpha1> <!-- Set in code | Handles the alpha of the date text -->
-		<_alpha2><_alpha2> <!-- Set in code | Handles the alpha of the box -->
-		<locus>&true;</locus>
-		<_line_alpha>255</_line_alpha>
 		<_selected></_selected> <!-- Set in code-->
-		<_day_state></_day_state>
+		<_day_state></_day_state> <!-- Set in code-->
+		<_has_events></_has_events> <!-- Set in code-->
+		<_is_today></_is_today> <!-- Set in code-->
+		<_month_offset></_month_offset> <!-- Set in code: -1 previous, 0 current, 1 next -->
 
 		<!-- The boxes that make up the calendar -->
 		<hotrect name="CM_Box_Main">
 			<id>509</id>
 			<depth>6</depth>
-			<include src="text_box.xml"/>
+			<width>
+				<copy src="parent" trait="width"/>
+				<sub src="self" trait="x" />
+			</width>
+			<height>
+				<copy src="parent" trait="height"/>
+			</height>
+			<target>&true;</target>
+			<mouseoversound>UIMenuFocus</mouseoversound>
+			<clickSound>UIMenuOK</clickSound>
+		</hotrect>
+
+		<image name="CM_Box_Today">
+			<depth>6</depth>
+			<filename>Interface\Shared\solid.dds</filename>
+			<width><copy src="parent" trait="width"/></width>
+			<height><copy src="parent" trait="height"/></height>
+			<visible>
+				<copy src="parent" trait="_is_today"/>
+				<gt>0</gt>
+			</visible>
+			<alpha>64</alpha>
+		</image>
+
+		<text name="CM_Box_Text">
+			<depth>7</depth>
+			<x>24</x>
+			<y>20</y>
 			<width><copy src="parent" trait="width"/></width>
 			<height><copy src="parent" trait="height"/></height>
 			<string><copy src="parent" trait="_string1"/></string>
-			<justify>&left;</justify>
-			<_line_alpha><copy src="parent" trait="_alpha1"/></alpha>
-			<target>&true;</target>
-			<mouseoversound>UIMenuFocus</mouseoversound>
-			<clickSound>UIMenuOK</clickSound>			
-		</hotrect>
+			<alpha>
+				<copy>255</copy>
+				<sub>
+					<copy>127</copy>
+					<onlyif>
+						<copy src="parent" trait="_month_offset"/>
+						<lt>0</lt>
+					</onlyif>
+				</sub>
+				<sub>
+					<copy>105</copy>
+					<onlyif>
+						<copy src="parent" trait="_month_offset"/>
+						<gt>0</gt>
+					</onlyif>
+				</sub>
+			</alpha>
+			<font>2</font>
+			<justify>&center;</justify>
+		</text>
 
-		<!-- The box's alpha -->
-		<image name="CM_Box_Selected">
-			<depth>7</depth>
+		<!-- The box's selected/hover highlight -->
+		<rect name="CM_Box_Selected">
+			<depth>8</depth>
 			<include src="box.xml"/>
-			<filename> Interface\Shared\solid.dds</filename>
 			<width><copy src="parent" trait="width"/></width>
 			<height><copy src="parent" trait="height"/></height>
-			<visible><copy src="parent()" trait="_selected"/></visible>
-			<alpha>150</alpha>
-			<_line_alpha> <copy src="parent()" trait="_line_alpha"/> </_line_alpha>
-		</image>
+			<visible>
+				<copy src="parent()" trait="_selected"/>
+				<or src="sibling(CM_Box_Main)" trait="mouseover"/>
+			</visible>
+			<_line_alpha>
+				<copy>128</copy>
+				<add>
+					<copy>127</copy>
+					<onlyif src="parent()" trait="_selected"/>
+				</add>
+			</_line_alpha>
+		</rect>
 
 		<image name="CM_Box_Hours">
-			<depth>8</depth>
+			<depth>9</depth>
 			
 			<filename> Interface\Shared\solid.dds</filename>
 			<width>
@@ -1490,7 +1537,8 @@
 				<div>24</div>
 				<mul><copy src="parent" trait="width"/></mul>
 			</width>
-			<height> 4 </height>
+			<height>4</height>
+			<x>0</x>
 			<y>
 				<copy src="parent" trait="height"/>
 				<sub><copy src="me()" trait="height"/></sub>
@@ -1500,6 +1548,25 @@
 				<gt>0</gt>
 			</visible>
 			<alpha>150</alpha>
+		</image>
+
+		<image name="CM_Box_Indicator">
+			<depth>10</depth>
+			<filename>Interface\piplog\indicator.dds</filename>
+			<width>16</width>
+			<height>16</height>
+			<x>
+				<copy src="parent" trait="width" />
+				<sub><copy src="me" trait="width" /></sub>
+				<sub>5</sub>
+			</x>
+			<y>5</y>
+			<clips>&true;</clips>
+			<visible>
+				<copy src="parent" trait="_has_events"/>
+				<gt>0</gt>
+			</visible>
+			<zoom>&scale;</zoom>
 		</image>
 
 

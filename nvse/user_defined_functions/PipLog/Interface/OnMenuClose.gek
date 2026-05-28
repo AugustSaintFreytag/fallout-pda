@@ -11,7 +11,6 @@ begin function { short iMenuId }
 
 	if Player.AuxiliaryVariableGetFloat "*PLC_bDidGenerateCalendar" == 1
 		Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
-		Player.AuxiliaryVariableSetFloat "*PLC_bPulseAscending" 0
 		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarYear" 0
 		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarMonth" 0
 	endif

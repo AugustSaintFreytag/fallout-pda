@@ -5,7 +5,7 @@ begin function { array_var aDate }
 
 	; UDFs
 
-	ref GetEventsForDateUDF = CompileScript "PipLog\Calendar\GetEventsForDate.gek"
+	ref GetEventsForDateUDF = CompileScript "PipLog\Event\GetEventsForDate.gek"
 
 	; Main
 

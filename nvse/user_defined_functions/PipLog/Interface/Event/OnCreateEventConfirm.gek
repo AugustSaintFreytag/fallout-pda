@@ -1,6 +1,6 @@
 begin function { string_var sEventTitle }
 
-	; Creates a one-time player event for the selected calendar date.
+	; Creates a one-off player event for the selected calendar date.
 	; Empty titles or missing selected dates are ignored.
 
 	; Guards
