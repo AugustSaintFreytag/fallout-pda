@@ -19,8 +19,6 @@ begin function { array_var aDate }
 	string_var sDay = Call GetPaddedIntUDF iDay 2
 
 	string_var sResult = Sv_Construct "%z.%z.%z" sDay sMonth sYear
-
-	PrintC "Returning display date string %z." sResult
 	
 	SetFunctionValue sResult
 
