@@ -414,7 +414,7 @@ string_var sSetting = GetINIString_Cached "General:sSetting" "ModName.ini" "Fall
 
 The third argument is the default value if the key is missing. The fallback is optional and can be omitted.
 
-> **Note:** Despite the function being named `GetINIFloat_Cached`, it is used for both `float` and `short` values. The value is coerced on assignment.
+> **Note:** Despite the function being named `GetINIFloat`, it is used for both `float` and `short` values. The value is coerced on assignment.
 
 #### Reading Entire Sections
 
@@ -564,7 +564,7 @@ begin function { ... }
 
     ; Config
 
-    float fSomeThreshold = GetINIFloat_Cached "Section:fKey" "Mod.ini"
+    float fSomeThreshold = GetINIFloat "Section:fKey" "Mod.ini"
 
     ; State
 
@@ -628,7 +628,7 @@ begin function { ref rSomeRef, float fSomeFloat }
 
     ; Config
 
-    float fThreshold = GetINIFloat_Cached "General:fThreshold" "ModName.ini" 1.0
+    float fThreshold = GetINIFloat "General:fThreshold" "ModName.ini"
 
     ; State
 
