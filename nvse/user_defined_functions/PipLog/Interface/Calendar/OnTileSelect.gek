@@ -36,8 +36,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 		short iNewMonth = aComponents[1]
 		short iNewDay = aComponents[2]
 
-		let aComponents := Ar_Null
-
 		Player.AuxiliaryVariableSetString "*PLC_sPreviousSelectedCalendarDate" ($sCurrentSelectedDate)
 		Player.AuxiliaryVariableSetString "*PLC_sSelectedCalendarDate" ($sComponent)
 		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
@@ -47,7 +45,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 		Player.AuxiliaryVariableSetFloat "*PLC_iSelectedYear" iNewYear
 
 		if eval (iNewYear > GameYear) || ((iNewYear == GameYear) && (iNewMonth > GameMonth)) || ((iNewYear == GameYear) && (iNewMonth == GameMonth) && (iNewDay > GameDay))
-			short bIsTracked = (Call GetPlayerDateReminderUDF sComponent)
+			short bIsTracked = (Call GetPlayerDateReminderUDF aComponents)
 
 			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateFuture" 1
 			Player.AuxiliaryVariableSetFloat "*PLC_bIsSelectedCalendarDateTracked" bIsTracked
@@ -57,6 +55,8 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 		endif
 
 		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
+
+		let aComponents := Ar_Null
 	else
 		Call OnTileDeselectUDF
 	endif
