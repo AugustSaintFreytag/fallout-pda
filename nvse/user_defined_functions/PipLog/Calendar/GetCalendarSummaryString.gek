@@ -113,7 +113,7 @@ begin function { string_var sDate }
 		endif
 
 		string_var sIniKey = Sv_Construct "Stats:%z" sStatCode
-		string_var sStatName = GetINIString ($sIniKey) "PipLog\stats\stats.ini" ($sStatCode)
+		string_var sStatName = GetINIString ($sIniKey) "PipLog\stats\stats.ini"
 
 		let sResult += $sStatName
 		let sResult += ": "
