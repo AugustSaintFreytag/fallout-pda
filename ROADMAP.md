@@ -25,11 +25,11 @@ Original script files have been dumped to `reference/` directory.
 - [ ] Fix date format import for journal entries
 - [ ] Implement journal entry sorting (button functionality)
 
-- [ ] Display messages to the player with custom icon for daily events
-- [ ] Add indicator to date tiles that have events
-- [ ] Event handler API to allow adding events and journal entries
+- [x] Display messages to the player with custom icon for daily events
+- [x] Add indicator to date tiles that have events
+- [x] Event handler API to allow adding events and journal entries
 - [x] Push vanilla content rect for notes text further down
-- [ ] Enhance event listing (include system/player, improve formatting)
-- [ ] Restyle selected event details to use same font size as calendar view
 - [x] Add YSI icon support for all mod buttons
+- [ ] Restyle selected event details to use same font size as calendar view
+- [ ] Enhance event listing (include system/player, improve formatting)
 - [ ] Add content placeholders ("No events." and "No journal entries.")
