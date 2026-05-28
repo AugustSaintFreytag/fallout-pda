@@ -22,7 +22,7 @@ begin function { short iYear }
 
 	; Easter Event
 
-	if GetINIFloat_Cached "Events:bEaster" "Config\PipLog\PipLog.ini" != 0
+	if GetINIFloat "Events:bEaster" "PipLog\PipLog.ini" != 0
 		string_var sEasterDate = (Call GetEasterDateUDF iYear)
 
 		if eval sEasterDate != ""
@@ -36,7 +36,7 @@ begin function { short iYear }
 
 	; Thanksgiving Event
 
-	if GetINIFloat_Cached "Events:bThanksgiving" "Config\PipLog\PipLog.ini" != 0
+	if GetINIFloat "Events:bThanksgiving" "PipLog\PipLog.ini" != 0
 		string_var sThanksgivingDate = (Call GetThanksgivingDateUDF iYear)
 
 		if eval sThanksgivingDate != ""
