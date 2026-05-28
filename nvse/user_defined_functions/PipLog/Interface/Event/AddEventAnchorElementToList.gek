@@ -14,7 +14,7 @@ begin function { short iKind }
 
 	; Main
 
-	string_var sParentPath = "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
+	string_var sParentPath = "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect"
 	string_var sTemplateName = Call GetTemplateNameForKindUDF iKind
 	string_var sTileInsertCommand = Sv_Construct "%z|%z" sParentPath sTemplateName
 

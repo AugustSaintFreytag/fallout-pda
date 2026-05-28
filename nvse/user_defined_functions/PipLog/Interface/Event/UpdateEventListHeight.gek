@@ -4,9 +4,9 @@ begin function {}
 
 	; Main
 
-	float fTailY = GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/CM_EventAnchor_Tail/y"
-	float fTailHeight = GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/CM_EventAnchor_Tail/height"
-	float fScrollDelta = GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_ScrollDelta"
+	float fTailY = GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect/CM_EventAnchor_Tail/y"
+	float fTailHeight = GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect/CM_EventAnchor_Tail/height"
+	float fScrollDelta = GetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventScrollbar/_ScrollDelta"
 	float fMeasuredContentHeight = fTailY + fTailHeight
 	float fMeasuredItems = 0
 
@@ -14,6 +14,6 @@ begin function {}
 		let fMeasuredItems := fMeasuredContentHeight / fScrollDelta
 	endif
 
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventScrollbar/_number_of_items" fMeasuredItems
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventScrollbar/_number_of_items" fMeasuredItems
 
 end

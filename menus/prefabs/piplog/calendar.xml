@@ -437,6 +437,8 @@
 				<sub src="me" trait="x"/>					
 			</width>
 			<height>106</height>
+			<zoom>&scale;</zoom>
+			<_font>2</_font>
 			<_tileselected>0</_tileselected>
 			<_editable>0</_editable>
 
@@ -452,10 +454,6 @@
 				<x><copy src="parent" trait="width"/></x>
 			</image>
 
-			<!--Variables for Events-->
-			<_font>2</_font>
-			<_zoom>90</_zoom>
-
 			<text name="CM_Event_Side_1R">
 				<visible><copy src="parent" trait="_tileselected"/></visible>				
 				<string></string><!-- Set in code-->
@@ -464,7 +462,12 @@
 				<x>5</x>
 				<width>
 					<copy src="parent" trait="width"/>
+					<sub>96</sub>
 				</width>
+				<wrapwidth>
+					<copy src="parent" trait="width"/>
+					<sub>96</sub>
+				</wrapwidth>
 				<font><copy src="parent" trait="_font"/></font>
 				<zoom><copy src="parent" trait="_zoom"/></zoom>
 			</text>
@@ -480,8 +483,9 @@
 				</y>
 				<x><copy src="sibling(CM_Event_Side_1R)" trait="x"/></x>
 				<width>
-					<copy src="parent" trait="width"/>
+					<copy src="sibling(CM_Event_Side_1R)" trait="width"/>
 				</width>
+				<wrapwidth><copy src="sibling(CM_Event_Side_1R)" trait="width"/></wrapwidth>
 				<font><copy src="parent" trait="_font"/></font>
 				<zoom><copy src="parent" trait="_zoom"/></zoom>
 			</text>
@@ -580,7 +584,7 @@
 		</rect>
 
 		<!--Larger section for holding event list rows-->
-		<hotrect name="CM_EventTextRect">
+		<hotrect name="CM_EventListRect">
 			<locus>&true;</locus>
 			<wheelable>&true;</wheelable>
 			<clipwindow> &true; </clipwindow>
@@ -670,7 +674,7 @@
 				<include src="text_box.xml"/>
 				<y>60</y>
 				<_title_1>Sort Asc.</_title_1>
-				<_title_2>Sort Dsc.</_title_2>
+				<_title_2>Sort Desc.</_title_2>
 				<_Title>
 					<copy src="me()" trait="_value"/>
 					<add>1</add>

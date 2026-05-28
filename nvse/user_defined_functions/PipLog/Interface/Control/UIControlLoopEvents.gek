@@ -56,14 +56,14 @@ begin function {}
 
 	if bIsEventSelectionModified
 		if eval (Sv_Length sPreviousSelectedEventTileName) > 0
-			string_var sOldEventTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/%z/_selected" sPreviousSelectedEventTileName
+			string_var sOldEventTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect/%z/_selected" sPreviousSelectedEventTileName
 			SetUIFloatAlt ($sOldEventTilePath) 0
 			Sv_Destruct sOldEventTilePath
 		endif
 
 		if eval (Sv_Length sSelectedEventId) > 0
 			if eval (Sv_Length sSelectedEventTileName) > 0
-				string_var sNewEventTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/%z/_selected" sSelectedEventTileName
+				string_var sNewEventTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect/%z/_selected" sSelectedEventTileName
 				SetUIFloatAlt ($sNewEventTilePath) 1
 				Sv_Destruct sNewEventTilePath
 			endif

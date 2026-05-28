@@ -19,8 +19,8 @@ begin function { array_var aEvent, short iIndex }
 		let iEventSourceKind := aEvent["_source"]
 	endif
 
-	string_var sTileInsertCommand = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect|CM_Event_Template|CM_Event%g" iIndex
-	string_var sTileBasePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/CM_Event%g" iIndex
+	string_var sTileInsertCommand = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect|CM_Event_Template|CM_Event%g" iIndex
+	string_var sTileBasePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect/CM_Event%g" iIndex
 	string_var sTilePropertyPath = ""
 
 	AddTileFromTemplate ($sTileInsertCommand)

@@ -15,8 +15,8 @@ begin function {}
 
 	; Add Tile
 
-	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect"
-	AddTileFromTemplate "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect|CM_EventParentRect_Template|CM_EventParentRect"
+	UnloadUIComponent "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect"
+	AddTileFromTemplate "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect|CM_EventParentRect_Template|CM_EventParentRect"
 
 	; Add Events
 
@@ -25,7 +25,7 @@ begin function {}
 	Call AddEventsToListUDF aEvents
 	CallAfterFrames 1.1 UpdateEventListHeightUDF 1
 
-	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/visible" 1
+	SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventListRect/CM_EventParentRect/visible" 1
 
 	; Store for Interaction
 
