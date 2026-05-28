@@ -55,8 +55,6 @@ begin function {}
 	; Selection
 
 	if bIsEventSelectionModified
-		PrintC "Updating event selection. Selection modified: %g" bIsEventSelectionModified
-
 		if eval (Sv_Length sPreviousSelectedEventTileName) > 0
 			string_var sOldEventTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_EventRect/CM_EventTextRect/CM_EventParentRect/%z/_selected" sPreviousSelectedEventTileName
 			SetUIFloatAlt ($sOldEventTilePath) 0
