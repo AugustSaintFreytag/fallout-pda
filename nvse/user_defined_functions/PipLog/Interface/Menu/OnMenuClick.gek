@@ -1,9 +1,8 @@
 begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	; Handles main Pip-Log buttons and calendar month arrows by mutating the view model.
-	; UIControlLoop.gek owns applying those values to menu tiles.
 
-	; Guards
+	; Pre-Check
 
 	if eval !(MenuMode 1023)
 		return
@@ -29,6 +28,7 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 	short bButton1Target = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button1/target" == 1
 	short bButton2Target = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button2/target" == 1
 	short bButton3Target = GetUIFloat "MapMenu/CM_MainRect/CM_ButtonRect/CM_Button3/target" == 1
+	
 	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
 
 	if eval (iTileId >= 510) && (iTileId <= 512)
