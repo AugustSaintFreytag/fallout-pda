@@ -2,7 +2,7 @@ begin function { array_var aDate }
 
 	; Returns a positional array of decoded event stringmaps for the given date.
 	; Checks both global (transient) and player (persistent) event storage.
-	; Date patterns checked: YYYY-MM-DD (year-specific), *-MM-DD (yearly recurring), *-*-DD (monthly recurring).
+	; Date patterns checked: YYYY-MM-DD, *-MM-DD, *-*-DD, *-*-*.
 	; aDate is [year, 0-indexed month, day].
 	; Caller is responsible for Ar_Null on the returned array.
 
@@ -20,6 +20,7 @@ begin function { array_var aDate }
 	string_var sDateSpecific = (Call GetStorageDateStringUDF aDate)
 	string_var sDateYearly = (Call GetRecurringDatePatternStringUDF 1 iMonth iDay)
 	string_var sDateMonthly = (Call GetRecurringDatePatternStringUDF 2 iMonth iDay)
+	string_var sDateDaily = (Call GetRecurringDatePatternStringUDF 3 iMonth iDay)
 
 	array_var aGlobalEventsById = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsById"
 	array_var aGlobalEventsByDate = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsByDate"
@@ -29,7 +30,7 @@ begin function { array_var aDate }
 	; Main
 	
 	array_var aAllEvents = Ar_Construct "array"
-	array_var aPatterns = Ar_List sDateSpecific, sDateYearly, sDateMonthly
+	array_var aPatterns = Ar_List sDateSpecific, sDateYearly, sDateMonthly, sDateDaily
 
 	foreach (array_var aEntry) <- aPatterns
 		string_var sPattern = aEntry["value"]
@@ -41,7 +42,7 @@ begin function { array_var aDate }
 
 	; Clean-Up
 
-	Sv_Destruct sDateSpecific, sDateYearly, sDateMonthly
+	Sv_Destruct sDateSpecific, sDateYearly, sDateMonthly, sDateDaily
 
 	let aPatterns := Ar_Null
 	let aGlobalEventsById := Ar_Null

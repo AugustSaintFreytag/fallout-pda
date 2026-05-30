@@ -1,7 +1,7 @@
 begin function { short iIntervalKind }
 
 	; Collects events from all storage sources for the active event list filter.
-	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = weekly, 4 = daily.
+	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = daily.
 
 	; UDFs
 

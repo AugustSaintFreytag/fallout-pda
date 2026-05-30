@@ -2,15 +2,11 @@ begin function { array_var aDate, string_var sName, short iIntervalKind }
 
 	; Adds a player-defined custom event to the persistent event registry.
 	; aDate is [year, 0-indexed month, day].
-	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = weekly, 4 = daily.
-	; Supported storage patterns: date-specific = YYYY-MM-DD, yearly = *-MM-DD, monthly = *-*-DD.
+	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = daily.
+	; Supported storage patterns: date-specific = YYYY-MM-DD, yearly = *-MM-DD, monthly = *-*-DD, daily = *-*-*.
 	; Events are stored as player events (bIsPlayerEvent = 1).
 
-	if eval (iIntervalKind == 3) || (iIntervalKind == 4)
-		return
-	endif
-
-	if eval (iIntervalKind < 0) || (iIntervalKind > 4)
+	if eval (iIntervalKind < 0) || (iIntervalKind > 3)
 		return
 	endif
 

@@ -1,8 +1,8 @@
 begin function { array_var aEventsById, array_var aEventIdsByDate, short iIntervalKind }
 
 	; Collects decoded events from one event storage source for the active event list filter.
-	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = weekly, 4 = daily.
-	; Supported storage patterns: date-specific = YYYY-MM-DD, yearly = *-MM-DD, monthly = *-*-DD.
+	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = daily.
+	; Supported storage patterns: date-specific = YYYY-MM-DD, yearly = *-MM-DD, monthly = *-*-DD, daily = *-*-*.
 	; Injects a transient "_source" property to each returned event.
 
 	; UDFs
@@ -30,6 +30,7 @@ begin function { array_var aEventsById, array_var aEventIdsByDate, short iInterv
 		if eval (Ar_Size aDateComponents) == 3
 			string_var sYear = aDateComponents[0]
 			string_var sMonth = aDateComponents[1]
+			string_var sDay = aDateComponents[2]
 
 			if iIntervalKind == 0
 				; Date-specific
@@ -38,17 +39,22 @@ begin function { array_var aEventsById, array_var aEventIdsByDate, short iInterv
 				endif
 			elseif iIntervalKind == 1
 				; Yearly recurring
-				if eval (sYear == "*") && (sMonth != "*")
+				if eval (sYear == "*") && (sMonth != "*") && (sDay != "*")
 					let bMatchesFilter := 1
 				endif
 			elseif iIntervalKind == 2
 				; Monthly recurring
-				if eval (sYear == "*") && (sMonth == "*")
+				if eval (sYear == "*") && (sMonth == "*") && (sDay != "*")
+					let bMatchesFilter := 1
+				endif
+			elseif iIntervalKind == 3
+				; Daily recurring
+				if eval (sYear == "*") && (sMonth == "*") && (sDay == "*")
 					let bMatchesFilter := 1
 				endif
 			endif
 
-			Sv_Destruct sYear, sMonth
+			Sv_Destruct sYear, sMonth, sDay
 		endif
 
 		if eval bMatchesFilter
