@@ -1,0 +1,33 @@
+begin function { string_var sDate }
+
+	; Splits a DD.MM.YYYY date string into its components.
+	; Returns a positional array: [0] = year, [1] = month (0-indexed), [2] = day.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; Main
+
+	array_var aComponents = Sv_Split sDate, "."
+
+	if eval (Ar_Size aComponents) != 3
+		PrintC "Invalid display date string '%z' (got %g parts)." sDate (Ar_Size aComponents)
+
+		SetFunctionValue Ar_Null
+		let aComponents := Ar_Null
+		
+		return
+	endif
+
+	array_var aResult = Ar_Construct "array"
+
+	Ar_Append aResult, (#aComponents[2])
+	Ar_Append aResult, (#aComponents[1] - 1)
+	Ar_Append aResult, (#aComponents[0])
+
+	SetFunctionValue aResult
+
+	; Clean-Up
+
+	let aComponents := Ar_Null
+	let aResult := Ar_Null
+
+end
