@@ -48,8 +48,14 @@ begin function {}
 
 		string_var sDate = aEntry["date"]
 		string_var sName = aEntry["name"]
+		string_var sDescription = ""
+
+		if eval (Ar_HasKey aEntry, "description")
+			let sDescription := aEntry["description"]
+		endif
 
 		array_var aEvent = (Call CreateEventUDF sDate sName)
+		let aEvent["description"] := sDescription
 
 		; PrintC "Would have added holiday event at index %g, id '%z', date '%z', name '%z'." iIndex (aEvent["id"]) (aEvent["date"]) (aEvent["name"])
 
@@ -60,7 +66,7 @@ begin function {}
 		let aEvent := Ar_Null
 		let aEntry := Ar_Null
 		
-		Sv_Destruct sDate, sName
+		Sv_Destruct sDate, sName, sDescription
 	loop
 
 	SetFunctionValue aEvents

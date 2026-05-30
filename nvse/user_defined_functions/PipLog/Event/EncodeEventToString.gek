@@ -18,15 +18,25 @@ begin function { array_var aEvent }
 
 	short iFlags = aEvent["flags"]
 	string_var sFlags = $iFlags
+	string_var sDescription = ""
+
+	if eval (Ar_HasKey aEvent, "description")
+		let sDescription := aEvent["description"]
+	endif
 
 	array_var aComponents = Ar_List aEvent["id"], aEvent["date"], aEvent["name"], sFlags
+
+	if eval (Sv_Length sDescription) > 0
+		Ar_Append aComponents, sDescription
+	endif
+
 	string_var sEncodedEvent = Sv_Join aComponents, "@@@"
 
 	SetFunctionValue sEncodedEvent
 
 	; Clean-Up
 
-	Sv_Destruct sFlags
+	Sv_Destruct sFlags, sDescription
 	let aComponents := Ar_Null
 
 end

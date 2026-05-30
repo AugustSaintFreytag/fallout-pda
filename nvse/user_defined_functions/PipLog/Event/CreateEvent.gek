@@ -12,6 +12,7 @@ begin function { string_var sDate, string_var sName }
 	let aEvent["id"] := (Call GetRandomIdUDF)
 	let aEvent["date"] := sDate
 	let aEvent["name"] := sName
+	let aEvent["description"] := ""
 
 	let aEvent["_isSystemEvent"] := 1
 	let aEvent["_isPlayerEvent"] := 0
@@ -19,6 +20,8 @@ begin function { string_var sDate, string_var sName }
 	Call EncodeEventFlagsUDF aEvent
 
 	SetFunctionValue aEvent
+
+	; Clean-Up
 
 	let aEvent := Ar_Null
 
