@@ -45,10 +45,6 @@ begin function {}
 	string_var sDateTimeReal = (Call GetRealDateTimeStringUDF)
 	string_var sPath = (Call GetExchangePathUDF "PlayerEvents")
 
-	if eval (Sv_Length sPlayerName) == 0
-		let sPlayerName := "Player"
-	endif
-
 	let aDocument["version"] := 1
 	let aDocument["kind"] := "PlayerEvents"
 	let aDocument["playerName"] := sPlayerName
