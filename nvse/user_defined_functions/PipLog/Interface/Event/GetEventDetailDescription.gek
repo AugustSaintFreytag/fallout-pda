@@ -1,0 +1,24 @@
+begin function { array_var aEvent }
+
+	; Returns the selected event description text.
+
+	; Main
+
+	if eval (aEvent == Ar_Null) || ((Ar_Size aEvent) == -1)
+		SetFunctionValue ""
+		return
+	endif
+
+	string_var sDescription = ""
+
+	if eval (Ar_HasKey aEvent, "description")
+		let sDescription := aEvent["description"]
+	endif
+
+	SetFunctionValue sDescription
+
+	; Clean-Up
+
+	Sv_Destruct sDescription
+
+end
