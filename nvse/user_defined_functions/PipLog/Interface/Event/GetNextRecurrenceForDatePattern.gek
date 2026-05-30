@@ -1,0 +1,95 @@
+begin function { string_var sDatePattern }
+
+	; Returns the next date array for a supported event date pattern.
+
+	; UDFs
+
+	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
+
+	; Main
+
+	array_var aComponents = Sv_Split sDatePattern, "-"
+
+	if eval (Ar_Size aComponents) != 3
+		SetFunctionValue Ar_Null
+		let aComponents := Ar_Null
+		return
+	endif
+
+	string_var sYear = aComponents[0]
+	string_var sMonth = aComponents[1]
+	string_var sDay = aComponents[2]
+	
+	short iNextYear = GameYear
+	short iNextMonth = GameMonth
+	short iNextDay = GameDay
+
+	array_var aNextDate = Ar_Null
+
+	if eval (sYear != "*") && (sMonth != "*") && (sDay != "*")
+		let aNextDate := Ar_List (#sYear), (#sMonth - 1), (#sDay)
+	elseif eval (sYear == "*") && (sMonth == "*") && (sDay == "*")
+		let aNextDate := Ar_List GameYear, GameMonth, GameDay
+	elseif eval (sYear == "*") && (sMonth == "*") && (sDay != "*")
+		let iNextDay := #sDay
+
+		short bFoundMonthlyDate = 0
+		short iNumMonthSearches = 0
+
+		while eval (!bFoundMonthlyDate) && (iNumMonthSearches < 36)
+			short iDaysInMonth = (Call GetDaysInMonthUDF iNextYear iNextMonth)
+
+			if iNextDay <= iDaysInMonth
+				if eval (iNextYear > GameYear) || (iNextMonth > GameMonth) || (iNextDay >= GameDay)
+					let bFoundMonthlyDate := 1
+				endif
+			endif
+
+			if eval !bFoundMonthlyDate
+				let iNextMonth += 1
+
+				if iNextMonth > 11
+					let iNextMonth := 0
+					let iNextYear += 1
+				endif
+
+				let iNumMonthSearches += 1
+			endif
+		loop
+
+		let aNextDate := Ar_List iNextYear, iNextMonth, iNextDay
+	elseif eval (sYear == "*") && (sMonth != "*") && (sDay != "*")
+		let iNextMonth := #sMonth - 1
+		let iNextDay := #sDay
+
+		short bDidFindYearlyDate = 0
+		short iNumYearSearches = 0
+
+		while eval (!bDidFindYearlyDate) && (iNumYearSearches < 8)
+			short iDaysInYearlyMonth = (Call GetDaysInMonthUDF iNextYear iNextMonth)
+
+			if iNextDay <= iDaysInYearlyMonth
+				if eval (iNextYear > GameYear) || (iNextMonth > GameMonth) || ((iNextMonth == GameMonth) && (iNextDay >= GameDay))
+					let bDidFindYearlyDate := 1
+				endif
+			endif
+
+			if eval !bDidFindYearlyDate
+				let iNextYear += 1
+				let iNumYearSearches += 1
+			endif
+		loop
+
+		let aNextDate := Ar_List iNextYear, iNextMonth, iNextDay
+	endif
+
+	SetFunctionValue aNextDate
+
+	; Clean-Up
+
+	Sv_Destruct sYear, sMonth, sDay
+
+	let aComponents := Ar_Null
+	let aNextDate := Ar_Null
+
+end

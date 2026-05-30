@@ -1,0 +1,37 @@
+begin function { string_var sDatePattern }
+
+	; Returns a display label for a supported event date pattern.
+
+	; Main
+
+	array_var aComponents = Sv_Split sDatePattern, "-"
+
+	if eval (Ar_Size aComponents) != 3
+		SetFunctionValue ""
+		let aComponents := Ar_Null
+		return
+	endif
+
+	string_var sYear = aComponents[0]
+	string_var sMonth = aComponents[1]
+	string_var sDay = aComponents[2]
+	string_var sLabel = ""
+
+	if eval (sYear != "*") && (sMonth != "*") && (sDay != "*")
+		let sLabel := "One-Off"
+	elseif eval (sYear == "*") && (sMonth == "*") && (sDay == "*")
+		let sLabel := "Daily"
+	elseif eval (sYear == "*") && (sMonth == "*") && (sDay != "*")
+		let sLabel := "Monthly"
+	elseif eval (sYear == "*") && (sMonth != "*") && (sDay != "*")
+		let sLabel := "Yearly"
+	endif
+
+	SetFunctionValue sLabel
+
+	; Clean-Up
+
+	Sv_Destruct sYear, sMonth, sDay
+	let aComponents := Ar_Null
+
+end
