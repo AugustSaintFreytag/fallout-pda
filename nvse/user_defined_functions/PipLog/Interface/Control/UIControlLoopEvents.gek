@@ -6,7 +6,8 @@ begin function {}
 
 	ref GenerateEventListUDF = CompileScript "PipLog\Interface\Event\GenerateEventList.gek"
 	ref GetEventByIdUDF = CompileScript "PipLog\Event\GetEventById.gek"
-	ref GetEventDateLabelUDF = CompileScript "PipLog\Interface\Event\GetEventDateLabel.gek"
+	ref GetEventRecurrenceDescriptionUDF = CompileScript "PipLog\Interface\Event\GetEventRecurrenceDescription.gek"
+	ref GetEventDetailDescriptionUDF = CompileScript "PipLog\Interface\Event\GetEventDetailDescription.gek"
 
 	; State
 
@@ -75,15 +76,21 @@ begin function {}
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" 0
 			else
 				string_var sSelectedEventName = aSelectedEvent["name"]
-				string_var sSelectedEventDate = aSelectedEvent["date"]
-				string_var sSelectedEventDateLabel = (Call GetEventDateLabelUDF sSelectedEventDate)
+				string_var sSelectedEventRecurrenceDescription = (Call GetEventRecurrenceDescriptionUDF aSelectedEvent)
+				string_var sSelectedEventDetailDescription = (Call GetEventDetailDescriptionUDF aSelectedEvent)
+				string_var sSelectedEventTitleBlock = Sv_Construct "%z" sSelectedEventName
+
+				if eval (Sv_Length sSelectedEventRecurrenceDescription) > 0
+					let sSelectedEventTitleBlock += "%r"
+					let sSelectedEventTitleBlock += $sSelectedEventRecurrenceDescription
+				endif
 
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 1
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" bIsSelectedEventPlayer
-				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_1R/string" ($sSelectedEventName)
-				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_2R/string" ($sSelectedEventDateLabel)
+				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_1R/string" ($sSelectedEventTitleBlock)
+				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_2R/string" ($sSelectedEventDetailDescription)
 
-				Sv_Destruct sSelectedEventName, sSelectedEventDate, sSelectedEventDateLabel
+				Sv_Destruct sSelectedEventName, sSelectedEventRecurrenceDescription, sSelectedEventDetailDescription, sSelectedEventTitleBlock
 			endif
 
 			let aSelectedEvent := Ar_Null
