@@ -10,7 +10,6 @@ begin function {}
 
 	; State
 
-	short bDidGenerateCalendar = Player.AuxiliaryVariableGetFloat "*PLC_bDidGenerateCalendar"
 	short bIsCalendarSummaryModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsCalendarSummaryModified"
 	short bIsCalendarSelectionModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsCalendarSelectionModified"
 	short bIsCalendarViewModified = Player.AuxiliaryVariableGetFloat "*PLC_bIsCalendarViewModified"
@@ -21,6 +20,7 @@ begin function {}
 	string_var sPreviousSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sPreviousSelectedCalendarDate"
 	string_var sSelectedCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sSelectedCalendarDate"
 	string_var sHoveredCalendarDate = Player.AuxiliaryVariableGetString "*PLC_sHoveredCalendarDate"
+	string_var sCalendarGridPath = "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids"
 
 	; View Controls
 
@@ -40,9 +40,8 @@ begin function {}
 
 	; Tiles
 
-	if eval (!bDidGenerateCalendar) || (bIsCalendarViewModified)
+	if eval bIsCalendarViewModified
 		Call GenerateCalendarTilesUDF
-		let bDidGenerateCalendar := 1
 	endif
 
 	; Summary Text
@@ -73,15 +72,15 @@ begin function {}
 
 	; Selection
 
-	if eval (bIsCalendarSelectionModified) && (bDidGenerateCalendar)
+	if eval bIsCalendarSelectionModified
 		if eval (Sv_Length sPreviousSelectedCalendarDate) > 0
-			string_var sOldTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sPreviousSelectedCalendarDate
+			string_var sOldTilePath = Sv_Construct "%z/%z/_selected" sCalendarGridPath sPreviousSelectedCalendarDate
 			SetUIFloatAlt ($sOldTilePath) 0
 			Sv_Destruct sOldTilePath
 		endif
 
 		if eval (Sv_Length sSelectedCalendarDate) > 0
-			string_var sNewTilePath = Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids/%z/_selected" sSelectedCalendarDate
+			string_var sNewTilePath = Sv_Construct "%z/%z/_selected" sCalendarGridPath sSelectedCalendarDate
 			SetUIFloatAlt ($sNewTilePath) 1
 			Sv_Destruct sNewTilePath
 		endif
@@ -107,6 +106,7 @@ begin function {}
 
 	; Clean-Up
 
-	Sv_Destruct sCalendarDateSummary, sPreviousSelectedCalendarDate, sSelectedCalendarDate, sHoveredCalendarDate
+	Sv_Destruct sCalendarDateSummary, sPreviousSelectedCalendarDate, sSelectedCalendarDate
+	Sv_Destruct sHoveredCalendarDate, sCalendarGridPath
 
 end

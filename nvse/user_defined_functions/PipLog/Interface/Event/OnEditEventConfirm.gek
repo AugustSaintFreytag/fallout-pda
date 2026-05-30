@@ -25,7 +25,6 @@ begin function { string_var sEventTitle }
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
-	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 
