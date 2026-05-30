@@ -3,7 +3,7 @@ begin function { array_var aParams }
 	; UDFs
 
 	ref AddPlayerEventUDF = CompileScript "PipLog\Event\AddPlayerEvent.gek"
-	ref ParseStorageDateStringUDF = CompileScript "PipLog\DateTime\ParseStorageDateString.gek"
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 
 	; Main
 
@@ -17,8 +17,15 @@ begin function { array_var aParams }
 
 	PrintC "Adding player event '%z' for date %z via API call." sEventName sEventDate
 
-	array_var aEventDate = (Call ParseStorageDateStringUDF sEventDate)
+	array_var aEventDate = (Call ParseStorageDateToComponentsUDF sEventDate)
+
 	Call AddPlayerEventUDF aEventDate sEventName 0
+
+	; Invalidate
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
 	
 	; Clean-Up
 
