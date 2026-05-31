@@ -1,0 +1,63 @@
+begin function {}
+
+	; Reads reference-only event description entries from the events JSON config file.
+	; Returns a stringmap where each key is an event reference.
+	; Caller is responsible for Ar_Null on the returned map.
+
+	; Main
+
+	array_var aDescriptionsByReference = Ar_Construct "stringmap"
+
+	; Read from File
+
+	array_var aEntries = ReadFromJSON "data\config\PipLog\events\events.json" "" 0 0
+
+	if eval !aEntries || aEntries == Ar_Null
+		Print "Could not load event descriptions from file 'data\config\PipLog\events\events.json'."
+		SetFunctionValue aDescriptionsByReference
+		return
+	endif
+
+	short iNumEntries = Ar_Size aEntries
+
+	if iNumEntries == -1
+		Print "Could not load event descriptions from file 'data\config\PipLog\events\events.json'."
+		SetFunctionValue aDescriptionsByReference
+		return
+	endif
+
+	; Create Map
+
+	short iIndex = 0
+
+	while iIndex < iNumEntries
+		array_var aEntry = aEntries[iIndex]
+
+		if eval (Ar_Size aEntry) == -1
+			PrintC "Could not process event description at index %g, invalid entry." iIndex
+			break
+		endif
+
+		if eval (Ar_HasKey aEntry, "reference") && (Ar_HasKey aEntry, "description")
+			string_var sReference = aEntry["reference"]
+			string_var sDescription = aEntry["description"]
+
+			if eval (Sv_Length sReference) > 0
+				let aDescriptionsByReference[sReference] := sDescription
+			endif
+
+			Sv_Destruct sReference, sDescription
+		endif
+
+		let iIndex += 1
+		let aEntry := Ar_Null
+	loop
+
+	SetFunctionValue aDescriptionsByReference
+
+	; Clean-Up
+
+	let aEntries := Ar_Null
+	let aDescriptionsByReference := Ar_Null
+
+end

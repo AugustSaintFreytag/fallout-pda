@@ -1,0 +1,86 @@
+begin function {}
+
+	; Reads dated system event definitions from the events JSON config file.
+	; Returns a positional array of event stringmaps, each with "id", "date", and "name" fields.
+	; Returns an empty array if the JSON file could not be loaded.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
+
+	; Main
+
+	array_var aEvents = Ar_Construct "array"
+
+	; Read from File
+
+	array_var aEntries = ReadFromJSON "data\config\PipLog\events\events.json" "" 0 0
+
+	if eval !aEntries || aEntries == Ar_Null
+		Print "Could not load system events from file 'data\config\PipLog\events\events.json'."
+		SetFunctionValue aEvents
+		return
+	endif
+
+	short iNumEntries = Ar_Size aEntries
+
+	if iNumEntries == -1
+		Print "Could not load system events from file, no usable entries."
+		SetFunctionValue aEvents
+		return
+	else
+		PrintC "Processing %g event config entries." iNumEntries
+	endif
+
+	; Create Events
+
+	short iIndex = 0
+
+	while iIndex < iNumEntries
+		array_var aEntry = aEntries[iIndex]
+
+		if eval (Ar_Size aEntry) == -1
+			PrintC "Could not read and process system event at index %g, invalid entry." iIndex
+			break
+		endif
+
+		if eval !(Ar_HasKey aEntry, "date")
+			let iIndex += 1
+			let aEntry := Ar_Null
+			continue
+		endif
+
+		string_var sDate = aEntry["date"]
+		string_var sName = aEntry["name"]
+		string_var sDescription = ""
+
+		if eval (Ar_HasKey aEntry, "description")
+			let sDescription := aEntry["description"]
+		endif
+
+		array_var aEvent = (Call CreateEventUDF sDate sName)
+		let aEvent["description"] := sDescription
+
+		; PrintC "Would have added system event at index %g." iIndex
+
+		Ar_Append aEvents, aEvent
+
+		let iIndex += 1
+
+		let aEvent := Ar_Null
+		let aEntry := Ar_Null
+		
+		Sv_Destruct sDate, sName, sDescription
+	loop
+
+	; Return
+
+	SetFunctionValue aEvents
+
+	; Clean-Up
+
+	let aEntries := Ar_Null
+	let aEvents := Ar_Null
+
+end

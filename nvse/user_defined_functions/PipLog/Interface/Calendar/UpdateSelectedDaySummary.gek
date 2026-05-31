@@ -6,14 +6,14 @@ begin function { string_var sDate }
 
 	; UDFs
 
-	ref GetCalendarSummaryStringUDF = CompileScript "PipLog\Calendar\GetCalendarSummaryString.gek"
+	ref GetCalendarDateSummaryUDF = CompileScript "PipLog\Interface\Calendar\GetCalendarDateSummary.gek"
 
 	; Main
 
 	string_var sSummary = ""
 
 	if eval (Sv_Length sDate) > 0
-		let sSummary := (Call GetCalendarSummaryStringUDF sDate)
+		let sSummary := (Call GetCalendarDateSummaryUDF sDate)
 	else
 		let sSummary := "No date selected."
 	endif

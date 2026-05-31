@@ -12,6 +12,7 @@ begin function { string_var sDate }
 	ref GetPlayerStatValuesForDateUDF = CompileScript "PipLog\Stats\GetPlayerStatValuesForDate.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetVerbalDateStringUDF = CompileScript "PipLog\DateTime\GetVerbalDateString.gek"
+	ref GetEventDisplayNameUDF = CompileScript "PipLog\Interface\Event\GetEventDisplayName.gek"
 
 	; State
 
@@ -47,7 +48,7 @@ begin function { string_var sDate }
 
 		foreach (array_var aElement) <- aEvents
 			array_var aEvent = aElement["value"]
-			string_var sEventName = aEvent["name"]
+			string_var sEventName = (Call GetEventDisplayNameUDF aEvent iYear)
 
 			let sResult += $sEventName
 			let sResult += "%r"

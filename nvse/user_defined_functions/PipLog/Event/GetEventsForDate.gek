@@ -10,7 +10,7 @@ begin function { array_var aDate }
 
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetRecurringDatePatternStringUDF = CompileScript "PipLog\DateTime\GetRecurringDatePatternString.gek"
-	ref CollectEventsForPatternUDF = CompileScript "PipLog\Calendar\CollectEventsForPattern.gek"
+	ref GetEventsForDatePatternUDF = CompileScript "PipLog\Event\GetEventsForDatePattern.gek"
 
 	; State
 
@@ -34,8 +34,8 @@ begin function { array_var aDate }
 
 	foreach (array_var aEntry) <- aPatterns
 		string_var sPattern = aEntry["value"]
-		Call CollectEventsForPatternUDF sPattern aGlobalEventsById aGlobalEventsByDate aAllEvents
-		Call CollectEventsForPatternUDF sPattern aPlayerEventsById aPlayerEventsByDate aAllEvents
+		Call GetEventsForDatePatternUDF sPattern aGlobalEventsById aGlobalEventsByDate aAllEvents
+		Call GetEventsForDatePatternUDF sPattern aPlayerEventsById aPlayerEventsByDate aAllEvents
 	loop
 
 	SetFunctionValue aAllEvents
