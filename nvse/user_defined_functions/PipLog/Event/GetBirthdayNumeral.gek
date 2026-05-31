@@ -1,0 +1,32 @@
+begin function { short iYear }
+
+	; UDFs
+
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
+
+	; Main
+
+	string_var sBirthdayDate = Player.AuxiliaryVariableGetString "PLC_sBirthdayDate"
+	array_var aBirthdayDate = (Call ParseStorageDateToComponentsUDF sBirthdayDate)
+
+	if eval (Ar_Size aBirthdayDate) < 3
+		Print "Could not read date for birthday numeral, birthday not set or date invalid."
+
+		SetFunctionValue 0
+		
+		Sv_Destruct sBirthdayDate
+		let aBirthdayDate := Ar_Null	
+		return
+	endif
+	
+	short iBirthdayYear = aBirthdayDate[0]
+	short iNumBirthday = iYear - iBirthdayYear
+
+	SetFunctionValue iNumBirthday
+
+	; Clean-Up
+
+	Sv_Destruct sBirthdayDate
+	let aBirthdayDate := Ar_Null
+
+end
