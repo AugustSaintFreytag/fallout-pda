@@ -18,8 +18,8 @@ ref OnRemoveJournalEntryUDF = CompileScript "PipLog\Interface\Journal\OnRemoveJo
 ref OnToggleReminderClickUDF = CompileScript "PipLog\Interface\Reminder\OnToggleReminderClick.gek"
 ref OnWaitUntilClickUDF = CompileScript "PipLog\Interface\Wait\OnWaitUntilClick.gek"
 ref TickRemindersUDF = CompileScript "PipLog\Reminder\TickReminders.gek"
-ref AddComputedEventsUDF = CompileScript "PipLog\Calendar\AddComputedEvents.gek"
-ref AddHolidayEventsUDF = CompileScript "PipLog\Calendar\AddHolidayEvents.gek"
+ref AddComputedEventsUDF = CompileScript "PipLog\Event\AddComputedEvents.gek"
+ref AddSystemEventsUDF = CompileScript "PipLog\Event\AddSystemEvents.gek"
 ref AppendJournalEntryUDF = CompileScript "PipLog\Journal\AppendJournalEntry.gek"
 ref OnPlayerMiscStatChangeUDF = CompileScript "PipLog\Stats\OnPlayerMiscStatChange.gek"
 ref SetUpAPIEventHandlersUDF = CompileScript "PipLog\API\SetUpAPIEventHandlers.gek"
@@ -56,7 +56,7 @@ SetEventHandler "ShowOff:OnPCMiscStatChange" OnPlayerMiscStatChangeUDF
 ; Data Initialization
 
 Call AddComputedEventsUDF GameYear
-Call AddHolidayEventsUDF
+Call AddSystemEventsUDF
 
 ; API
 
