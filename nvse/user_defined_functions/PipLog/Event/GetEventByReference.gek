@@ -1,0 +1,72 @@
+begin function { string_var sReference }
+
+	; Returns the first decoded event with sReference from global or player event storage.
+	; Checks global storage first, then player storage.
+	; Returns Ar_Null if no matching event exists.
+
+	; UDFs
+
+	ref DecodeEventFromStringUDF = CompileScript "PipLog\Event\DecodeEventFromString.gek"
+
+	; Main
+
+	array_var aEventsById = Player.AuxStringMapArrayGetAsArray "*PLC_aGlobalEventsById"
+
+	if eval (Ar_Size aEventsById) != -1
+		foreach array_var aElement <- aEventsById
+			string_var sEncodedEvent = aElement["value"]
+			array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+			if eval (aEvent != Ar_Null) && ((Ar_Size aEvent) != -1)
+				string_var sEventReference = aEvent["reference"]
+
+				if eval sEventReference == sReference
+					SetFunctionValue aEvent
+
+					Sv_Destruct sEncodedEvent, sEventReference
+					let aEventsById := Ar_Null
+					return
+				endif
+
+				Sv_Destruct sEventReference
+			endif
+
+			Sv_Destruct sEncodedEvent
+			let aEvent := Ar_Null
+		loop
+	endif
+
+	let aEventsById := Ar_Null
+	let aEventsById := Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
+
+	if eval (Ar_Size aEventsById) != -1
+		foreach array_var aElement <- aEventsById
+			string_var sEncodedEvent = aElement["value"]
+			array_var aEvent = (Call DecodeEventFromStringUDF sEncodedEvent)
+
+			if eval (aEvent != Ar_Null) && ((Ar_Size aEvent) != -1)
+				string_var sEventReference = aEvent["reference"]
+
+				if eval sEventReference == sReference
+					SetFunctionValue aEvent
+
+					Sv_Destruct sEncodedEvent, sEventReference
+					let aEventsById := Ar_Null
+					return
+				endif
+
+				Sv_Destruct sEventReference
+			endif
+
+			Sv_Destruct sEncodedEvent
+			let aEvent := Ar_Null
+		loop
+	endif
+
+	SetFunctionValue Ar_Null
+
+	; Clean-Up
+
+	let aEventsById := Ar_Null
+
+end
