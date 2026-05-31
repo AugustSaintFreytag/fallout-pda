@@ -12,7 +12,7 @@ begin function { string_var sData }
 	array_var aComponents = Sv_Split sData, "@@@"
 	short iNumComponents = Ar_Size aComponents
 
-	if eval (iNumComponents != 3) && (iNumComponents != 4) && (iNumComponents != 5)
+	if eval (iNumComponents != 3) && (iNumComponents != 4) && (iNumComponents != 5) && (iNumComponents != 6)
 		PrintC "Could not decode event from string '%z', invalid format." sData
 
 		SetFunctionValue Ar_Null
@@ -26,6 +26,7 @@ begin function { string_var sData }
 	let aEvent["date"] := aComponents[1]
 	let aEvent["name"] := aComponents[2]
 	let aEvent["description"] := ""
+	let aEvent["reference"] := ""
 
 	short iFlags = 0
 
@@ -34,6 +35,14 @@ begin function { string_var sData }
 	elseif iNumComponents == 5
 		let iFlags := #(aComponents[3])
 		let aEvent["description"] := aComponents[4]
+	elseif iNumComponents == 6
+		let iFlags := #(aComponents[3])
+		let aEvent["description"] := aComponents[4]
+		let aEvent["reference"] := aComponents[5]
+
+		if eval aEvent["description"] == " "
+			let aEvent["description"] := ""
+		endif
 	endif
 
 	let aEvent["flags"] := iFlags
