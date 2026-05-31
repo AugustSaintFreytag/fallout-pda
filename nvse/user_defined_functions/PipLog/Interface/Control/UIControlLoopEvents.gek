@@ -7,7 +7,8 @@ begin function {}
 	ref GenerateEventListUDF = CompileScript "PipLog\Interface\Event\GenerateEventList.gek"
 	ref GetEventByIdUDF = CompileScript "PipLog\Event\GetEventById.gek"
 	ref GetEventRecurrenceDescriptionUDF = CompileScript "PipLog\Interface\Event\GetEventRecurrenceDescription.gek"
-	ref GetEventDetailDescriptionUDF = CompileScript "PipLog\Interface\Event\GetEventDetailDescription.gek"
+	ref GetEventDisplayNameUDF = CompileScript "PipLog\Interface\Event\GetEventDisplayName.gek"
+	ref GetEventDisplayDescriptionUDF = CompileScript "PipLog\Interface\Event\GetEventDisplayDescription.gek"
 
 	; State
 
@@ -75,9 +76,9 @@ begin function {}
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 0
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" 0
 			else
-				string_var sSelectedEventName = aSelectedEvent["name"]
+				string_var sSelectedEventName = (Call GetEventDisplayNameUDF aSelectedEvent GameYear)
 				string_var sSelectedEventRecurrenceDescription = (Call GetEventRecurrenceDescriptionUDF aSelectedEvent)
-				string_var sSelectedEventDetailDescription = (Call GetEventDetailDescriptionUDF aSelectedEvent)
+				string_var sSelectedEventDetailDescription = (Call GetEventDisplayDescriptionUDF aSelectedEvent)
 				string_var sSelectedEventTitleBlock = Sv_Construct "%z" sSelectedEventName
 
 				if eval (Sv_Length sSelectedEventRecurrenceDescription) > 0

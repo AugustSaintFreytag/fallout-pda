@@ -9,6 +9,12 @@ begin function { array_var aEvent }
 		return
 	endif
 
+	string_var sReference = ""
+
+	if eval (Ar_HasKey aEvent, "reference")
+		let sReference := aEvent["reference"]
+	endif
+
 	string_var sDescription = ""
 
 	if eval (Ar_HasKey aEvent, "description")
@@ -19,6 +25,6 @@ begin function { array_var aEvent }
 
 	; Clean-Up
 
-	Sv_Destruct sDescription
+	Sv_Destruct sReference, sDescription
 
 end
