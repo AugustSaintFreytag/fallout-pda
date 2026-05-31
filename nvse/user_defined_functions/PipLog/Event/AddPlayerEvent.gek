@@ -21,6 +21,7 @@ begin function { array_var aDate, string_var sName, short iIntervalKind }
 
 	short iMonth = aDate[1]
 	short iDay = aDate[2]
+	
 	string_var sDate = ""
 
 	if iIntervalKind == 0

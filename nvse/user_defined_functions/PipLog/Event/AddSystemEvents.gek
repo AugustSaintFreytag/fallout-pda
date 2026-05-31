@@ -1,0 +1,23 @@
+begin function {}
+
+	; Registers each system event into global event storage.
+	; aSystemEvents should be a positional array of event stringmaps as returned by GetSystemEvents.
+
+	; UDFs
+
+	ref GetSystemEventsUDF = CompileScript "PipLog\Event\GetSystemEvents.gek"
+	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+
+	; Main
+
+	array_var aSystemEvents = (Call GetSystemEventsUDF)
+
+	PrintC "Adding %g system events to calendar." (Ar_Size aSystemEvents)
+
+	Call AddEventsUDF aSystemEvents 0
+
+	; Clean-Up
+
+	let aSystemEvents := Ar_Null
+
+end

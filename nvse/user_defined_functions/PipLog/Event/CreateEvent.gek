@@ -13,6 +13,7 @@ begin function { string_var sDate, string_var sName }
 	let aEvent["date"] := sDate
 	let aEvent["name"] := sName
 	let aEvent["description"] := ""
+	let aEvent["reference"] := ""
 
 	let aEvent["_isSystemEvent"] := 1
 	let aEvent["_isPlayerEvent"] := 0
