@@ -1,0 +1,25 @@
+begin function { short iYear }
+
+	; Computes and registers algorithm-driven calendar events for the given year.
+	; Dedicated computed event UDFs are idempotent by event reference.
+
+	; UDFs
+
+	ref GetEventDescriptionsByReferenceUDF = CompileScript "PipLog\Event\GetEventDescriptionsByReference.gek"
+	ref AddEasterEventUDF = CompileScript "PipLog\Event\Computed\AddEasterEvent.gek"
+	ref AddThanksgivingEventUDF = CompileScript "PipLog\Event\Computed\AddThanksgivingEvent.gek"
+	ref AddBirthdayEventUDF = CompileScript "PipLog\Event\Computed\AddBirthdayEvent.gek"
+
+	; Main
+
+	array_var aDescriptionsByReference = (Call GetEventDescriptionsByReferenceUDF)
+
+	Call AddEasterEventUDF iYear aDescriptionsByReference
+	Call AddThanksgivingEventUDF iYear aDescriptionsByReference
+	Call AddBirthdayEventUDF aDescriptionsByReference
+
+	; Clean-Up
+
+	let aDescriptionsByReference := Ar_Null
+
+end
