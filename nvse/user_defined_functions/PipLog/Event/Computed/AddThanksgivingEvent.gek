@@ -1,4 +1,4 @@
-begin function { short iYear, array_var aDescriptionsByReference }
+begin function { short iYear, string_var sDescription }
 
 	; Replaces and adds the computed Thanksgiving event for iYear.
 
@@ -25,11 +25,9 @@ begin function { short iYear, array_var aDescriptionsByReference }
 
 	if eval sThanksgivingDate != ""
 		array_var aThanksgivingEvent = (Call CreateEventUDF sThanksgivingDate "Thanksgiving")
+		
 		let aThanksgivingEvent["reference"] := "thanksgiving"
-
-		if eval (Ar_HasKey aDescriptionsByReference, "thanksgiving")
-			let aThanksgivingEvent["description"] := aDescriptionsByReference["thanksgiving"]
-		endif
+		let aThanksgivingEvent["description"] := sDescription
 
 		array_var aEvents = Ar_List aThanksgivingEvent
 		Call AddEventsUDF aEvents 0

@@ -14,9 +14,9 @@ begin function { short iYear }
 
 	array_var aDescriptionsByReference = (Call GetEventDescriptionsByReferenceUDF)
 
-	Call AddEasterEventUDF iYear aDescriptionsByReference
-	Call AddThanksgivingEventUDF iYear aDescriptionsByReference
-	Call AddBirthdayEventUDF aDescriptionsByReference
+	Call AddEasterEventUDF iYear aDescriptionsByReference["easter"]
+	Call AddThanksgivingEventUDF iYear aDescriptionsByReference["thanksgiving"]
+	Call AddBirthdayEventUDF
 
 	; Clean-Up
 

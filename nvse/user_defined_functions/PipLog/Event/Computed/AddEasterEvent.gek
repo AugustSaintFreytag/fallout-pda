@@ -1,4 +1,4 @@
-begin function { short iYear, array_var aDescriptionsByReference }
+begin function { short iYear, string_var sDescription }
 
 	; Replaces and adds the computed Easter event for iYear.
 
@@ -25,11 +25,9 @@ begin function { short iYear, array_var aDescriptionsByReference }
 
 	if eval sEasterDate != ""
 		array_var aEasterEvent = (Call CreateEventUDF sEasterDate "Easter")
+		
 		let aEasterEvent["reference"] := "easter"
-
-		if eval (Ar_HasKey aDescriptionsByReference, "easter")
-			let aEasterEvent["description"] := aDescriptionsByReference["easter"]
-		endif
+		let aEasterEvent["description"] := sDescription
 
 		array_var aEvents = Ar_List aEasterEvent
 		Call AddEventsUDF aEvents 0
