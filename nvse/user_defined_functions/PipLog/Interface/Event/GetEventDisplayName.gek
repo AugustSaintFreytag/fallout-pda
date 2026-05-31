@@ -1,10 +1,14 @@
 begin function { array_var aEvent, short iYear }
 
 	; Checks for special events by reference and allows renaming them.
+	;
+	; Passing a year parameter will return an event name for that year.
+	; Passing -1 for the year will calculate the next recurrence of the event.
 
 	; UDFs
 
 	ref GetBirthdayNumeralUDF = CompileScript "PipLog\Event\GetBirthdayNumeral.gek"
+	ref GetNextRecurrenceForDatePatternUDF = CompileScript "PipLog\Event\GetNextRecurrenceForDatePattern.gek"
 	ref GetOrdinalSuffixUDF = CompileScript "PipLog\DateTime\GetOrdinalSuffix.gek"
 
 	; Main
@@ -22,8 +26,16 @@ begin function { array_var aEvent, short iYear }
 		string_var sDate = aEvent["date"]
 		string_var sPlayerName = (GetName Player)
 
-		if iYear == 0
-			let iYear := GameYear
+		if iYear == -1
+			array_var aNextDate = (Call GetNextRecurrenceForDatePatternUDF sDate)
+
+			if eval (aNextDate != Ar_Null) && ((Ar_Size aNextDate) != -1)
+				let iYear := aNextDate[0]
+			else
+				let iYear := GameYear
+			endif
+
+			let aNextDate := Ar_Null
 		endif
 
 		short iNumBirthday = (Call GetBirthdayNumeralUDF iYear)
@@ -35,7 +47,7 @@ begin function { array_var aEvent, short iYear }
 			let sName := Sv_Construct "%z's Birthday" sPlayerName
 		endif
 
-		Sv_Destruct sDate, sPlayerName
+		Sv_Destruct sDate, sPlayerName, sOrdinalSuffix
 	endif
 
 	; Return

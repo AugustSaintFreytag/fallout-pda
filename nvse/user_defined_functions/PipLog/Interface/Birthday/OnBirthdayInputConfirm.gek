@@ -9,7 +9,6 @@ begin function { string_var sInput }
 	ref ParseDisplayDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseDisplayDateToComponents.gek"
 	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
-	ref GetEventDescriptionsByReferenceUDF = CompileScript "PipLog\Event\GetEventDescriptionsByReference.gek"
 	ref AddBirthdayEventUDF = CompileScript "PipLog\Event\Computed\AddBirthdayEvent.gek"
 
 	; Main
@@ -41,8 +40,7 @@ begin function { string_var sInput }
 
 	Player.AuxiliaryVariableSetString "PLC_sBirthdayDate" ($sBirthdayDate)
 
-	array_var aDescriptionsByReference = (Call GetEventDescriptionsByReferenceUDF)
-	Call AddBirthdayEventUDF aDescriptionsByReference
+	Call AddBirthdayEventUDF
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
@@ -53,7 +51,6 @@ begin function { string_var sInput }
 	; Clean-Up
 
 	Sv_Destruct sBirthdayDate
-	let aDescriptionsByReference := Ar_Null
 	let aBirthdayDate := Ar_Null
 
 end

@@ -76,7 +76,7 @@ begin function {}
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 0
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" 0
 			else
-				string_var sSelectedEventName = (Call GetEventDisplayNameUDF aSelectedEvent GameYear)
+				string_var sSelectedEventName = (Call GetEventDisplayNameUDF aSelectedEvent -1)
 				string_var sSelectedEventRecurrenceDescription = (Call GetEventRecurrenceDescriptionUDF aSelectedEvent)
 				string_var sSelectedEventDetailDescription = (Call GetEventDisplayDescriptionUDF aSelectedEvent)
 				string_var sSelectedEventTitleBlock = Sv_Construct "%z" sSelectedEventName
