@@ -1,0 +1,70 @@
+begin function {}
+
+	; Returns the birthday event description that best matches player state.
+	; Text is loaded from config\PipLog\events\player.json and formatted with the player name.
+
+	; Main
+
+	array_var aTexts = ReadFromJSON "data\config\PipLog\events\player.json" "" 0 0
+
+	if eval !aTexts || aTexts == Ar_Null
+		Print "Could not load player event descriptions from file 'data\config\PipLog\events\player.json'."
+		SetFunctionValue ""
+		return
+	endif
+
+	if eval (Ar_Size aTexts) == -1
+		Print "Could not load player event descriptions from file, no usable entries."
+		SetFunctionValue ""
+		return
+	endif
+
+	short bDidCompleteMQ01 = GetQuestCompleted MQ01
+	short bDidCompleteMQ04 = GetQuestCompleted MQ04
+	short bDidCompleteMQ11 = GetQuestCompleted MQ11
+	short bDidCompleteMQA = GetQuestCompleted MQA
+
+	short iKarma = Player.GetAV Karma
+	string_var sKey = "intro-mq01"
+
+	if eval bDidCompleteMQ11
+		if eval bDidCompleteMQA
+			let sKey := "mq11-end-mqa"
+		else
+			let sKey := "mq11-end-nomqa"
+		endif
+	elseif eval bDidCompleteMQ01
+		if iKarma <= -1750
+			let sKey := "mq01-mq11-evil"
+		elseif eval !bDidCompleteMQ04
+			let sKey := "mq01-mq04-any"
+		elseif iKarma >= 500
+			let sKey := "mq04-mq11-positive"
+		elseif iKarma <= -500
+			let sKey := "mq04-mq11-negative"
+		else
+			let sKey := "mq04-mq11-neutral"
+		endif
+	endif
+
+	string_var sDescription = ""
+
+	if eval (Ar_HasKey aTexts, sKey)
+		string_var sTemplate = aTexts[sKey]
+		string_var sPlayerName = (GetName Player)
+
+		let sDescription := Sv_Construct ($sTemplate) sPlayerName
+
+		Sv_Destruct sTemplate, sPlayerName
+	else
+		PrintC "Could not find player event description for key '%z'." sKey
+	endif
+
+	SetFunctionValue sDescription
+
+	; Clean-Up
+
+	Sv_Destruct sKey, sDescription
+	let aTexts := Ar_Null
+
+end
