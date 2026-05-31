@@ -1,5 +1,17 @@
 [
 	{
+		"reference": "birthday",
+		"description": "Accounts from the Capital Wasteland identify a Vault 101 expatriate, commonly known as the Lone Wanderer. Stories of their contributions to post-war society are varied."
+	},
+	{
+		"reference": "easter",
+		"description": "A Christian observance tied to resurrection, spring, and old seasonal customs. Pre-war civilian practice often combined worship, family meals, decorated eggs, and confectionery."
+	},
+	{
+		"reference": "thanksgiving",
+		"description": "An American harvest and civic holiday traditionally observed with communal meals and formal gratitude. In post-war use, the date can mark ration inventories and settlement celebrations."
+	},
+	{
 		"date": "*-01-01",
 		"name": "New Year's Day",
 		"description": "Marks the first day of the civil calendar year under the old-world dating system. The date served as a formal reset point for records, contracts, inventories, and personal resolutions."
