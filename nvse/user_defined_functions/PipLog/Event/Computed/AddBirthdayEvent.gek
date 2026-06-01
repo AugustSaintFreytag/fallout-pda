@@ -1,14 +1,15 @@
-begin function { array_var aDescriptionsByReference }
+begin function {}
 
 	; Replaces and adds the computed birthday event when a birthday is stored.
 
 	; UDFs
 
-	ref GetRecurringDatePatternStringUDF = CompileScript "PipLog\DateTime\GetRecurringDatePatternString.gek"
-	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
 	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
 	ref RemoveEventByReferenceUDF = CompileScript "PipLog\Event\RemoveEventByReference.gek"
+	ref GetBirthdayEventDescriptionForPlayerUDF = CompileScript "PipLog\Event\GetBirthdayEventDescriptionForPlayer.gek"
+	ref GetRecurringDatePatternStringUDF = CompileScript "PipLog\DateTime\GetRecurringDatePatternString.gek"
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 
 	; Main
 
@@ -38,8 +39,10 @@ begin function { array_var aDescriptionsByReference }
 
 	let aBirthdayEvent["reference"] := "birthday"
 
-	if eval (Ar_HasKey aDescriptionsByReference, "birthday")
-		let aBirthdayEvent["description"] := aDescriptionsByReference["birthday"]
+	string_var sDescription = (Call GetBirthdayEventDescriptionForPlayerUDF)
+
+	if eval (Sv_Length sDescription) > 0
+		let aBirthdayEvent["description"] := sDescription
 	endif
 
 	array_var aEvents = Ar_List aBirthdayEvent
@@ -47,7 +50,8 @@ begin function { array_var aDescriptionsByReference }
 
 	; Clean-Up
 
-	Sv_Destruct sStoredBirthdayDate, sPlayerName, sBirthdayDate, sBirthdayName
+	Sv_Destruct sStoredBirthdayDate, sPlayerName, sBirthdayDate, sBirthdayName, sDescription
+
 	let aEvents := Ar_Null
 	let aBirthdayEvent := Ar_Null
 	let aBirthdayDate := Ar_Null

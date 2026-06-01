@@ -17,17 +17,8 @@ begin function { array_var aEvent }
 
 	string_var sDate = aEvent["date"]
 	string_var sRecurrenceLabel = (Call GetRecurrenceLabelForDatePatternUDF sDate)
-
-	if eval (Sv_Length sRecurrenceLabel) == 0
-		string_var sFallback = Sv_Construct "%z" sDate
-
-		SetFunctionValue sFallback
-
-		Sv_Destruct sDate, sRecurrenceLabel, sFallback
-		return
-	endif
-
 	string_var sDescription = ""
+	
 	array_var aNextDate = (Call GetNextRecurrenceForDatePatternUDF sDate)
 
 	if eval (aNextDate == Ar_Null) || ((Ar_Size aNextDate) == -1)

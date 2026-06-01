@@ -62,9 +62,9 @@ begin function {}
 		array_var aEvent = (Call CreateEventUDF sDate sName)
 		let aEvent["description"] := sDescription
 
-		; PrintC "Would have added system event at index %g." iIndex
-
 		Ar_Append aEvents, aEvent
+
+		; Conclude
 
 		let iIndex += 1
 

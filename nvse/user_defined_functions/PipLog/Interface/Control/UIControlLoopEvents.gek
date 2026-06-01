@@ -9,6 +9,7 @@ begin function {}
 	ref GetEventRecurrenceDescriptionUDF = CompileScript "PipLog\Interface\Event\GetEventRecurrenceDescription.gek"
 	ref GetEventDisplayNameUDF = CompileScript "PipLog\Interface\Event\GetEventDisplayName.gek"
 	ref GetEventDisplayDescriptionUDF = CompileScript "PipLog\Interface\Event\GetEventDisplayDescription.gek"
+	ref EllipsizeUDF = CompileScript "PipLog\Utils\Ellipsize.gek"
 
 	; State
 
@@ -50,7 +51,6 @@ begin function {}
 	; List
 
 	if bIsEventListModified
-		PrintC "Generating event list. List modified: %g" bIsEventListModified
 		Call GenerateEventListUDF
 	endif
 
@@ -76,10 +76,12 @@ begin function {}
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 0
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" 0
 			else
-				string_var sSelectedEventName = (Call GetEventDisplayNameUDF aSelectedEvent GameYear)
+				string_var sSelectedEventName = (Call GetEventDisplayNameUDF aSelectedEvent (-1))
 				string_var sSelectedEventRecurrenceDescription = (Call GetEventRecurrenceDescriptionUDF aSelectedEvent)
-				string_var sSelectedEventDetailDescription = (Call GetEventDisplayDescriptionUDF aSelectedEvent)
+				string_var sSelectedEventDescription = (Call GetEventDisplayDescriptionUDF aSelectedEvent)
 				string_var sSelectedEventTitleBlock = Sv_Construct "%z" sSelectedEventName
+
+				PrintC "Now serving event description '%z'." (Call EllipsizeUDF sSelectedEventDescription 64)
 
 				if eval (Sv_Length sSelectedEventRecurrenceDescription) > 0
 					let sSelectedEventTitleBlock += "%r"
@@ -89,9 +91,9 @@ begin function {}
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_tileselected" 1
 				SetUIFloatAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/_editable" bIsSelectedEventPlayer
 				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_1R/string" ($sSelectedEventTitleBlock)
-				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_2R/string" ($sSelectedEventDetailDescription)
+				SetUIStringAlt "MapMenu/CM_MainRect/CM_EventRect/CM_EventSide/CM_Event_Side_2R/string" ($sSelectedEventDescription)
 
-				Sv_Destruct sSelectedEventName, sSelectedEventRecurrenceDescription, sSelectedEventDetailDescription, sSelectedEventTitleBlock
+				Sv_Destruct sSelectedEventName, sSelectedEventRecurrenceDescription, sSelectedEventDescription, sSelectedEventTitleBlock
 			endif
 
 			let aSelectedEvent := Ar_Null
