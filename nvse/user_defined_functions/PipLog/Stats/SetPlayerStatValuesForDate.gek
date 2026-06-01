@@ -1,0 +1,38 @@
+begin function { array_var aDate, array_var aStats }
+
+	; Encodes and writes one day's player stat values.
+	; aDate is [year, 0-indexed month, day].
+	; Returns 1 if the date was written, otherwise 0.
+
+	; UDFs
+
+	ref EncodePlayerStatValuesUDF = CompileScript "PipLog\Stats\EncodePlayerStatValues.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+
+	; State
+
+	string_var sDate = (Call GetStorageDateStringUDF aDate)
+	string_var sEncodedStats = (Call EncodePlayerStatValuesUDF aStats)
+	array_var aStoredStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
+	short bDidWrite = 0
+
+	; Main
+
+	if eval ((Sv_Length sDate) > 0) && ((Sv_Length sEncodedStats) > 0)
+		if eval (Ar_Size aStoredStats) == -1
+			let aStoredStats := Ar_Construct "stringmap"
+		endif
+
+		let aStoredStats[sDate] := sEncodedStats
+		Player.AuxStringMapArraySetFromArray "PLC_aPlayerStats" aStoredStats
+		let bDidWrite := 1
+	endif
+
+	SetFunctionValue bDidWrite
+
+	; Clean-Up
+
+	Sv_Destruct sDate, sEncodedStats
+	let aStoredStats := Ar_Null
+
+end

@@ -1,0 +1,38 @@
+begin function {}
+
+	; Returns decoded player quest stat storage as { date: [questId, ...] }.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref DecodePlayerQuestIdsUDF = CompileScript "PipLog\Stats\DecodePlayerQuestIds.gek"
+
+	; State
+
+	array_var aStoredQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
+	array_var aQuestTable = Ar_Construct "stringmap"
+
+	; Main
+
+	if eval (Ar_Size aStoredQuestStats) != -1
+		foreach array_var aElement <- aStoredQuestStats
+			string_var sDate = aElement["key"]
+			string_var sEncodedQuestIds = aElement["value"]
+
+			if eval (Sv_Length sDate) > 0
+				array_var aQuestIds = (Call DecodePlayerQuestIdsUDF sEncodedQuestIds)
+				let aQuestTable[sDate] := aQuestIds
+				let aQuestIds := Ar_Null
+			endif
+
+			Sv_Destruct sDate, sEncodedQuestIds
+		loop
+	endif
+
+	SetFunctionValue aQuestTable
+
+	; Clean-Up
+
+	let aStoredQuestStats := Ar_Null
+
+end

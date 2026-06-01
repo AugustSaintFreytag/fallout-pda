@@ -1,0 +1,45 @@
+begin function { array_var aStatTable }
+
+	; Encodes and writes decoded player stat storage.
+	; Returns the number of dates written.
+
+	; UDFs
+
+	ref EncodePlayerStatValuesUDF = CompileScript "PipLog\Stats\EncodePlayerStatValues.gek"
+
+	; State
+
+	array_var aStoredStats = Ar_Construct "stringmap"
+	short iWrittenDates = 0
+
+	; Main
+
+	if eval (Ar_Size aStatTable) != -1
+		foreach array_var aElement <- aStatTable
+			string_var sDate = aElement["key"]
+			array_var aStats = aElement["value"]
+
+			if eval ((Sv_Length sDate) > 0) && ((Ar_Size aStats) != -1)
+				string_var sEncodedStats = (Call EncodePlayerStatValuesUDF aStats)
+
+				if eval (Sv_Length sEncodedStats) > 0
+					let aStoredStats[sDate] := sEncodedStats
+					let iWrittenDates += 1
+				endif
+
+				Sv_Destruct sEncodedStats
+			endif
+
+			Sv_Destruct sDate
+			let aStats := Ar_Null
+		loop
+	endif
+
+	Player.AuxStringMapArraySetFromArray "PLC_aPlayerStats" aStoredStats
+	SetFunctionValue iWrittenDates
+
+	; Clean-Up
+
+	let aStoredStats := Ar_Null
+
+end

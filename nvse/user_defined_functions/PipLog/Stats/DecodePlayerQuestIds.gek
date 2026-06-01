@@ -1,0 +1,33 @@
+begin function { string_var sEncodedQuestIds }
+
+	; Expands comma-separated quest stat storage into a positional array.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; Main
+
+	array_var aQuestIds = Ar_Construct "array"
+
+	if eval (Sv_Length sEncodedQuestIds) == 0
+		SetFunctionValue aQuestIds
+		return
+	endif
+
+	array_var aComponents = Sv_Split sEncodedQuestIds, ","
+
+	foreach array_var aElement <- aComponents
+		string_var sQuestId = aElement["value"]
+
+		if eval (Sv_Length sQuestId) > 0
+			Ar_Append aQuestIds, sQuestId
+		endif
+
+		Sv_Destruct sQuestId
+	loop
+
+	SetFunctionValue aQuestIds
+
+	; Clean-Up
+
+	let aComponents := Ar_Null
+
+end

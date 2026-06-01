@@ -1,0 +1,42 @@
+begin function { string_var sEncodedStats }
+
+	; Expands "code:count,code:count" daily stat storage into a StringMap.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; Main
+
+	array_var aStats = Ar_Construct "stringmap"
+
+	if eval (Sv_Length sEncodedStats) == 0
+		SetFunctionValue aStats
+		return
+	endif
+
+	array_var aPairs = Sv_Split sEncodedStats, ","
+
+	foreach array_var aElement <- aPairs
+		string_var sPair = aElement["value"]
+		array_var aComponents = Sv_Split sPair, ":"
+
+		if eval (Ar_Size aComponents) == 2
+			string_var sCode = aComponents[0]
+			short iValue = #(aComponents[1])
+
+			if eval (Sv_Length sCode) > 0
+				let aStats[sCode] := iValue
+			endif
+
+			Sv_Destruct sCode
+		endif
+
+		Sv_Destruct sPair
+		let aComponents := Ar_Null
+	loop
+
+	SetFunctionValue aStats
+
+	; Clean-Up
+
+	let aPairs := Ar_Null
+
+end

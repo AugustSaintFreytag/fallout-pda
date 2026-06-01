@@ -1,0 +1,38 @@
+begin function {}
+
+	; Returns decoded player stat storage as { date: { statCode: count } }.
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref DecodePlayerStatValuesUDF = CompileScript "PipLog\Stats\DecodePlayerStatValues.gek"
+
+	; State
+
+	array_var aStoredStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
+	array_var aStatTable = Ar_Construct "stringmap"
+
+	; Main
+
+	if eval (Ar_Size aStoredStats) != -1
+		foreach array_var aElement <- aStoredStats
+			string_var sDate = aElement["key"]
+			string_var sEncodedStats = aElement["value"]
+
+			if eval (Sv_Length sDate) > 0
+				array_var aStats = (Call DecodePlayerStatValuesUDF sEncodedStats)
+				let aStatTable[sDate] := aStats
+				let aStats := Ar_Null
+			endif
+
+			Sv_Destruct sDate, sEncodedStats
+		loop
+	endif
+
+	SetFunctionValue aStatTable
+
+	; Clean-Up
+
+	let aStoredStats := Ar_Null
+
+end

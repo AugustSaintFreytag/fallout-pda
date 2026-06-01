@@ -1,0 +1,38 @@
+begin function { array_var aDate, array_var aQuestIds }
+
+	; Encodes and writes one day's completed quest IDs.
+	; aDate is [year, 0-indexed month, day].
+	; Returns 1 if the date was written, otherwise 0.
+
+	; UDFs
+
+	ref EncodePlayerQuestIdsUDF = CompileScript "PipLog\Stats\EncodePlayerQuestIds.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+
+	; State
+
+	string_var sDate = (Call GetStorageDateStringUDF aDate)
+	string_var sEncodedQuestIds = (Call EncodePlayerQuestIdsUDF aQuestIds)
+	array_var aStoredQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
+	short bDidWrite = 0
+
+	; Main
+
+	if eval ((Sv_Length sDate) > 0) && ((Sv_Length sEncodedQuestIds) > 0)
+		if eval (Ar_Size aStoredQuestStats) == -1
+			let aStoredQuestStats := Ar_Construct "stringmap"
+		endif
+
+		let aStoredQuestStats[sDate] := sEncodedQuestIds
+		Player.AuxStringMapArraySetFromArray "PLC_aPlayerQuestStats" aStoredQuestStats
+		let bDidWrite := 1
+	endif
+
+	SetFunctionValue bDidWrite
+
+	; Clean-Up
+
+	Sv_Destruct sDate, sEncodedQuestIds
+	let aStoredQuestStats := Ar_Null
+
+end
