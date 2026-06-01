@@ -1,6 +1,6 @@
 begin function {}
 
-	; Reads holiday definitions from the holidays JSON config file.
+	; Reads dated system event definitions from the events JSON config file.
 	; Returns a positional array of event stringmaps, each with "id", "date", and "name" fields.
 	; Returns an empty array if the JSON file could not be loaded.
 	; Caller is responsible for Ar_Null on the returned array.
@@ -8,7 +8,6 @@ begin function {}
 	; UDFs
 
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
-	ref GetRandomIdUDF = CompileScript "PipLog\Utils\GetRandomId.gek"
 
 	; Main
 
@@ -16,10 +15,10 @@ begin function {}
 
 	; Read from File
 
-	array_var aEntries = ReadFromJSON "data\config\PipLog\events\holidays.json" "" 0 0
+	array_var aEntries = ReadFromJSON "data\config\PipLog\events\events.json" "" 0 0
 
 	if eval !aEntries || aEntries == Ar_Null
-		Print "Could not load holiday events from file 'data\config\PipLog\events\holidays.json', file could not be loaded."
+		Print "Could not load system events from file 'data\config\PipLog\events\events.json'."
 		SetFunctionValue aEvents
 		return
 	endif
@@ -27,11 +26,11 @@ begin function {}
 	short iNumEntries = Ar_Size aEntries
 
 	if iNumEntries == -1
-		Print "Could not load holiday events from file 'data\config\PipLog\events\holidays.json', file contains no usable entries."
+		Print "Could not load system events from file, no usable entries."
 		SetFunctionValue aEvents
 		return
 	else
-		PrintC "Processing %g holiday events from config file." iNumEntries
+		PrintC "Processing %g event config entries." iNumEntries
 	endif
 
 	; Create Events
@@ -42,26 +41,40 @@ begin function {}
 		array_var aEntry = aEntries[iIndex]
 
 		if eval (Ar_Size aEntry) == -1
-			PrintC "Could not read and process holiday event at index %g, invalid entry." iIndex
+			PrintC "Could not read and process system event at index %g, invalid entry." iIndex
 			break
+		endif
+
+		if eval !(Ar_HasKey aEntry, "date")
+			let iIndex += 1
+			let aEntry := Ar_Null
+			continue
 		endif
 
 		string_var sDate = aEntry["date"]
 		string_var sName = aEntry["name"]
+		string_var sDescription = ""
+
+		if eval (Ar_HasKey aEntry, "description")
+			let sDescription := aEntry["description"]
+		endif
 
 		array_var aEvent = (Call CreateEventUDF sDate sName)
-
-		; PrintC "Would have added holiday event at index %g, id '%z', date '%z', name '%z'." iIndex (aEvent["id"]) (aEvent["date"]) (aEvent["name"])
+		let aEvent["description"] := sDescription
 
 		Ar_Append aEvents, aEvent
+
+		; Conclude
 
 		let iIndex += 1
 
 		let aEvent := Ar_Null
 		let aEntry := Ar_Null
 		
-		Sv_Destruct sDate, sName
+		Sv_Destruct sDate, sName, sDescription
 	loop
+
+	; Return
 
 	SetFunctionValue aEvents
 

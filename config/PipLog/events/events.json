@@ -1,0 +1,159 @@
+[
+	{
+		"reference": "birthday",
+		"description": "Accounts from the Capital Wasteland identify a Vault 101 expatriate, commonly known as the Lone Wanderer. Stories of their contributions to post-war society are varied."
+	},
+	{
+		"reference": "easter",
+		"description": "A Christian observance tied to resurrection, spring, and old seasonal customs. Pre-war civilian practice often combined worship, family meals, decorated eggs, and confectionery."
+	},
+	{
+		"reference": "thanksgiving",
+		"description": "An American harvest and civic holiday traditionally observed with communal meals and formal gratitude. In post-war use, the date can mark ration inventories and settlement celebrations."
+	},
+	{
+		"date": "*-01-01",
+		"name": "New Year's Day",
+		"description": "Marks the first day of the civil calendar year under the old-world dating system. The date served as a formal reset point for records, contracts, inventories, and personal resolutions."
+	},
+	{
+		"date": "*-01-10",
+		"name": "Anchorage Liberation Day",
+		"description": "Marks the United States recapture of Anchorage during the final stage of the Sino-American War. Pre-war records treated the victory as proof of restored military initiative after more than a decade of Alaskan fighting."
+	},
+	{
+		"date": "*-01-15",
+		"name": "MLK Jr. Birthday",
+		"description": "Honors Martin Luther King Jr., a pre-war civil rights leader born on January 15, 1929. The date is associated with nonviolent protest and the expansion of federal civil rights protections."
+	},
+	{
+		"date": "*-02-14",
+		"name": "Valentine's Day",
+		"description": "A pre-war social holiday centered on courtship, affection, and reciprocal gift exchange. Surviving customs emphasize cards, sweets, flowers, meals, and other tokens of attachment."
+	},
+	{
+		"date": "*-02-22",
+		"name": "Washington's Birthday",
+		"description": "Honors George Washington, the first president of the United States and a central figure in old-world civic mythology. Later usage often broadened the date into a general observance of the presidency."
+	},
+	{
+		"date": "*-02-29",
+		"name": "Leap Year Hype",
+		"description": "Marks the extra calendar day inserted during leap years to keep civil time aligned with the solar year. Its rarity made most associated customs informal, temporary, or locally invented."
+	},
+	{
+		"date": "*-03-17",
+		"name": "St. Patrick's Day",
+		"description": "An Irish religious and cultural feast day that became a broad public celebration in many pre-war American cities. Surviving material links the date to Irish identity, parades, music, alcohol, and the color green."
+	},
+	{
+		"date": "*-04-01",
+		"name": "April Fools' Day",
+		"description": "A customary day for jokes, false reports, and minor social deception. Historical records indicate reduced reliability of public claims on this date."
+	},
+	{
+		"date": "*-04-20",
+		"name": "Indulgence Day",
+		"description": "An informal observance associated with recreational chem use, food, rest, and tolerated vice. Legal status and medical risk varied by settlement, supply, and local authority."
+	},
+	{
+		"date": "*-04-22",
+		"name": "Earth Day",
+		"description": "A pre-war environmental observance dedicated to land, water, air, and ecological stewardship. Post-war usage frames the date through reclamation, radiation survey, and scientific efforts."
+	},
+	{
+		"date": "*-05-01",
+		"name": "Workers' Day",
+		"description": "An international observance recognizing workers, unions, strikes, and collective bargaining. Not recognized in pre-war America due to its inherent association with socialistic values and the Chinese party."
+	},
+	{
+		"date": "*-05-05",
+		"name": "Cinco de Mayo",
+		"description": "Marks Mexico's 1862 victory over French forces at the Battle of Puebla. In the pre-war United States, the date often broadened into a celebration of Mexican culture and community identity."
+	},
+	{
+		"date": "*-05-10",
+		"name": "Mother's Day",
+		"description": "A family observance honoring mothers and maternal figures. Pre-war customs emphasized cards, flowers, meals, and recognition of domestic care."
+	},
+	{
+		"date": "*-06-19",
+		"name": "Juneteenth",
+		"description": "Commemorates the June 19, 1865 announcement of emancipation in Texas after the American Civil War. The date represents freedom, delayed justice, and the survival of memory beyond official proclamation."
+	},
+	{
+		"date": "*-06-21",
+		"name": "Father's Day",
+		"description": "A family observance honoring fathers and paternal figures. Pre-war customs emphasized cards, meals, practical gifts, and recognition of domestic care."
+	},
+	{
+		"date": "*-07-04",
+		"name": "Independence Day",
+		"description": "Marks the adoption of the United States Declaration of Independence in 1776. Pre-war usage joined civic ceremony, military display, and fireworks. Post-war, it connects with efforts of national continuity."
+	},
+	{
+		"date": "*-07-26",
+		"name": "Last Peace Day",
+		"description": "Marks the formal dissolution of the United Nations on July 26, 2052, during the opening phase of the Resource Wars. The date represents the failure of old-world collective security before the Sino-American War."
+	},
+	{
+		"date": "*-09-01",
+		"name": "Labor Day",
+		"description": "A United States labor observance from the early September civil calendar recognizing workers and the labor movement. Pre-war usage shifted the date toward civic rest, travel, retail activity, and the symbolic end of summer."
+	},
+	{
+		"date": "*-09-11",
+		"name": "Enclave Remembrance Day",
+		"description": "A disputed post-war memorial date attributed to Enclave survivors, sympathizers, or local records. Where retained, it frames Enclave defeats as losses of governmental continuity rather than factional collapse."
+	},
+	{
+		"date": "*-10-08",
+		"name": "The Jubilee",
+		"description": "A local commemorative date marking the founding of a revered establishment of unclear but persistent cultural significance. Surviving references associate the event with patronage and efficient use of interior space."
+	},
+	{
+		"date": "*-10-20",
+		"name": "Founder's Vigil",
+		"description": "Marks Roger Maxson's secession from the United States at Mariposa Military Base, later treated as the Brotherhood of Steel's ideological origin. The date represents duty, diligence, and independence."
+	},
+	{
+		"date": "*-10-23",
+		"name": "Great War Anniversary",
+		"description": "Marks October 23, 2077, the day the old world ended in total nuclear annihilation, both the peak and the end of the Sino-American War. The date is associated with vault activation, civil defense, and mass casualty remembrance."
+	},
+	{
+		"date": "*-10-23",
+		"name": "Reclamation Day",
+		"description": "Commemorates the opening of Vault 76 on October 23, 2102, twenty-five years after the Great War. In Vault-Tec records, the date marks the transition from sealed preservation to authorized surface reclamation."
+	},
+	{
+		"date": "*-10-31",
+		"name": "Halloween",
+		"description": "A pre-war seasonal holiday involving costumes, masks, sweets, and theatrical fear. The Great War left many decorations in place, giving the date added scavenger and memorial significance."
+	},
+	{
+		"date": "*-11-02",
+		"name": "Day of the Dead",
+		"description": "A Mexican remembrance tradition honoring deceased family members and ancestors. Surviving accounts emphasize offerings, marigolds, food, candles, altars, and continued memory rather than simple mourning."
+	},
+	{
+		"date": "*-11-11",
+		"name": "Veterans Day",
+		"description": "Honors military veterans and their service under the United States flag. Post-war use depends on whether the date is treated as remembrance, recruitment, or factional legitimacy."
+	},
+	{
+		"date": "*-12-24",
+		"name": "Christmas Eve",
+		"description": "The evening before Christmas, associated with family gatherings, travel, preparation, and religious services. Pre-war households also used the date for meal preparation, gift placement, and final domestic ceremony."
+	},
+	{
+		"date": "*-12-25",
+		"name": "Christmas Day",
+		"description": "A winter holiday with Christian origins and broad pre-war cultural adoption. Typical customs included gifts, meals, music, decorated trees, charitable gestures, and domestic peace rhetoric."
+	},
+	{
+		"date": "*-12-31",
+		"name": "New Year's Eve",
+		"description": "The final night of the civil calendar year, associated with countdowns, gatherings, music, and drinking. Settlements with functioning clocks or civic records may use the date for year-end inventories and watch changes."
+	}
+]

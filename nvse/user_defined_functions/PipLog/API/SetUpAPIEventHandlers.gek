@@ -34,6 +34,14 @@ begin function {}
 
 	SetEventHandler "PLC_AddPlayerEvent" OnAPIAddPlayerEventUDF
 
+	SetEventHandler "PLC_APITest_AddPlayerEvent" (begin function {} 
+		array_var aParams = Ar_Construct "stringmap"
+		let aParams["name"] := "API Testing Day"
+		let aParams["date"] := "2277-12-01"
+
+		DispatchEventAlt "PLC_AddPlayerEvent" aParams
+	end)
+
 	; Debug
 
 	SetEventHandler "PLC_RearmEventReminders" (begin function {} 

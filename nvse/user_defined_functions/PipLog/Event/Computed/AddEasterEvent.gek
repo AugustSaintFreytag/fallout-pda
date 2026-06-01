@@ -1,0 +1,43 @@
+begin function { short iYear, string_var sDescription }
+
+	; Replaces and adds the computed Easter event for iYear.
+
+	; UDFs
+
+	ref GetEasterDateUDF = CompileScript "PipLog\Calendar\GetEasterDate.gek"
+	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
+	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+	ref RemoveEventByReferenceUDF = CompileScript "PipLog\Event\RemoveEventByReference.gek"
+
+	; Config
+
+	short bShouldGenerateEaster = GetINIFloat "Events:bEaster" "PipLog\PipLog.ini"
+
+	; Main
+
+	Call RemoveEventByReferenceUDF "easter"
+
+	if eval !bShouldGenerateEaster
+		return
+	endif
+
+	string_var sEasterDate = (Call GetEasterDateUDF iYear)
+
+	if eval sEasterDate != ""
+		array_var aEasterEvent = (Call CreateEventUDF sEasterDate "Easter")
+		
+		let aEasterEvent["reference"] := "easter"
+		let aEasterEvent["description"] := sDescription
+
+		array_var aEvents = Ar_List aEasterEvent
+		Call AddEventsUDF aEvents 0
+
+		let aEvents := Ar_Null
+		let aEasterEvent := Ar_Null
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sEasterDate
+
+end

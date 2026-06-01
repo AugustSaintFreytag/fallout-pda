@@ -5,7 +5,7 @@ begin function {}
 	; and no birthday has been stored yet.
 	
 	; Guards against re-showing within the same session via a transient flag.
-	; Currently still uses the internal storage ISO format.
+	; The prompt uses the display date format.
 
 	; UDFs
 

@@ -150,7 +150,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarMonth" iCalendarMonth
 		Player.AuxiliaryVariableSetFloat "*PLC_iCalendarYear" iCalendarYear
 		Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
-		Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
 
 		Call OnTileDeselectUDF
 	endif

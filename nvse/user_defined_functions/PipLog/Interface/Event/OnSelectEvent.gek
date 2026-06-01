@@ -7,10 +7,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 	ref GetEventByIdUDF = CompileScript "PipLog\Event\GetEventById.gek"
 	ref GetEventListIndexFromTileNameUDF = CompileScript "PipLog\Interface\Event\GetEventListIndexFromTileName.gek"
 
-	; Main
-
-	PrintC "Handling click on event tile %z (%g)." sTileName iTileId
-
 	; Guards
 
 	if eval !(MenuMode 1023)

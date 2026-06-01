@@ -11,8 +11,10 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 		return
 	endif
 
-	if Player.AuxiliaryVariableGetFloat "*PLC_iViewMode" != 2
-		PrintC "Cannot delete event, incompatible view mode %g (expected: 2)." (Player.AuxiliaryVariableGetFloat "*PLC_iViewMode")
+	short iViewMode = Player.AuxiliaryVariableGetFloat "*PLC_iViewMode"
+
+	if iViewMode != 2
+		PrintC "Cannot delete event, incompatible view mode %g (expected: 2)." iViewMode
 		return
 	endif
 
@@ -48,7 +50,6 @@ begin function { short iMenuId, short iTileId, string_var sTileName }
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
-	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 

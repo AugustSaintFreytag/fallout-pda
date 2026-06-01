@@ -12,13 +12,18 @@ begin function {}
 
 	; Main
 
-	short bDidSetBirthday = Player.AuxiliaryVariableGetFloat "PLC_bDidSetBirthday"
+	string_var sBirthdayDate = Player.AuxiliaryVariableGetString "PLC_sBirthdayDate"
 	short bDidShowBirthdayPrompt = Player.AuxiliaryVariableGetFloat "*PLC_bDidShowBirthdayPrompt"
 
-	if eval (bDidSetBirthday) || (bDidShowBirthdayPrompt)
+	if eval ((Sv_Length sBirthdayDate) > 0) || (bDidShowBirthdayPrompt)
+		Sv_Destruct sBirthdayDate
 		return
 	endif
 
 	CallAfterSeconds 1.0 ShowBirthdayPromptUDF 2
+
+	; Clean-Up
+
+	Sv_Destruct sBirthdayDate
 
 end

@@ -1,8 +1,8 @@
 begin function { short iIntervalKind, short iMonth, short iDay }
 
 	; Returns a recurring date pattern string for a supported interval kind.
-	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = weekly, 4 = daily.
-	; Supported recurring storage patterns: yearly = *-MM-DD, monthly = *-*-DD.
+	; Interval kind: 0 = date-specific/non-recurring, 1 = yearly, 2 = monthly, 3 = daily.
+	; Supported recurring storage patterns: yearly = *-MM-DD, monthly = *-*-DD, daily = *-*-*.
 	; iMonth is 0-indexed (0 = January); output month is 1-indexed and zero-padded.
 	; Caller is responsible for Sv_Destruct on the returned string.
 
@@ -16,12 +16,8 @@ begin function { short iIntervalKind, short iMonth, short iDay }
 		PrintC "Cannot build recurring date pattern for date-specific interval kind."
 		SetFunctionValue ""
 		return
-	elseif eval (iIntervalKind < 0) || (iIntervalKind > 4)
+	elseif eval (iIntervalKind < 0) || (iIntervalKind > 3)
 		PrintC "Cannot build recurring date pattern for invalid interval kind %g." iIntervalKind
-		SetFunctionValue ""
-		return
-	elseif eval (iIntervalKind == 3) || (iIntervalKind == 4)
-		PrintC "Cannot build recurring date pattern for unsupported interval kind %g." iIntervalKind
 		SetFunctionValue ""
 		return
 	endif
@@ -38,6 +34,8 @@ begin function { short iIntervalKind, short iMonth, short iDay }
 		Sv_Destruct sMonth
 	elseif iIntervalKind == 2
 		let sResult := Sv_Construct "*-*-%z" sDay
+	elseif iIntervalKind == 3
+		let sResult := Sv_Construct "*-*-*"
 	endif
 
 	SetFunctionValue sResult

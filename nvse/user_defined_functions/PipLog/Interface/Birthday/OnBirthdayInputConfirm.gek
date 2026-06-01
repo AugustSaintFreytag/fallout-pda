@@ -1,43 +1,56 @@
 begin function { string_var sInput }
 
 	; Callback for the birthday text input prompt.
-	; Parses a YYYY.MM.DD string, validates, clamps day to a valid range,
-	; saves to persistent aux vars, and registers the birthday as a recurring event.
+	; Parses a DD.MM.YYYY string, validates, clamps day to a valid range,
+	; and saves the birthday as one persistent storage date string.
 
 	; UDFs
 
+	ref ParseDisplayDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseDisplayDateToComponents.gek"
 	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
-	ref AddComputedEventsUDF = CompileScript "PipLog\Calendar\AddComputedEvents.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref AddBirthdayEventUDF = CompileScript "PipLog\Event\Computed\AddBirthdayEvent.gek"
 
 	; Main
 
-	array_var aComponents = Sv_Split sInput, "."
+	array_var aBirthdayDate = (Call ParseDisplayDateToComponentsUDF sInput)
 
-	if eval (Ar_Size aComponents) != 3
-		let aComponents := Ar_Null
+	if eval aBirthdayDate == Ar_Null
 		return
 	endif
 
-	short iYear = #aComponents[0]
-	short iMonth = #aComponents[1]
-	short iDay = #aComponents[2]
+	short iYear = aBirthdayDate[0]
+	short iMonth = aBirthdayDate[1]
+	short iDay = aBirthdayDate[2]
 
-	let aComponents := Ar_Null
-
-	if eval (iDay < 1) || (iMonth < 1) || (iMonth > 12) || (iYear < 1) || (iYear > GameYear)
+	if eval (iDay < 1) || (iMonth < 0) || (iMonth > 11) || (iYear < 1) || (iYear > GameYear)
+		let aBirthdayDate := Ar_Null
+		Print "Could not set birthday from player input, invalid format or future date."
 		return
 	endif
 
-	short iMonthZeroIndexed = iMonth - 1
-	short iDaysInMonth = (Call GetDaysInMonthUDF iYear iMonthZeroIndexed)
+	short iDaysInMonth = (Call GetDaysInMonthUDF iYear iMonth)
 
 	if iDay > iDaysInMonth
 		let iDay := iDaysInMonth
+		let aBirthdayDate[2] := iDay
 	endif
 
-	Player.AuxiliaryVariableSetFloat "PLC_iBirthdayDay" iDay
-	Player.AuxiliaryVariableSetFloat "PLC_iBirthdayMonth" iMonthZeroIndexed
-	Player.AuxiliaryVariableSetFloat "PLC_iBirthdayYear" iYear
-	Player.AuxiliaryVariableSetFloat "PLC_bDidSetBirthday" 1
+	string_var sBirthdayDate = (Call GetStorageDateStringUDF aBirthdayDate)
+
+	Player.AuxiliaryVariableSetString "PLC_sBirthdayDate" ($sBirthdayDate)
+
+	Call AddBirthdayEventUDF
+
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
+	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
+
+	; Clean-Up
+
+	Sv_Destruct sBirthdayDate
+	let aBirthdayDate := Ar_Null
 
 end

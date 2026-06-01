@@ -1,0 +1,43 @@
+begin function { short iYear, string_var sDescription }
+
+	; Replaces and adds the computed Thanksgiving event for iYear.
+
+	; UDFs
+
+	ref GetThanksgivingDateUDF = CompileScript "PipLog\Calendar\GetThanksgivingDate.gek"
+	ref RemoveEventByReferenceUDF = CompileScript "PipLog\Event\RemoveEventByReference.gek"
+	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
+	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+
+	; Config
+
+	short bShouldGenerateThanksgiving = GetINIFloat "Events:bThanksgiving" "PipLog\PipLog.ini"
+
+	; Main
+
+	Call RemoveEventByReferenceUDF "thanksgiving"
+
+	if eval !bShouldGenerateThanksgiving
+		return
+	endif
+
+	string_var sThanksgivingDate = (Call GetThanksgivingDateUDF iYear)
+
+	if eval sThanksgivingDate != ""
+		array_var aThanksgivingEvent = (Call CreateEventUDF sThanksgivingDate "Thanksgiving")
+		
+		let aThanksgivingEvent["reference"] := "thanksgiving"
+		let aThanksgivingEvent["description"] := sDescription
+
+		array_var aEvents = Ar_List aThanksgivingEvent
+		Call AddEventsUDF aEvents 0
+
+		let aEvents := Ar_Null
+		let aThanksgivingEvent := Ar_Null
+	endif
+
+	; Clean-Up
+
+	Sv_Destruct sThanksgivingDate
+
+end

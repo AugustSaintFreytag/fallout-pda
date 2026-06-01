@@ -1,0 +1,59 @@
+begin function {}
+
+	; Replaces and adds the computed birthday event when a birthday is stored.
+
+	; UDFs
+
+	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
+	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+	ref RemoveEventByReferenceUDF = CompileScript "PipLog\Event\RemoveEventByReference.gek"
+	ref GetBirthdayEventDescriptionForPlayerUDF = CompileScript "PipLog\Event\GetBirthdayEventDescriptionForPlayer.gek"
+	ref GetRecurringDatePatternStringUDF = CompileScript "PipLog\DateTime\GetRecurringDatePatternString.gek"
+	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
+
+	; Main
+
+	Call RemoveEventByReferenceUDF "birthday"
+
+	string_var sStoredBirthdayDate = Player.AuxiliaryVariableGetString "PLC_sBirthdayDate"
+
+	if eval (Sv_Length sStoredBirthdayDate) == 0
+		Sv_Destruct sStoredBirthdayDate
+		return
+	endif
+
+	array_var aBirthdayDate = (Call ParseStorageDateToComponentsUDF sStoredBirthdayDate)
+
+	if eval aBirthdayDate == Ar_Null
+		Sv_Destruct sStoredBirthdayDate
+		return
+	endif
+
+	short iBirthdayMonth = aBirthdayDate[1]
+	short iBirthdayDay = aBirthdayDate[2]
+	
+	string_var sPlayerName = (GetName Player)
+	string_var sBirthdayDate = (Call GetRecurringDatePatternStringUDF 1 iBirthdayMonth iBirthdayDay)
+	string_var sBirthdayName = Sv_Construct "%z's Birthday" sPlayerName
+	array_var aBirthdayEvent = (Call CreateEventUDF sBirthdayDate sBirthdayName)
+
+	let aBirthdayEvent["reference"] := "birthday"
+
+	string_var sDescription = (Call GetBirthdayEventDescriptionForPlayerUDF)
+
+	if eval (Sv_Length sDescription) > 0
+		let aBirthdayEvent["description"] := sDescription
+	endif
+
+	array_var aEvents = Ar_List aBirthdayEvent
+	Call AddEventsUDF aEvents 0
+
+	; Clean-Up
+
+	Sv_Destruct sStoredBirthdayDate, sPlayerName, sBirthdayDate, sBirthdayName, sDescription
+
+	let aEvents := Ar_Null
+	let aBirthdayEvent := Ar_Null
+	let aBirthdayDate := Ar_Null
+
+end

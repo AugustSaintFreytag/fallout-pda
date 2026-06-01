@@ -1,0 +1,29 @@
+begin function { string_var sReference }
+
+	; Removes all events with the given reference from event storage.
+
+	; UDFs
+
+	ref GetEventByReferenceUDF = CompileScript "PipLog\Event\GetEventByReference.gek"
+	ref RemoveEventUDF = CompileScript "PipLog\Event\RemoveEvent.gek"
+
+	; Main
+
+	array_var aEvent = (Call GetEventByReferenceUDF sReference)
+
+	while eval (aEvent != Ar_Null) && ((Ar_Size aEvent) != -1)
+		string_var sEventId = aEvent["id"]
+		short bIsPlayerEvent = aEvent["_isPlayerEvent"]
+
+		Call RemoveEventUDF sEventId bIsPlayerEvent
+
+		Sv_Destruct sEventId
+		let aEvent := Ar_Null
+		let aEvent := (Call GetEventByReferenceUDF sReference)
+	loop
+
+	; Clean-Up
+
+	let aEvent := Ar_Null
+
+end

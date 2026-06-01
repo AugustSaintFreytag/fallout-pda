@@ -13,7 +13,6 @@ begin function { short iMenuId }
 	UnloadUIComponent "MapMenu/CM_MainRect/CM_JournalRect/CM_JournalTextRect/CM_JournalEntryRect"
 	
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsLogOpen" 0
-	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 0
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSummaryModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1

@@ -2,9 +2,9 @@ begin function {}
 
 	; Unloads any existing calendar tile grid and generates a fresh 6x7 grid for the
 	; view month. Tiles span prev/current/next month overlap. Sets tile positions,
-	; day labels, alpha, and day-state for the current month. Writes *PLC_bDidGenerateCalendar
-	; to 1 on completion. Reads *PLC_iCalendarYear/*PLC_iCalendarMonth; defaults to the current
-	; in-game month if year is 0 (unset), and persists the defaults back to aux vars.
+	; day labels, alpha, and day-state for the current month. Reads
+	; *PLC_iCalendarYear/*PLC_iCalendarMonth; defaults to the current in-game month
+	; if year is 0 (unset), and persists the defaults back to aux vars.
 
 	; UDFs
 
@@ -52,9 +52,11 @@ begin function {}
 	short iDaysInCurrentMonth = (Call GetDaysInMonthUDF iCalendarYear iCalendarMonth)
 	short iDaysInPreviousMonth = (Call GetDaysInMonthUDF iPreviousYear iPreviousMonth)
 
+	string_var sCalendarPath = "MapMenu/CM_MainRect/CM_CalendarRect"
+
 	; Month title
 
-	string_var sMonthTitlePath = (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_MonthTitle/_month_%g" iCalendarMonth)
+	string_var sMonthTitlePath = (Sv_Construct "%z/CM_MonthTitle/_month_%g" sCalendarPath iCalendarMonth)
 	string_var sMonthName = GetUIString ($sMonthTitlePath)
 	string_var sMonthTitle = Sv_Construct "%z %g" sMonthName iCalendarYear
 
@@ -114,7 +116,7 @@ begin function {}
 		array_var aTileDate = Ar_List iTileYear, iTileMonth, iTileDay
 
 		let sTileDate := (Call GetStorageDateStringUDF aTileDate)
-		let sTileInsertCommand := (Sv_Construct "MapMenu/CM_MainRect/CM_CalendarRect/CM_CalendarGrids|CM_Box_Template|%z" sTileDate)
+		let sTileInsertCommand := (Sv_Construct "%z/CM_CalendarGrids|CM_Box_Template|%z" sCalendarPath sTileDate)
 
 		AddTileFromTemplate ($sTileInsertCommand)
 
@@ -169,13 +171,12 @@ begin function {}
 		let iBuiltTileCount += 1
 	loop
 
-	Player.AuxiliaryVariableSetFloat "*PLC_bDidGenerateCalendar" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarViewModified" 0
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsCalendarSelectionModified" 1
 
 	; Clean-Up
 
-	Sv_Destruct sTileDate, sTileInsertCommand, sTileBasePath, sTilePropertyPath
+	Sv_Destruct sCalendarPath, sTileDate, sTileInsertCommand, sTileBasePath, sTilePropertyPath
 
 	let aFirstDate := Ar_Null
 	let aTileDate := Ar_Null

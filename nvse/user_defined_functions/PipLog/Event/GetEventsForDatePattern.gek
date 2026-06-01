@@ -1,6 +1,6 @@
 begin function { string_var sPattern, array_var aById, array_var aByDate, array_var aAllEvents }
 
-	; Collects and decodes all events matching sPattern from aByDate into aAllEvents.
+	; Gets and decodes all events matching sPattern from aByDate into aAllEvents.
 	; Returns early if aByDate is unset or has no entry for sPattern.
 	; aAllEvents is modified in-place; caller owns it.
 

@@ -7,10 +7,6 @@ begin function {}
 
 	string_var sPlayerName = (GetName Player)
 
-	if eval (Sv_Length sPlayerName) == 0
-		let sPlayerName := "Player"
-	endif
-
 	string_var sSafePlayerName = Sv_Construct "%z" sPlayerName
 
 	Sv_Replace "<|_" sSafePlayerName

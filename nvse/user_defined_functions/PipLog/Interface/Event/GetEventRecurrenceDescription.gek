@@ -1,0 +1,45 @@
+begin function { array_var aEvent }
+
+	; Builds the selected event date or recurrence line.
+
+	; UDFs
+
+	ref GetDisplayDateStringUDF = CompileScript "PipLog\DateTime\GetDisplayDateString.gek"
+	ref GetRecurrenceLabelForDatePatternUDF = CompileScript "PipLog\Interface\Event\GetRecurrenceLabelForDatePattern.gek"
+	ref GetNextRecurrenceForDatePatternUDF = CompileScript "PipLog\DateTime\GetNextRecurrenceForDatePattern.gek"
+
+	; Main
+
+	if eval (aEvent == Ar_Null) || ((Ar_Size aEvent) == -1)
+		SetFunctionValue ""
+		return
+	endif
+
+	string_var sDate = aEvent["date"]
+	string_var sRecurrenceLabel = (Call GetRecurrenceLabelForDatePatternUDF sDate)
+	string_var sDescription = ""
+	
+	array_var aNextDate = (Call GetNextRecurrenceForDatePatternUDF sDate)
+
+	if eval (aNextDate == Ar_Null) || ((Ar_Size aNextDate) == -1)
+		let sDescription := Sv_Construct "%z" sDate
+	else
+		string_var sNextDate = (Call GetDisplayDateStringUDF aNextDate)
+
+		if eval sRecurrenceLabel == "One-Off"
+			let sDescription := Sv_Construct "%z" sNextDate
+		else
+			let sDescription := Sv_Construct "Next: %z (%z)" sNextDate sRecurrenceLabel
+		endif
+
+		Sv_Destruct sNextDate
+	endif
+
+	SetFunctionValue sDescription
+
+	; Clean-Up
+
+	Sv_Destruct sDate, sRecurrenceLabel, sDescription
+	let aNextDate := Ar_Null
+
+end
