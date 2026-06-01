@@ -6,7 +6,7 @@ begin function { array_var aEvent }
 
 	ref GetDisplayDateStringUDF = CompileScript "PipLog\DateTime\GetDisplayDateString.gek"
 	ref GetRecurrenceLabelForDatePatternUDF = CompileScript "PipLog\Interface\Event\GetRecurrenceLabelForDatePattern.gek"
-	ref GetNextRecurrenceForDatePatternUDF = CompileScript "PipLog\Event\GetNextRecurrenceForDatePattern.gek"
+	ref GetNextRecurrenceForDatePatternUDF = CompileScript "PipLog\DateTime\GetNextRecurrenceForDatePattern.gek"
 
 	; Main
 

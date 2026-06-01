@@ -8,7 +8,7 @@ begin function { array_var aEvent, short iYear }
 	; UDFs
 
 	ref GetBirthdayNumeralUDF = CompileScript "PipLog\Event\GetBirthdayNumeral.gek"
-	ref GetNextRecurrenceForDatePatternUDF = CompileScript "PipLog\Event\GetNextRecurrenceForDatePattern.gek"
+	ref GetNextRecurrenceForDatePatternUDF = CompileScript "PipLog\DateTime\GetNextRecurrenceForDatePattern.gek"
 	ref GetOrdinalSuffixUDF = CompileScript "PipLog\DateTime\GetOrdinalSuffix.gek"
 
 	; Main
