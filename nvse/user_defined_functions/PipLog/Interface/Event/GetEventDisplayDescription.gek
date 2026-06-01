@@ -2,10 +2,6 @@ begin function { array_var aEvent }
 
 	; Returns the selected event description text.
 
-	; UDFs
-
-	ref GetBirthdayEventDescriptionForPlayerUDF = CompileScript "PipLog\Event\GetBirthdayEventDescriptionForPlayer.gek"
-
 	; Main
 
 	if eval (aEvent == Ar_Null) || ((Ar_Size aEvent) == -1)
