@@ -4,6 +4,9 @@ begin function { array_var aParams }
 
 	ref AddPlayerEventUDF = CompileScript "PipLog\Event\AddPlayerEvent.gek"
 	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
+	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
 
 	; Main
 
@@ -12,14 +15,22 @@ begin function { array_var aParams }
 		return
 	endif
 
-	string_var sEventDate = aParams["date"] ; YYYY-MM-DD
-	string_var sEventName = aParams["name"]
+	array_var aEventDate = (Call ParseStorageDateToComponentsUDF (aParams["date"]))
 
-	PrintC "Adding player event '%z' for date %z via API call." sEventName sEventDate
+	if eval aEventDate == Ar_Null
+		PrintC "Cannot add player event via API call, invalid date from input '%z'." (aParams["date"])
+		return
+	endif
 
-	array_var aEventDate = (Call ParseStorageDateToComponentsUDF sEventDate)
+	string_var sEventDate = (Call GetStorageDateStringUDF aEventDate)
+	array_var aEventParams = Ar_DeepCopy aParams
 
-	Call AddPlayerEventUDF aEventDate sEventName 0
+	let aEventParams["date"] := sEventDate
+
+	PrintC "Adding player event '%z' for validated date %z via API call." (aEventParams["name"]) (aEventParams["date"])
+
+	array_var aEvent = Call CreateEventUDF aEventParams
+	Call AddEventUDF aEvent 1
 
 	; Invalidate
 
@@ -29,7 +40,10 @@ begin function { array_var aParams }
 	
 	; Clean-Up
 
-	Sv_Destruct sEventDate, sEventName
+	Sv_Destruct sEventDate
+
 	let aEventDate := Ar_Null
+	let aEventParams := Ar_Null
+	let aEvent := Ar_Null
 
 end
