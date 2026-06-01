@@ -1,0 +1,51 @@
+begin function { array_var aDate, short iNumDays }
+
+	; Returns a date array iNumDays after aDate.
+	; aDate is [year, 0-indexed month, day].
+
+	if eval (Ar_Size aDate) == -1
+		SetFunctionValue Ar_Null
+		return
+	endif
+
+	; UDFs
+
+	ref GetDaysInMonthUDF = CompileScript "PipLog\DateTime\GetDaysInMonth.gek"
+
+	; State
+
+	short iYear = aDate[0]
+	short iMonth = aDate[1]
+	short iDay = aDate[2]
+	short iDaysRemaining = iNumDays
+
+	; Main
+
+	while iDaysRemaining > 0
+		short iDaysInMonth = (Call GetDaysInMonthUDF iYear iMonth)
+		short iDaysLeftInMonth = iDaysInMonth - iDay
+
+		if iDaysRemaining <= iDaysLeftInMonth
+			let iDay += iDaysRemaining
+			let iDaysRemaining := 0
+		else
+			let iDaysRemaining -= (iDaysLeftInMonth + 1)
+			let iDay := 1
+			let iMonth += 1
+
+			if iMonth > 11
+				let iMonth := 0
+				let iYear += 1
+			endif
+		endif
+	loop
+
+	array_var aFutureDate = Ar_List iYear, iMonth, iDay
+
+	SetFunctionValue aFutureDate
+
+	; Clean-Up
+
+	let aFutureDate := Ar_Null
+
+end
