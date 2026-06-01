@@ -9,7 +9,7 @@ begin function {}
 	ref GetExchangePathUDF = CompileScript "PipLog\Exchange\Utils\GetExchangePath.gek"
 	ref GetRandomIdUDF = CompileScript "PipLog\Utils\GetRandomId.gek"
 	ref RemoveEventUDF = CompileScript "PipLog\Event\RemoveEvent.gek"
-	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
 
 	; Read
 
@@ -55,7 +55,6 @@ begin function {}
 	; Import
 
 	array_var aExistingEventsById = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerEventsById"
-	array_var aEventsToAdd = Ar_Construct "array"
 	short iImportedCount = 0
 
 	foreach array_var aElement <- aData
@@ -103,7 +102,7 @@ begin function {}
 			let aEvent["flags"] := #(aInputEvent["flags"])
 		endif
 
-		Ar_Append aEventsToAdd, aEvent
+		Call AddEventUDF aEvent 1
 
 		let iImportedCount += 1
 
@@ -111,10 +110,6 @@ begin function {}
 		let aEvent := Ar_Null
 		let aInputEvent := Ar_Null
 	loop
-
-	if eval (Ar_Size aEventsToAdd) > 0
-		Call AddEventsUDF aEventsToAdd 1
-	endif
 
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventListModified" 1
 	Player.AuxiliaryVariableSetFloat "*PLC_bIsEventSelectionModified" 1
@@ -126,7 +121,6 @@ begin function {}
 
 	Sv_Destruct sPath, sKind
 	let aExistingEventsById := Ar_Null
-	let aEventsToAdd := Ar_Null
 	let aDocument := Ar_Null
 	let aData := Ar_Null
 

@@ -5,7 +5,7 @@ begin function {}
 	; UDFs
 
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
-	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
 	ref RemoveEventByReferenceUDF = CompileScript "PipLog\Event\RemoveEventByReference.gek"
 	ref GetBirthdayEventDescriptionForPlayerUDF = CompileScript "PipLog\Event\GetBirthdayEventDescriptionForPlayer.gek"
 	ref GetRecurringDatePatternStringUDF = CompileScript "PipLog\DateTime\GetRecurringDatePatternString.gek"
@@ -35,25 +35,24 @@ begin function {}
 	string_var sPlayerName = (GetName Player)
 	string_var sBirthdayDate = (Call GetRecurringDatePatternStringUDF 1 iBirthdayMonth iBirthdayDay)
 	string_var sBirthdayName = Sv_Construct "%z's Birthday" sPlayerName
-	array_var aBirthdayEvent = (Call CreateEventUDF sBirthdayDate sBirthdayName)
 
-	let aBirthdayEvent["reference"] := "birthday"
+	array_var aBirthdayEventParams = Ar_Map "reference"::"birthday", "date"::sBirthdayDate, "name"::sBirthdayName
+	array_var aBirthdayEvent = Call CreateEventUDF aBirthdayEventParams
 
-	string_var sDescription = (Call GetBirthdayEventDescriptionForPlayerUDF)
+	string_var sDescription = Call GetBirthdayEventDescriptionForPlayerUDF
 
 	if eval (Sv_Length sDescription) > 0
 		let aBirthdayEvent["description"] := sDescription
 	endif
 
-	array_var aEvents = Ar_List aBirthdayEvent
-	Call AddEventsUDF aEvents 0
+	Call AddEventUDF aBirthdayEvent 0
 
 	; Clean-Up
 
 	Sv_Destruct sStoredBirthdayDate, sPlayerName, sBirthdayDate, sBirthdayName, sDescription
 
-	let aEvents := Ar_Null
 	let aBirthdayEvent := Ar_Null
+	let aBirthdayEventParams := Ar_Null
 	let aBirthdayDate := Ar_Null
 
 end

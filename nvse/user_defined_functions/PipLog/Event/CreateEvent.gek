@@ -1,4 +1,4 @@
-begin function { string_var sDate, string_var sName }
+begin function { array_var aParams }
 
 	; UDFs
 
@@ -9,14 +9,30 @@ begin function { string_var sDate, string_var sName }
 
 	array_var aEvent = Ar_Construct "stringmap"
 
-	let aEvent["id"] := (Call GetRandomIdUDF)
-	let aEvent["date"] := sDate
-	let aEvent["name"] := sName
-	let aEvent["description"] := ""
-	let aEvent["reference"] := ""
+	; Value Properties
 
-	let aEvent["_isSystemEvent"] := 1
+	let aEvent["id"] := (Call GetRandomIdUDF)
+	let aEvent["date"] := aParams["date"]
+	let aEvent["name"] := aParams["name"]
+
+	if eval (Ar_HasKey aParams "description")
+		let aEvent["description"] := aParams["description"]
+	else 
+		let aEvent["description"] := ""
+	endif
+
+	if eval (Ar_HasKey aParams "reference")
+		let aEvent["reference"] := aParams["reference"]
+	else
+		let aEvent["reference"] := ""
+	endif
+
+	; Derived Properties
+
+	let aEvent["_isSystemEvent"] := 0
 	let aEvent["_isPlayerEvent"] := 0
+
+	; Encode & Return
 
 	Call EncodeEventFlagsUDF aEvent
 

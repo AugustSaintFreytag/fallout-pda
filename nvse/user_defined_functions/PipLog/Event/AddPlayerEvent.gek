@@ -15,7 +15,7 @@ begin function { array_var aDate, string_var sName, short iIntervalKind }
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetRecurringDatePatternStringUDF = CompileScript "PipLog\DateTime\GetRecurringDatePatternString.gek"
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
-	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
 
 	; State
 
@@ -25,25 +25,22 @@ begin function { array_var aDate, string_var sName, short iIntervalKind }
 	string_var sDate = ""
 
 	if iIntervalKind == 0
-		let sDate := (Call GetStorageDateStringUDF aDate)
+		let sDate := Call GetStorageDateStringUDF aDate
 	else
-		let sDate := (Call GetRecurringDatePatternStringUDF iIntervalKind iMonth iDay)
+		let sDate := Call GetRecurringDatePatternStringUDF iIntervalKind iMonth iDay
 	endif
 
 	; Main
 
-	array_var aEvent = (Call CreateEventUDF sDate sName)
+	array_var aEventParams = Ar_Map "date"::sDate, "name"::sName
+	array_var aEvent = Call CreateEventUDF aEventParams
 
-	let aEvent["_isSystemEvent"] := 0
-	let aEvent["_isPlayerEvent"] := 1
-
-	array_var aEvents = Ar_List aEvent
-	Call AddEventsUDF aEvents 1
+	Call AddEventUDF aEvent 1
 
 	; Clean-Up
 
 	Sv_Destruct sDate
-	let aEvents := Ar_Null
 	let aEvent := Ar_Null
+	let aEventParams := Ar_Null
 
 end

@@ -6,7 +6,7 @@ begin function {}
 	; UDFs
 
 	ref GetSystemEventsUDF = CompileScript "PipLog\Event\GetSystemEvents.gek"
-	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
 
 	; Main
 
@@ -14,7 +14,9 @@ begin function {}
 
 	PrintC "Adding %g system events to calendar." (Ar_Size aSystemEvents)
 
-	Call AddEventsUDF aSystemEvents 0
+	foreach array_var aElement <- aSystemEvents
+		Call AddEventUDF (*aElement) 0
+	loop
 
 	; Clean-Up
 

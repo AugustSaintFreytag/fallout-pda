@@ -7,7 +7,7 @@ begin function { short iYear, string_var sDescription }
 	ref GetThanksgivingDateUDF = CompileScript "PipLog\Calendar\GetThanksgivingDate.gek"
 	ref RemoveEventByReferenceUDF = CompileScript "PipLog\Event\RemoveEventByReference.gek"
 	ref CreateEventUDF = CompileScript "PipLog\Event\CreateEvent.gek"
-	ref AddEventsUDF = CompileScript "PipLog\Event\AddEvents.gek"
+	ref AddEventUDF = CompileScript "PipLog\Event\AddEvent.gek"
 
 	; Config
 
@@ -24,16 +24,13 @@ begin function { short iYear, string_var sDescription }
 	string_var sThanksgivingDate = (Call GetThanksgivingDateUDF iYear)
 
 	if eval sThanksgivingDate != ""
-		array_var aThanksgivingEvent = (Call CreateEventUDF sThanksgivingDate "Thanksgiving")
+		array_var aThanksgivingEventParams = Ar_Map "reference"::"thanksgiving", "date"::sThanksgivingDate, "name"::"Thanksgiving", "description"::sDescription
+		array_var aThanksgivingEvent = Call CreateEventUDF aThanksgivingEventParams
 		
-		let aThanksgivingEvent["reference"] := "thanksgiving"
-		let aThanksgivingEvent["description"] := sDescription
+		Call AddEventUDF aThanksgivingEvent 0
 
-		array_var aEvents = Ar_List aThanksgivingEvent
-		Call AddEventsUDF aEvents 0
-
-		let aEvents := Ar_Null
 		let aThanksgivingEvent := Ar_Null
+		let aThanksgivingEventParams := Ar_Null
 	endif
 
 	; Clean-Up

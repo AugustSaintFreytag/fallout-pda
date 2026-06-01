@@ -59,8 +59,8 @@ begin function {}
 			let sDescription := aEntry["description"]
 		endif
 
-		array_var aEvent = (Call CreateEventUDF sDate sName)
-		let aEvent["description"] := sDescription
+		array_var aEventParams = Ar_Map "date"::sDate, "name"::sName, "description"::sDescription
+		array_var aEvent = Call CreateEventUDF aEventParams
 
 		Ar_Append aEvents, aEvent
 
@@ -69,6 +69,7 @@ begin function {}
 		let iIndex += 1
 
 		let aEvent := Ar_Null
+		let aEventParams := Ar_Null
 		let aEntry := Ar_Null
 		
 		Sv_Destruct sDate, sName, sDescription
