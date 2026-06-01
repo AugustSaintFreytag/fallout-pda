@@ -8,16 +8,18 @@ begin function {}
 	array_var aTexts = ReadFromJSON "data\config\PipLog\events\player.json" "" 0 0
 
 	if eval !aTexts || aTexts == Ar_Null
-		Print "Could not load player event descriptions from file 'data\config\PipLog\events\player.json'."
+		Print "Could not load player event descriptions from 'player.json'."
 		SetFunctionValue ""
 		return
 	endif
 
 	if eval (Ar_Size aTexts) == -1
-		Print "Could not load player event descriptions from file, no usable entries."
+		Print "Could not load player event descriptions from file 'player.json', no usable entries."
 		SetFunctionValue ""
 		return
 	endif
+
+	; States
 
 	short bDidCompleteMQ01 = GetQuestCompleted MQ01
 	short bDidCompleteMQ04 = GetQuestCompleted MQ04
@@ -27,6 +29,8 @@ begin function {}
 	short iKarma = Player.GetAV Karma
 	string_var sKey = "intro-mq01"
 
+	; Quest Checks
+
 	if eval bDidCompleteMQ11
 		if eval bDidCompleteMQA
 			let sKey := "mq11-end-mqa"
@@ -34,26 +38,30 @@ begin function {}
 			let sKey := "mq11-end-nomqa"
 		endif
 	elseif eval bDidCompleteMQ01
-		if iKarma <= -1750
+		if iKarma <= (-1750)
 			let sKey := "mq01-mq11-evil"
 		elseif eval !bDidCompleteMQ04
 			let sKey := "mq01-mq04-any"
 		elseif iKarma >= 500
 			let sKey := "mq04-mq11-positive"
-		elseif iKarma <= -500
+		elseif iKarma <= (-500)
 			let sKey := "mq04-mq11-negative"
 		else
 			let sKey := "mq04-mq11-neutral"
 		endif
 	endif
 
+	; Description
+
 	string_var sDescription = ""
 
 	if eval (Ar_HasKey aTexts, sKey)
-		string_var sTemplate = aTexts[sKey]
+		string_var sTemplate = aTexts[$sKey]
 		string_var sPlayerName = (GetName Player)
 
-		let sDescription := Sv_Construct ($sTemplate) sPlayerName
+		string_var sReplacePattern = Sv_Construct "$player|%z" sPlayerName
+		string_var sDescription = Sv_Construct "%z" sTemplate
+		Sv_Replace ($sReplacePattern), sDescription
 
 		Sv_Destruct sTemplate, sPlayerName
 	else
@@ -64,7 +72,7 @@ begin function {}
 
 	; Clean-Up
 
-	Sv_Destruct sKey, sDescription
+	Sv_Destruct sKey
 	let aTexts := Ar_Null
 
 end
