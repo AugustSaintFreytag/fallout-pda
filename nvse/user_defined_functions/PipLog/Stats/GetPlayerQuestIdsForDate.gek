@@ -1,0 +1,34 @@
+begin function { array_var aDate }
+
+	; Returns a positional array of completed quest IDs for the given date.
+	; aDate is [year, 0-indexed month, day].
+	; Caller is responsible for Ar_Null on the returned array.
+
+	; UDFs
+
+	ref DecodePlayerQuestIdsUDF = CompileScript "PipLog\Stats\DecodePlayerQuestIds.gek"
+	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+
+	; State
+
+	string_var sDate = (Call GetStorageDateStringUDF aDate)
+	array_var aStoredQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
+	array_var aQuestIds = Ar_Construct "array"
+	string_var sEncodedQuestIds = ""
+
+	; Main
+
+	if eval ((Ar_Size aStoredQuestStats) != -1) && (Ar_HasKey aStoredQuestStats, sDate)
+		let sEncodedQuestIds := aStoredQuestStats[sDate]
+		let aQuestIds := Ar_Null
+		let aQuestIds := (Call DecodePlayerQuestIdsUDF sEncodedQuestIds)
+	endif
+
+	SetFunctionValue aQuestIds
+
+	; Clean-Up
+
+	Sv_Destruct sDate, sEncodedQuestIds
+	let aStoredQuestStats := Ar_Null
+
+end

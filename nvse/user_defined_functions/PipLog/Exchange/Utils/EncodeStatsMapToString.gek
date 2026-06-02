@@ -3,32 +3,13 @@ begin function { array_var aStats }
 	; Compacts a stat StringMap into "code:count,code:count" daily stat storage.
 	; Caller is responsible for Sv_Destruct on the returned string.
 
+	; UDFs
+
+	ref EncodePlayerStatValuesUDF = CompileScript "PipLog\Stats\EncodePlayerStatValues.gek"
+
 	; Main
 
-	string_var sEncodedStats = ""
-
-	if eval (Ar_Size aStats) == -1
-		SetFunctionValue sEncodedStats
-		return
-	endif
-
-	foreach array_var aElement <- aStats
-		string_var sCode = aElement["key"]
-		short iValue = aElement["value"]
-
-		if eval (Sv_Length sCode) == 0
-			Sv_Destruct sCode
-			continue
-		endif
-
-		if eval (Sv_Length sEncodedStats) > 0
-			let sEncodedStats += ","
-		endif
-
-		let sEncodedStats += (sCode + ":" + $iValue)
-
-		Sv_Destruct sCode
-	loop
+	string_var sEncodedStats = (Call EncodePlayerStatValuesUDF aStats)
 
 	SetFunctionValue sEncodedStats
 

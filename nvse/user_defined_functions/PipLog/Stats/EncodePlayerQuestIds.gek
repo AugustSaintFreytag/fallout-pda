@@ -1,0 +1,34 @@
+begin function { array_var aQuestIds }
+
+	; Compacts quest IDs into comma-separated daily quest stat storage.
+	; Caller is responsible for Sv_Destruct on the returned string.
+
+	; Main
+
+	string_var sEncodedQuestIds = ""
+
+	if eval (Ar_Size aQuestIds) == -1
+		SetFunctionValue sEncodedQuestIds
+		return
+	endif
+
+	foreach array_var aElement <- aQuestIds
+		string_var sQuestId = aElement["value"]
+
+		if eval (Sv_Length sQuestId) == 0
+			Sv_Destruct sQuestId
+			continue
+		endif
+
+		if eval (Sv_Length sEncodedQuestIds) > 0
+			let sEncodedQuestIds += ","
+		endif
+
+		let sEncodedQuestIds += sQuestId
+
+		Sv_Destruct sQuestId
+	loop
+
+	SetFunctionValue sEncodedQuestIds
+
+end

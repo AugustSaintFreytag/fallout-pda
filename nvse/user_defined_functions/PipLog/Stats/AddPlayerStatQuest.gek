@@ -11,45 +11,26 @@ begin function { ref rQuest }
 
 	; UDFs
 
-	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
+	ref GetPlayerQuestIdsForDateUDF = CompileScript "PipLog\Stats\GetPlayerQuestIdsForDate.gek"
+	ref SetPlayerQuestIdsForDateUDF = CompileScript "PipLog\Stats\SetPlayerQuestIdsForDate.gek"
 
 	; State
 
-	short iMonth = GameMonth - 1
-	array_var aDate = Ar_List GameYear, iMonth, GameDay
-
-	string_var sDate = (Call GetStorageDateStringUDF aDate)
+	array_var aDate = Ar_List GameYear, (GameMonth - 1), GameDay
 	string_var sQuestId = GetEditorId rQuest
-	array_var aQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
+	array_var aQuestIds = (Call GetPlayerQuestIdsForDateUDF aDate)
 
 	; Main
 
-	if eval (Ar_Size aQuestStats) == -1
-		let aQuestStats := Ar_Construct "stringmap"
-	endif
-
-	if eval (Ar_HasKey aQuestStats, sDate)
-		string_var sExisting = aQuestStats[sDate]
-		array_var aComponents = Sv_Split sExisting, ","
-
-		short bAlreadyRecorded = eval (Ar_Find sQuestId, aComponents) != Ar_BadNumericIndex
-
-		if eval !bAlreadyRecorded
-			let aQuestStats[sDate] := Sv_Construct "%z,%z" sExisting sQuestId
-			Player.AuxStringMapArraySetFromArray "PLC_aPlayerQuestStats" aQuestStats
-		endif
-
-		Sv_Destruct sExisting
-		let aComponents := Ar_Null
-	else
-		let aQuestStats[sDate] := sQuestId
-		Player.AuxStringMapArraySetFromArray "PLC_aPlayerQuestStats" aQuestStats
+	if eval (Ar_Find sQuestId, aQuestIds) == Ar_BadNumericIndex
+		Ar_Append aQuestIds, sQuestId
+		Call SetPlayerQuestIdsForDateUDF aDate aQuestIds
 	endif
 
 	; Clean-Up
 
-	Sv_Destruct sDate, sQuestId
+	Sv_Destruct sQuestId
 	let aDate := Ar_Null
-	let aQuestStats := Ar_Null
+	let aQuestIds := Ar_Null
 
 end

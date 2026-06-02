@@ -9,6 +9,8 @@ begin function { short iStatCode, short iModifiedValue, short iNewValue }
 
 	; Main
 
+	PrintC "Handling player misc stat change, code %g, modified value %g, new value %g." iStatCode iModifiedValue iNewValue
+
 	if iModifiedValue == 0
 		return
 	endif

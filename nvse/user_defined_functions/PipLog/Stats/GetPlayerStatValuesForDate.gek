@@ -7,6 +7,7 @@ begin function { array_var aDate }
 
 	; UDFs
 
+	ref DecodePlayerStatValuesUDF = CompileScript "PipLog\Stats\DecodePlayerStatValues.gek"
 	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 
 	; State
@@ -14,41 +15,21 @@ begin function { array_var aDate }
 	string_var sDate = (Call GetStorageDateStringUDF aDate)
 	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
 	array_var aResult = Ar_Construct "stringmap"
+	string_var sEncodedStats = ""
 
 	; Main
 
-	if eval (Ar_Size aAllStats) == -1 || !(Ar_HasKey aAllStats, sDate)
-		SetFunctionValue aResult
-		Sv_Destruct sDate
-		let aAllStats := Ar_Null
-		
-		return
+	if eval ((Ar_Size aAllStats) != -1) && (Ar_HasKey aAllStats, sDate)
+		let sEncodedStats := aAllStats[sDate]
+		let aResult := Ar_Null
+		let aResult := (Call DecodePlayerStatValuesUDF sEncodedStats)
 	endif
-
-	string_var sEncoded = aAllStats[sDate]
-	array_var aPairs = Sv_Split sEncoded, ","
-
-	foreach array_var aElement <- aPairs
-		string_var sPair = aElement["value"]
-		array_var aComponents = Sv_Split sPair, ":"
-		
-		if eval (Ar_Size aComponents) == 2
-			string_var iStatCode = aComponents[0]
-			short iStatValue = #(aComponents[1])
-
-			let aResult[iStatCode] := iStatValue
-			Sv_Destruct iStatCode
-		endif
-		
-		let aComponents := Ar_Null
-	loop
 
 	SetFunctionValue aResult
 
 	; Clean-Up
 
-	Sv_Destruct sDate, sEncoded
+	Sv_Destruct sDate, sEncodedStats
 	let aAllStats := Ar_Null
-	let aPairs := Ar_Null
 
 end

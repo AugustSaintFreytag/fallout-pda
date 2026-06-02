@@ -5,16 +5,16 @@ begin function {}
 
 	; UDFs
 
-	ref DecodeStatsStringToMapUDF = CompileScript "PipLog\Exchange\Utils\DecodeStatsStringToMap.gek"
-	ref SplitCommaStringToArrayUDF = CompileScript "PipLog\Exchange\Utils\SplitCommaStringToArray.gek"
+	ref GetPlayerStatTableUDF = CompileScript "PipLog\Stats\GetPlayerStatTable.gek"
+	ref GetPlayerQuestTableUDF = CompileScript "PipLog\Stats\GetPlayerQuestTable.gek"
 	ref GetCurrentDateTimeStringUDF = CompileScript "PipLog\DateTime\GetCurrentDateTimeString.gek"
 	ref GetRealDateTimeStringUDF = CompileScript "PipLog\Exchange\Utils\GetRealDateTimeString.gek"
 	ref GetExchangePathUDF = CompileScript "PipLog\Exchange\Utils\GetExchangePath.gek"
 
 	; State
 
-	array_var aAllStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerStats"
-	array_var aQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
+	array_var aAllStats = (Call GetPlayerStatTableUDF)
+	array_var aQuestStats = (Call GetPlayerQuestTableUDF)
 	array_var aData = Ar_Construct "stringmap"
 
 	; Stats
@@ -22,18 +22,14 @@ begin function {}
 	if eval (Ar_Size aAllStats) != -1
 		foreach array_var aElement <- aAllStats
 			string_var sDate = aElement["key"]
-			string_var sEncodedStats = aElement["value"]
+			array_var aStats = aElement["value"]
 			array_var aDay = Ar_Construct "stringmap"
-			array_var aStats = (Call DecodeStatsStringToMapUDF sEncodedStats)
 			array_var aQuests = Ar_Construct "array"
 
 			if eval (Ar_Size aQuestStats) != -1
 				if eval (Ar_HasKey aQuestStats, sDate)
-					string_var sQuestList = aQuestStats[sDate]
-
-					let aQuests := (Call SplitCommaStringToArrayUDF sQuestList)
-
-					Sv_Destruct sQuestList
+					let aQuests := Ar_Null
+					let aQuests := aQuestStats[sDate]
 				endif
 			endif
 
@@ -41,7 +37,7 @@ begin function {}
 			let aDay["quests"] := aQuests
 			let aData[sDate] := aDay
 
-			Sv_Destruct sDate, sEncodedStats
+			Sv_Destruct sDate
 			let aStats := Ar_Null
 			let aQuests := Ar_Null
 			let aDay := Ar_Null
@@ -55,16 +51,14 @@ begin function {}
 			string_var sDate = aElement["key"]
 
 			if eval !(Ar_HasKey aData, sDate)
-				string_var sQuestList = aElement["value"]
+				array_var aQuests = aElement["value"]
 				array_var aDay = Ar_Construct "stringmap"
 				array_var aStats = Ar_Construct "stringmap"
-				array_var aQuests = (Call SplitCommaStringToArrayUDF sQuestList)
 
 				let aDay["stats"] := aStats
 				let aDay["quests"] := aQuests
 				let aData[sDate] := aDay
 
-				Sv_Destruct sQuestList
 				let aStats := Ar_Null
 				let aQuests := Ar_Null
 				let aDay := Ar_Null

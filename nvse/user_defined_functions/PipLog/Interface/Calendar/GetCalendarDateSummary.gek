@@ -9,8 +9,8 @@ begin function { string_var sDate }
 
 	ref ParseStorageDateToComponentsUDF = CompileScript "PipLog\DateTime\ParseStorageDateToComponents.gek"
 	ref GetEventsForDateUDF = CompileScript "PipLog\Event\GetEventsForDate.gek"
+	ref GetPlayerQuestIdsForDateUDF = CompileScript "PipLog\Stats\GetPlayerQuestIdsForDate.gek"
 	ref GetPlayerStatValuesForDateUDF = CompileScript "PipLog\Stats\GetPlayerStatValuesForDate.gek"
-	ref GetStorageDateStringUDF = CompileScript "PipLog\DateTime\GetStorageDateString.gek"
 	ref GetVerbalDateStringUDF = CompileScript "PipLog\DateTime\GetVerbalDateString.gek"
 	ref GetEventDisplayNameUDF = CompileScript "PipLog\Interface\Event\GetEventDisplayName.gek"
 
@@ -61,59 +61,64 @@ begin function { string_var sDate }
 
 	; Quests
 
-	array_var aQuestStats = Player.AuxStringMapArrayGetAsArray "PLC_aPlayerQuestStats"
+	array_var aQuestIds = (Call GetPlayerQuestIdsForDateUDF aDate)
 
-	if eval (Ar_Size aQuestStats) != -1
-		string_var sDate = (Call GetStorageDateStringUDF aDate)
+	foreach (array_var aElement) <- aQuestIds
+		string_var sQuestId = aElement["value"]
 
-		if eval (Ar_HasKey aQuestStats, sDate)
-			string_var sQuestList = aQuestStats[sDate]
-			array_var aQuestIds = Sv_Split sQuestList, ","
-
-			foreach (array_var aElement) <- aQuestIds
-				string_var sQuestId = aElement["value"]
-
-				if eval !bHasQuests
-					let sResult += "%rQuests:%r"
-					let bHasQuests := 1
-				endif
-
-				ref rQuest = (StringToRef sQuestId)
-
-				if eval (IsFormValid rQuest)
-					string_var sQuestName = GetName rQuest
-					let sResult += $sQuestName
-					let sResult += "%r"
-					Sv_Destruct sQuestName
-				else
-					let sResult += $sQuestId
-					let sResult += "%r"
-				endif
-			loop
-
-			Sv_Destruct sQuestList
-			let aQuestIds := Ar_Null
+		if eval !bHasQuests
+			let sResult += "%rQuests:%r"
+			let bHasQuests := 1
 		endif
 
-		Sv_Destruct sDate
-	endif
+		ref rQuest = (StringToRef sQuestId)
 
-	let aQuestStats := Ar_Null
+		if eval (IsFormValid rQuest)
+			string_var sQuestName = GetName rQuest
+			let sResult += $sQuestName
+			let sResult += "%r"
+			Sv_Destruct sQuestName
+		else
+			let sResult += $sQuestId
+			let sResult += "%r"
+		endif
+
+		Sv_Destruct sQuestId
+	loop
+
+	let aQuestIds := Ar_Null
 
 	; Misc Stats
 
 	array_var aStats = (Call GetPlayerStatValuesForDateUDF aDate)
+	array_var aSummaryStats = GetINISection "Summary" "PipLog\stats\stats.ini"
+	short iSummaryIndex = 0
+	short iNumSummaryStats = Ar_Size aSummaryStats
 
-	foreach array_var aElement <- aStats
-		string_var sStatCode = aElement["key"]
-		short iNumStatEvents = aElement["value"]
+	while iSummaryIndex < iNumSummaryStats
+		string_var sSummaryIndex = $iSummaryIndex
+		string_var sStatCode = ""
+
+		if eval (Ar_HasKey aSummaryStats, sSummaryIndex)
+			let sStatCode := aSummaryStats[sSummaryIndex]
+		elseif eval (Ar_HasKey aSummaryStats, iSummaryIndex)
+			let sStatCode := aSummaryStats[iSummaryIndex]
+		endif
+
+		if eval ((Sv_Length sStatCode) == 0) || !(Ar_HasKey aStats, sStatCode)
+			Sv_Destruct sSummaryIndex, sStatCode
+			let iSummaryIndex += 1
+			continue
+		endif
+
+		short iNumStatEvents = aStats[sStatCode]
 
 		if eval !bHasStats
 			let sResult += "%rStats:%r"
 			let bHasStats := 1
 		endif
 
-		string_var sIniKey = Sv_Construct "Stats:%z" sStatCode
+		string_var sIniKey = Sv_Construct "Localization:%z" sStatCode
 		string_var sStatName = GetINIString ($sIniKey) "PipLog\stats\stats.ini"
 
 		let sResult += $sStatName
@@ -122,6 +127,9 @@ begin function { string_var sDate }
 		let sResult += "%r"
 
 		Sv_Destruct sStatCode, sIniKey, sStatName
+		Sv_Destruct sSummaryIndex
+
+		let iSummaryIndex += 1
 	loop
 
 	; Return
@@ -136,5 +144,6 @@ begin function { string_var sDate }
 
 	let aDate := Ar_Null
 	let aStats := Ar_Null
+	let aSummaryStats := Ar_Null
 
 end
