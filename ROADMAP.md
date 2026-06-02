@@ -31,5 +31,6 @@ Original script files have been dumped to `reference/` directory.
 - [x] Add YSI icon support for all mod buttons
 - [x] Restyle selected event details to use same font size as calendar view
 - [x] Enhance event listing (include system/player, improve formatting)
-- [ ] Add description for birthday event, include player age
+- [x] Add description for birthday event, include player age
+- [x] Check if stat tracking actually works
 - [ ] Add content placeholders ("No events." and "No journal entries.")
