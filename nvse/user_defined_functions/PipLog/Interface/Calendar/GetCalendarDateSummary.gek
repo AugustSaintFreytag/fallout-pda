@@ -91,17 +91,34 @@ begin function { string_var sDate }
 	; Misc Stats
 
 	array_var aStats = (Call GetPlayerStatValuesForDateUDF aDate)
+	array_var aSummaryStats = GetINISection "Summary" "PipLog\stats\stats.ini"
+	short iSummaryIndex = 0
+	short iNumSummaryStats = Ar_Size aSummaryStats
 
-	foreach array_var aElement <- aStats
-		string_var sStatCode = aElement["key"]
-		short iNumStatEvents = aElement["value"]
+	while iSummaryIndex < iNumSummaryStats
+		string_var sSummaryIndex = $iSummaryIndex
+		string_var sStatCode = ""
+
+		if eval (Ar_HasKey aSummaryStats, sSummaryIndex)
+			let sStatCode := aSummaryStats[sSummaryIndex]
+		elseif eval (Ar_HasKey aSummaryStats, iSummaryIndex)
+			let sStatCode := aSummaryStats[iSummaryIndex]
+		endif
+
+		if eval ((Sv_Length sStatCode) == 0) || !(Ar_HasKey aStats, sStatCode)
+			Sv_Destruct sSummaryIndex, sStatCode
+			let iSummaryIndex += 1
+			continue
+		endif
+
+		short iNumStatEvents = aStats[sStatCode]
 
 		if eval !bHasStats
 			let sResult += "%rStats:%r"
 			let bHasStats := 1
 		endif
 
-		string_var sIniKey = Sv_Construct "Stats:%z" sStatCode
+		string_var sIniKey = Sv_Construct "Localization:%z" sStatCode
 		string_var sStatName = GetINIString ($sIniKey) "PipLog\stats\stats.ini"
 
 		let sResult += $sStatName
@@ -110,6 +127,9 @@ begin function { string_var sDate }
 		let sResult += "%r"
 
 		Sv_Destruct sStatCode, sIniKey, sStatName
+		Sv_Destruct sSummaryIndex
+
+		let iSummaryIndex += 1
 	loop
 
 	; Return
@@ -124,5 +144,6 @@ begin function { string_var sDate }
 
 	let aDate := Ar_Null
 	let aStats := Ar_Null
+	let aSummaryStats := Ar_Null
 
 end
