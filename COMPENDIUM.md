@@ -110,6 +110,14 @@ if iSize == -1
 endif
 ```
 
+#### String Maps
+
+String map array types can be initialized with the `Ar_Map` convenience function.
+
+```gek
+array_var aEventParams = Ar_Map "date"::sDate, "name":"My Event"
+```
+
 #### Foreach Loop
 
 A foreach loop will *always* produce an `array_var aEntry`, a string map with keys "key" and "value".
