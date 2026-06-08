@@ -21,14 +21,14 @@ begin function { array_var aCurrentDate }
 	; Main
 
 	string_var sCurrentDate = (Call GetStorageDateStringUDF aCurrentDate)
-	string_var sLastReminderCheckDate = Player.AuxiliaryVariableGetString "*PLC_sLastReminderCheckDate"
+	string_var sLastReminderCheckDate = Player.AuxiliaryVariableGetString "PLC_sLastReminderCheckDate"
 
 	if eval sLastReminderCheckDate == sCurrentDate
 		Sv_Destruct sCurrentDate, sLastReminderCheckDate
 		return
 	endif
 
-	Player.AuxiliaryVariableSetString "*PLC_sLastReminderCheckDate" ($sCurrentDate)
+	Player.AuxiliaryVariableSetString "PLC_sLastReminderCheckDate" ($sCurrentDate)
 
 	array_var aEvents = (Call GetEventsForDateUDF aCurrentDate)
 

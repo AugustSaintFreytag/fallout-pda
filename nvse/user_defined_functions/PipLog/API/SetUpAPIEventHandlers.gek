@@ -45,7 +45,7 @@ begin function {}
 	; Debug
 
 	SetEventHandler "PLC_RearmEventReminders" (begin function {} 
-		Player.AuxiliaryVariableErase "*PLC_sLastReminderCheckDate"
+		Player.AuxiliaryVariableErase "PLC_sLastReminderCheckDate"
 	end)
 
 end
