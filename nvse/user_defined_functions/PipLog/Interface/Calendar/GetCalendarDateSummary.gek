@@ -92,21 +92,25 @@ begin function { string_var sDate }
 
 	array_var aStats = (Call GetPlayerStatValuesForDateUDF aDate)
 	array_var aSummaryStats = GetINISection "Summary" "PipLog\stats\stats.ini"
+	
 	short iSummaryIndex = 0
 	short iNumSummaryStats = Ar_Size aSummaryStats
 
 	while iSummaryIndex < iNumSummaryStats
-		string_var sSummaryIndex = $iSummaryIndex
-		string_var sStatCode = ""
+		string_var sSummaryKey = Sv_Construct "Summary:%g" iSummaryIndex
+		short iStatCode = GetINIFloat ($sSummaryKey) "PipLog\stats\stats.ini"
+		string_var sStatCode = $iStatCode
+		string_var sRawSummaryValue = ""
+		short bHasSummaryIndex = Ar_HasKey aSummaryStats, iSummaryIndex
 
-		if eval (Ar_HasKey aSummaryStats, sSummaryIndex)
-			let sStatCode := aSummaryStats[sSummaryIndex]
-		elseif eval (Ar_HasKey aSummaryStats, iSummaryIndex)
-			let sStatCode := aSummaryStats[iSummaryIndex]
+		if eval bHasSummaryIndex
+			let sRawSummaryValue := aSummaryStats[iSummaryIndex]
 		endif
 
-		if eval ((Sv_Length sStatCode) == 0) || !(Ar_HasKey aStats, sStatCode)
-			Sv_Destruct sSummaryIndex, sStatCode
+		short bHasDailyStat = Ar_HasKey aStats, sStatCode
+
+		if eval ((Sv_Length sStatCode) == 0) || !bHasDailyStat
+			Sv_Destruct sSummaryKey, sStatCode, sRawSummaryValue
 			let iSummaryIndex += 1
 			continue
 		endif
@@ -126,8 +130,7 @@ begin function { string_var sDate }
 		let sResult += $iNumStatEvents
 		let sResult += "%r"
 
-		Sv_Destruct sStatCode, sIniKey, sStatName
-		Sv_Destruct sSummaryIndex
+		Sv_Destruct sSummaryKey, sStatCode, sRawSummaryValue, sIniKey, sStatName
 
 		let iSummaryIndex += 1
 	loop
