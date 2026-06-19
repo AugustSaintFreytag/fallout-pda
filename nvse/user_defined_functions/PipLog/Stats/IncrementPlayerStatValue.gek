@@ -20,10 +20,10 @@ begin function { short iStatCode, short iUpdatedValue }
 	if eval (Ar_HasKey aStats, sStatCode)
 		short iPreviousValue = aStats[sStatCode]
 		let aStats[sStatCode] := (iPreviousValue + iUpdatedValue)
-		PrintC "Incrementing existing player stat value, code %g, value %g -> %g." iStatCode iPreviousValue (aStats[sStatCode])
+		; PrintC "Incrementing existing player stat value, code %g, value %g -> %g." iStatCode iPreviousValue (aStats[sStatCode])
 	else
 		let aStats[sStatCode] := iUpdatedValue
-		PrintC "Writing new player stat value for date, code %g, value %g -> %g." iStatCode 0 (aStats[sStatCode])
+		; PrintC "Writing new player stat value for date, code %g, value %g -> %g." iStatCode 0 (aStats[sStatCode])
 	endif
 
 	Call SetPlayerStatValuesForDateUDF aDate aStats

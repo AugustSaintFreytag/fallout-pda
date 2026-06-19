@@ -1,0 +1,9 @@
+begin function {}
+
+	; Clears all transient global event storage before rebuilding computed and system events.
+	; Player-created event storage is save-persistent and intentionally left untouched.
+
+	Player.AuxStringMapArrayDestroy "*PLC_aGlobalEventsById"
+	Player.AuxStringMapArrayDestroy "*PLC_aGlobalEventsByDate"
+
+end
